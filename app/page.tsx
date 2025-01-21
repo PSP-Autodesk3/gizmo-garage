@@ -7,7 +7,7 @@
 import { useEffect, useState } from 'react';
 
 export default function Home() {
-  const client_id = process.env.AUTODESK_CLIENT_ID;
+  const client_id = process.env.NEXT_PUBLIC_AUTODESK_CLIENT_ID;
   const [loading, setLoading] = useState(true);
   // const router = useRouter();
 
