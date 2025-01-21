@@ -28,7 +28,7 @@ export default function Home() {
   // Displays once page has loaded
   return (
     <div>
-        <a href={`https://developer.api.autodesk.com/authentication/v2/authorize?response_type=code&client_id=${client_id}&redirect_uri=http%3A%2F%2Flocalhost%3A3000&nonce=1232132&scope=data:read&prompt=login&state=12321321&code_challenge=fePr9SDGJIToHximLHTRokkzkfzZksznrDIx9bexsto&code_challenge_method=S256`}>Login through AutoDesk</a>
+        <a href={`https://developer.api.autodesk.com/authentication/v2/authorize?response_type=code&client_id=${client_id}&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fredirect&nonce=1232132&scope=data:read&prompt=login&state=12321321&code_challenge=fePr9SDGJIToHximLHTRokkzkfzZksznrDIx9bexsto&code_challenge_method=S256`}>Login through AutoDesk</a>
     </div>
   );
 }
