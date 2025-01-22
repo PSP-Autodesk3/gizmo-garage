@@ -43,14 +43,14 @@ export default function Home() {
                 console.error('Error response:', data);
             } else {
                 console.log('Access token data:', data);
+                sessionStorage.setItem('token', data.access_token);
             }
     
             console.log(response);
         }
 
         fetchToken();
-
-        //router.push("/");
+        router.push("/");
     }, [code, basicAuth])
 
     return (
