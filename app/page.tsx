@@ -27,28 +27,13 @@ export default function Home() {
       setToken(true);
     }
     if (user) {
-      async function GenerateCodeChallenge() {
-        // https://aps.autodesk.com/en/docs/oauth/v2/tutorials/code-challenge/
-        
-        // Dependency: Node.js crypto module
-        // https://nodejs.org/api/crypto.html#crypto_crypto
-        function base64URLEncode(str: any) {
-          return str.toString('base64')
-              .replace(/\+/g, '-')
-              .replace(/\//g, '_')
-              .replace(/=/g, '');
-        }
-        var code_verifier = base64URLEncode(crypto.randomBytes(32));
-        sessionStorage.setItem('code_verifier', code_verifier);
-  
-        // Dependency: Node.js crypto module
-        // https://nodejs.org/api/crypto.html#crypto_crypto
-        function sha256(buffer: any) {
-          return crypto.createHash('sha256').update(buffer).digest();
-        }
-        setCodeChallenge(base64URLEncode(sha256(code_verifier)));
+      const fetchCode = async () => {
+        const response = await fetch("/api/auth");
+        const data = await response.json();
+        setCodeChallenge(data.code_challenge)
+        sessionStorage.setItem('code_verifier', data.code_verifier);
       }
-      GenerateCodeChallenge();
+      fetchCode();
     }
   }, []);
 

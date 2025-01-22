@@ -7,7 +7,6 @@ export default function Home() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const code = searchParams.get("code");
-    const state = searchParams.get("state");
     const client_id = process.env.NEXT_PUBLIC_AUTODESK_CLIENT_ID;
     const client_secret = process.env.NEXT_PUBLIC_AUTODESK_CLIENT_SECRET;
     const basicAuth = btoa(`${client_id}:${client_secret}`);
