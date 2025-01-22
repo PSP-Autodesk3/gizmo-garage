@@ -23,6 +23,9 @@ export default function Home() {
 
   useEffect(() => {
     console.log("Token", sessionStorage.getItem('token'));
+    if (sessionStorage.getItem('token') != null && sessionStorage.getItem('token') != '') {
+      setToken(true);
+    }
     if (user) {
       async function GenerateCodeChallenge() {
         // https://aps.autodesk.com/en/docs/oauth/v2/tutorials/code-challenge/
@@ -44,15 +47,15 @@ export default function Home() {
           return crypto.createHash('sha256').update(buffer).digest();
         }
         setCodeChallenge(base64URLEncode(sha256(code_verifier)));
-  
-          // Logic needs updating to ensure validity of token
-        if (sessionStorage.getItem('token')) {
-          setToken(true);
-        }
       }
       GenerateCodeChallenge();
     }
   }, []);
+
+  const handleSignOut = async (e: any) => {
+    sessionStorage.setItem('token', '');
+    signOut(auth);
+  }
 
   // Displays if the page is still loading
   if (loading) {
@@ -74,10 +77,11 @@ export default function Home() {
   }
 
   // Displays if the user doesn't have a valid token
+  console.log(token);
   if (!token) {
     return (
       <div className="flex flex-col">
-        <button onClick={() => signOut(auth)}>Sign Out</button>
+        <button onClick={() => handleSignOut(auth)}>Sign Out</button>
         <Link href={`https://developer.api.autodesk.com/authentication/v2/authorize?response_type=code&client_id=${clientID}&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fredirect&nonce=1232132&scope=data:read&prompt=login&state=12321321&code_challenge=${codeChallenge}&code_challenge_method=S256`}>Login through AutoDesk</Link>
       </div>
     )
@@ -86,7 +90,7 @@ export default function Home() {
   // Displays in all information is valid
   return (
     <div>
-      <button onClick={() => signOut(auth)}>Sign Out</button>
+      <button onClick={() => handleSignOut(auth)}>Sign Out</button>
       <p>Logged in and successfully validated</p>
     </div>
   )
