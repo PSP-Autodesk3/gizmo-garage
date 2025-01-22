@@ -5,6 +5,7 @@
 // import Link from 'next/link';
 // import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import crypto from 'crypto';
 
 export default function Home() {
   const clientID = process.env.NEXT_PUBLIC_AUTODESK_CLIENT_ID;
@@ -13,10 +14,31 @@ export default function Home() {
   // const router = useRouter();
 
   useEffect(() => {
-    // GENERATE CODE CHALLENGE
+    async function GenerateCodeChallenge() {
+      // https://aps.autodesk.com/en/docs/oauth/v2/tutorials/code-challenge/
+      
+      // Dependency: Node.js crypto module
+      // https://nodejs.org/api/crypto.html#crypto_crypto
+      function base64URLEncode(str: any) {
+        return str.toString('base64')
+            .replace(/\+/g, '-')
+            .replace(/\//g, '_')
+            .replace(/=/g, '');
+      }
+      var code_verifier = base64URLEncode(crypto.randomBytes(32));
+      sessionStorage.setItem('code_verifier', code_verifier);
 
-    setLoading(false);
-  });
+      // Dependency: Node.js crypto module
+      // https://nodejs.org/api/crypto.html#crypto_crypto
+      function sha256(buffer: any) {
+        return crypto.createHash('sha256').update(buffer).digest();
+      }
+      setCodeChallenge(base64URLEncode(sha256(code_verifier)));
+
+      setLoading(false);
+    }
+    GenerateCodeChallenge();
+  }, []);
 
   // Displays if the page is still loading
   if (loading) {
