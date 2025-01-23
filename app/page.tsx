@@ -1,13 +1,7 @@
 "use client";
 
-// Useful imports (Only uncomment if using to avoid build errors)
-//
-// import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-
-// For Code Challenge
-import crypto from 'crypto';
 
 // For Firebase Login Auth
 import { auth } from '@/app/firebase/config';
@@ -19,10 +13,8 @@ export default function Home() {
   const [codeChallenge, setCodeChallenge] = useState();
   const [user, loading] = useAuthState(auth);
   const [token, setToken] = useState(false);
-  // const router = useRouter();
 
   useEffect(() => {
-    console.log("Token", sessionStorage.getItem('token'));
     if (sessionStorage.getItem('token') != null && sessionStorage.getItem('token') != '') {
       setToken(true);
     }
@@ -35,6 +27,15 @@ export default function Home() {
       }
       fetchCode();
     }
+    console.log("Fetching data...");
+    const fetchData = async () => {
+      const data = await fetch("https://developer.api.autodesk.com/project/v1/hubs", {
+        method: "GET",
+        headers: { Authorization: `Bearer ${sessionStorage.getItem("token")}` }
+      });
+      console.log("Data:", data.json());
+    }
+    fetchData();
   }, []);
 
   const handleSignOut = async (e: any) => {
@@ -62,7 +63,6 @@ export default function Home() {
   }
 
   // Displays if the user doesn't have a valid token
-  console.log(token);
   if (!token) {
     return (
       <div className="flex flex-col">
@@ -72,7 +72,7 @@ export default function Home() {
     )
   }
 
-  // Displays in all information is valid
+  // Displays if all information is valid
   return (
     <div>
       <button onClick={() => handleSignOut(auth)}>Sign Out</button>
