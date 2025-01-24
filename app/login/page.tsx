@@ -45,22 +45,26 @@ export default function Home() {
   }
 
   return (
-    <div>
-        <p>Login</p>
+    <>
+        <div className="bg-slate-900 p-4 w-[40%] m-auto rounded-lg shadow-lg mt-16">
+        <h1 className="text-3xl text-center p-2 font-semibold">Login</h1>
         <form onSubmit={(handleSignIn)}>
-            <label htmlFor="email">Email</label>
+            <div className="py-2">
+            <label className="text-xl" htmlFor="email">Email:</label>
             <input
-                className="text-black"
+                className="text-white w-full p-2 my-2 rounded-lg bg-slate-800"
                 type="email"
-                placeholder="email"
+                placeholder="Email Address"
                 name="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
             />
-            <label htmlFor="password">Password</label>
+            </div>
+            <div className="py-2">
+            <label htmlFor="password" className="text-xl">Password:</label>
             <input
-                className="text-black"
+                className="text-white w-full bg-slate-800 p-2 my-2 rounded-lg"
                 type="password"
                 placeholder="Password"
                 name="password"
@@ -68,9 +72,11 @@ export default function Home() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
             />
-            <button type="submit">Sign in</button>
+            </div>
+            <button type="submit" className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">Sign in</button>
             {error && <p>{error}</p>}
         </form>
-    </div>
+        </div>
+    </>
   );
 }
