@@ -29,11 +29,17 @@ export default function Home() {
     }
     console.log("Fetching data...");
     const fetchData = async () => {
-      const data = await fetch("https://developer.api.autodesk.com/project/v1/hubs", {
+      let data = await fetch("https://developer.api.autodesk.com/project/v1/hubs", {
         method: "GET",
         headers: { Authorization: `Bearer ${sessionStorage.getItem("token")}` }
       });
       console.log("Data:", data.json());
+
+      data = await fetch("https://developer.api.autodesk.com/oss/v2/buckets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${sessionStorage.getItem("token")}` },
+        body: JSON.stringify({ bucketKey: "myBucket", policyKey: "persistent" })
+      })
     }
     fetchData();
   }, []);
