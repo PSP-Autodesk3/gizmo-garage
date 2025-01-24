@@ -55,9 +55,18 @@ export default function Home() {
   // Displays if the user is not logged into their account
   if (!user) {
     return (
-      <div>
-        <Link href="/login">Log in to your account</Link>
-      </div>
+      <>
+        <div className="bg-slate-900 p-4 w-[40%] m-auto rounded-lg shadow-lg mt-16">
+            <div className="flex flex-col items-center space-y-6">
+                <h1 className="text-4xl text-center font-semibold">
+                    Gizmo Garage
+                </h1>
+                <Link href="/login" className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">
+                    Sign in to your account
+                </Link>
+            </div>
+        </div>
+      </>
     )
   }
 
@@ -65,9 +74,9 @@ export default function Home() {
   console.log(token);
   if (!token) {
     return (
-      <div className="flex flex-col">
-        <button onClick={() => handleSignOut(auth)}>Sign Out</button>
-        <Link href={`https://developer.api.autodesk.com/authentication/v2/authorize?response_type=code&client_id=${clientID}&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fredirect&nonce=1232132&scope=data:read&prompt=login&state=12321321&code_challenge=${codeChallenge}&code_challenge_method=S256`}>Login through AutoDesk</Link>
+      <div className="float-right my-2 mx-4 space-x-4">
+        <Link href={`https://developer.api.autodesk.com/authentication/v2/authorize?response_type=code&client_id=${clientID}&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fredirect&nonce=1232132&scope=data:read&prompt=login&state=12321321&code_challenge=${codeChallenge}&code_challenge_method=S256`} className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">Login through AutoDesk</Link>
+        <button onClick={() => handleSignOut(auth)} className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">Sign Out</button>
       </div>
     )
   }
