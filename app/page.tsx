@@ -1,13 +1,8 @@
 "use client";
 
-// Useful imports (Only uncomment if using to avoid build errors)
-//
-// import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-
-// For Code Challenge
-import crypto from 'crypto';
 
 // For Firebase Login Auth
 import { auth } from '@/app/firebase/config';
@@ -19,7 +14,7 @@ export default function Home() {
   const [codeChallenge, setCodeChallenge] = useState();
   const [user, loading] = useAuthState(auth);
   const [token, setToken] = useState(false);
-  // const router = useRouter();
+  const router = useRouter();
 
   useEffect(() => {
     console.log("Token", sessionStorage.getItem('token'));
@@ -42,22 +37,32 @@ export default function Home() {
     signOut(auth);
   }
 
+  const handleAccountSettings = async (e: any) => {
+    console.log("Pushed");
+    router.push("/account-settings");
+    console.log("Pushed");
+  }
+
   // Displays if the page is still loading
   if (loading) {
     // Can be used for lazy loading?
     return (
-      <div>
-        <p>Loading...</p>
-      </div>
+      <>
+        <div>
+          <p>Loading...</p>
+        </div>
+      </>
     )
   }
   
   // Displays if the user is not logged into their account
   if (!user) {
     return (
-      <div>
-        <Link href="/login">Log in to your account</Link>
-      </div>
+      <>
+        <div>
+          <Link href="/login">Log in to your account</Link>
+        </div>
+      </>
     )
   }
 
@@ -65,18 +70,24 @@ export default function Home() {
   console.log(token);
   if (!token) {
     return (
-      <div className="flex flex-col">
-        <button onClick={() => handleSignOut(auth)}>Sign Out</button>
-        <Link href={`https://developer.api.autodesk.com/authentication/v2/authorize?response_type=code&client_id=${clientID}&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fredirect&nonce=1232132&scope=data:read&prompt=login&state=12321321&code_challenge=${codeChallenge}&code_challenge_method=S256`}>Login through AutoDesk</Link>
-      </div>
+      <>
+        <div className="flex flex-col">
+          <button onClick={() => handleSignOut(auth)}>Sign Out</button>
+          <button onClick={() => handleAccountSettings(auth)}>Account Settings</button>
+          <Link href={`https://developer.api.autodesk.com/authentication/v2/authorize?response_type=code&client_id=${clientID}&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fredirect&nonce=1232132&scope=data:read&prompt=login&state=12321321&code_challenge=${codeChallenge}&code_challenge_method=S256`}>Login through AutoDesk</Link>
+        </div>
+      </>
     )
   }
 
   // Displays in all information is valid
   return (
-    <div>
-      <button onClick={() => handleSignOut(auth)}>Sign Out</button>
-      <p>Logged in and successfully validated</p>
-    </div>
+    <>
+      <div className="flex flex-col">
+        <button onClick={() => handleSignOut(auth)}>Sign Out</button>
+        <button onClick={() => handleAccountSettings(auth)}>Account Settings</button>
+        <p>Logged in and successfully validated</p>
+      </div>
+    </>
   )
 }
