@@ -50,28 +50,28 @@ export default function Home() {
         <h1 className="text-3xl text-center p-2 font-semibold">Login</h1>
         <form onSubmit={(handleSignIn)}>
             <div className="py-2">
-            <label className="text-xl" htmlFor="email">Email:</label>
-            <input
-                className="text-white w-full p-2 my-2 rounded-lg bg-slate-800"
-                type="email"
-                placeholder="Email Address"
-                name="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-            />
+              <label className="text-xl" htmlFor="email">Email:</label>
+              <input
+                  className="text-white w-full p-2 my-2 rounded-lg bg-slate-800"
+                  type="email"
+                  placeholder="Email Address"
+                  name="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+              />
             </div>
             <div className="py-2">
-            <label htmlFor="password" className="text-xl">Password:</label>
-            <input
-                className="text-white w-full bg-slate-800 p-2 my-2 rounded-lg"
-                type="password"
-                placeholder="Password"
-                name="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-            />
+              <label htmlFor="password" className="text-xl">Password:</label>
+              <input
+                  className="text-white w-full bg-slate-800 p-2 my-2 rounded-lg"
+                  type="password"
+                  placeholder="Password"
+                  name="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+              />
             </div>
             <button type="submit" className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">Sign in</button>
             {error && <p>{error}</p>}

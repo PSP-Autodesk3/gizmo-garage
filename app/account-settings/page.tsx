@@ -5,7 +5,6 @@ import { signOut } from 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import Link from 'next/link';
 import { useState } from 'react';
-import { imageConfigDefault } from 'next/dist/shared/lib/image-config';
 
 // https://www.typescriptlang.org/docs/handbook/2/objects.html
 interface Profile {
@@ -19,6 +18,7 @@ interface Profile {
 export default function Settings() {
   const [user, loading] = useAuthState(auth);
   const [details, setDetails] = useState<Profile | null>(null);
+  const [email, setEmail] = useState('');
   
   const handleSignOut = async (e: any) => {
     sessionStorage.setItem('token', '');
@@ -80,6 +80,24 @@ export default function Settings() {
         ) : (
           <p>Loading user details...</p>
         )}
+      </div>
+      <p>Gizmo Garage</p>
+      <div id="firebase-settings">
+        <form>
+          <div className="py-2">
+            <label htmlFor="email" className="text-xl">Email:</label>
+            <input
+              className="text-white w-full bg-slate-800 p-2 my-2 rounded-lg"
+              type="email"
+              placeholder="Email"
+              name="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+        </form>
+        <Link href="">Reset Password</Link>
       </div>
     </>
   )

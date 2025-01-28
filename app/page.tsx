@@ -101,10 +101,26 @@ export default function Home() {
   // Displays if all information is valid
   return (
     <>
-      <div className="flex flex-col">
-        <button onClick={() => handleSignOut(auth)}>Sign Out</button>
-        <button onClick={() => handleAccountSettings(auth)}>Account Settings</button>
-        <p>Logged in and successfully validated</p>
+      <div>
+        <div id="side-bar">
+          <img src="source" alt="Logo"/>
+          <p>Gizmo Garage</p>
+        </div>
+        <div id="filters">
+
+        </div>
+        <div id="options">
+          <button onClick={() => handleSignOut(auth)}>Sign Out</button>
+          <button onClick={() => handleAccountSettings(auth)}>Account Settings</button>
+        </div>
+      </div>
+      <div id="data">
+        <div id="folders">
+
+        </div>
+        <div id="files">
+
+        </div>
       </div>
     </>
   )
