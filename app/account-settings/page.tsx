@@ -13,7 +13,7 @@ interface Profile {
   lastName: string;
   emailId: string;
   userName: string;
-  profileImages: string;
+  profileImages: { [key: string]: string }; // Fix TS7015 by replacing type "string" with a defined KV pair of a string. - AJ Ref: https://stackoverflow.com/a/40358512
 }
 
 export default function Settings() {
