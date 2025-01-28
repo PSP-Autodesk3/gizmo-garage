@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
@@ -13,6 +14,7 @@ export default function Home() {
   const [codeChallenge, setCodeChallenge] = useState();
   const [user, loading] = useAuthState(auth);
   const [token, setToken] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     if (sessionStorage.getItem('token') != null && sessionStorage.getItem('token') != '') {
@@ -49,13 +51,21 @@ export default function Home() {
     signOut(auth);
   }
 
+  const handleAccountSettings = async (e: any) => {
+    console.log("Pushed");
+    router.push("/account-settings");
+    console.log("Pushed");
+  }
+
   // Displays if the page is still loading
   if (loading) {
     // Can be used for lazy loading?
     return (
-      <div>
-        <p>Loading...</p>
-      </div>
+      <>
+        <div>
+          <p>Loading...</p>
+        </div>
+      </>
     )
   }
   
@@ -83,15 +93,19 @@ export default function Home() {
       <div className="float-right my-2 mx-4 space-x-4">
         <Link href={`https://developer.api.autodesk.com/authentication/v2/authorize?response_type=code&client_id=${clientID}&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fredirect&nonce=1232132&scope=data:read&prompt=login&state=12321321&code_challenge=${codeChallenge}&code_challenge_method=S256`} className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">Login through AutoDesk</Link>
         <button onClick={() => handleSignOut(auth)} className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">Sign Out</button>
+          <button onClick={() => handleAccountSettings(auth)}>Account Settings</button>
       </div>
     )
   }
 
   // Displays if all information is valid
   return (
-    <div>
-      <button onClick={() => handleSignOut(auth)}>Sign Out</button>
-      <p>Logged in and successfully validated</p>
-    </div>
+    <>
+      <div className="flex flex-col">
+        <button onClick={() => handleSignOut(auth)}>Sign Out</button>
+        <button onClick={() => handleAccountSettings(auth)}>Account Settings</button>
+        <p>Logged in and successfully validated</p>
+      </div>
+    </>
   )
 }
