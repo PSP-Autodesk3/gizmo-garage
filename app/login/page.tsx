@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { auth } from '@/app/firebase/config';
 import { useRouter } from 'next/navigation';
-import { setegid } from 'process';
+import Link from 'next/link';
 
 export default function Home() {
   const [email, setEmail] = useState('');
@@ -46,7 +46,7 @@ export default function Home() {
 
   return (
     <>
-        <div className="bg-slate-900 p-4 w-[40%] m-auto rounded-lg shadow-lg mt-16">
+      <div className="bg-slate-900 p-4 w-[40%] m-auto rounded-lg shadow-lg mt-16">
         <h1 className="text-3xl text-center p-2 font-semibold">Login</h1>
         <form onSubmit={(handleSignIn)}>
             <div className="py-2">
@@ -76,7 +76,8 @@ export default function Home() {
             <button type="submit" className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">Sign in</button>
             {error && <p>{error}</p>}
         </form>
-        </div>
+        <Link href="/register">Not a Member?</Link>
+      </div>
     </>
   );
 }
