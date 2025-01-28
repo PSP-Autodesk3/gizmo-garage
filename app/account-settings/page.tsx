@@ -5,6 +5,7 @@ import { signOut } from 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import Link from 'next/link';
 import { useState } from 'react';
+import { imageConfigDefault } from 'next/dist/shared/lib/image-config';
 
 // https://www.typescriptlang.org/docs/handbook/2/objects.html
 interface Profile {
@@ -12,6 +13,7 @@ interface Profile {
   lastName: string;
   emailId: string;
   userName: string;
+  profileImages: string;
 }
 
 export default function Settings() {
@@ -33,7 +35,13 @@ export default function Settings() {
     });
     setDetails(await response.json());
   }
-  fetchData();
+  if (!details) {
+    fetchData();
+  }
+  else {
+    console.log(details.profileImages["sizeX80"]);
+    console.log(details);
+  }
 
   // Returns if loading
   if (loading) {
@@ -64,6 +72,7 @@ export default function Settings() {
         <button onClick={() => handleSignOut(auth)}>Sign Out</button>
         {details ? (
           <div>
+            <img src={(details.profileImages["sizeX80"])}></img>
             <p id="name">Name: {details.firstName} {details.lastName}</p>
             <p id="email">Email: {details.emailId}</p>
             <p id="username">Username: {details.userName}</p>
