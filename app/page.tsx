@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { Range } from 'react-range';
 
 // For Firebase Login Auth
 import { auth } from '@/app/firebase/config';
@@ -15,6 +16,10 @@ export default function Home() {
   const [user, loading] = useAuthState(auth);
   const [token, setToken] = useState(false);
   const router = useRouter();
+  const admin = useState(true);
+  const [query, updateQuery] = useState('');
+  const [tagQuery, updateTagQuery] = useState('');
+  const [values, setValues] = useState([20, 80]);
 
   useEffect(() => {
     if (sessionStorage.getItem('token') != null && sessionStorage.getItem('token') != '') {
@@ -101,17 +106,80 @@ export default function Home() {
   // Displays if all information is valid
   return (
     <>
-      <div>
-        <div id="side-bar">
-          <img src="source" alt="Logo"/>
-          <p>Gizmo Garage</p>
-        </div>
+      <div id="side-bar">
+        <img src="source" alt="Logo"/>
+        <p>Gizmo Garage</p>
         <div id="filters">
+          <div id="file-size-filter">
+            {/* https://www.geeksforgeeks.org/how-to-add-slider-in-next-js/ - Rob*/}
+            <Range
+              step={0.1}
+              min={0}
+              max={100}
+              values={values}
+              onChange={(newValues) => setValues(newValues)}
+              renderTrack={({ props, children }) => (
+                <div
+                  {...props}
+                  style={{
+                      ...props.style,
+                      height: '6px',
+                      width: '50%',
+                      backgroundColor: '#ccc'
+                  }}
+                >
+                  {children}
+                </div>
+              )}
+              renderThumb={({ props }) => (
+                <div
+                  {...props}
+                  style={{
+                    ...props.style,
+                    height: '42px',
+                    width: '42px',
+                    backgroundColor: '#999'
+                  }}
+                />
+              )}
+              onFinalChange={() => console.log(values)}
+            />
+          </div>
+          <div id="tags">
+            <label htmlFor="tag-search">Tags</label>
+            <input
+              type="text"
+              placeholder="Search"
+              name="tag-search"
+              value={tagQuery}
+              onChange={(e) => updateTagQuery(e.target.value)}
+            />
+            <div id="applied-tags">
 
+            </div>
+          </div>
+          <div id="search">
+            <label htmlFor="search=bar">Search</label>
+            <input
+              type="text"
+              placeholder="Search"
+              name="search"
+              value={query}
+              onChange={(e) => updateQuery(e.target.value)}
+            />
+          </div>
+          <button>Submit</button>
         </div>
         <div id="options">
-          <button onClick={() => handleSignOut(auth)}>Sign Out</button>
+          {admin ? (
+            <>
+              <button onClick={() => router.push("/users")}>Admin Settings</button>
+            </>
+          ) : (
+            <></>
+          )}
           <button onClick={() => handleAccountSettings(auth)}>Account Settings</button>
+          <button onClick={() => handleSignOut(auth)}>Sign Out</button>
         </div>
       </div>
       <div id="data">
