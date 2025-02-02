@@ -36,17 +36,13 @@ export default function Home() {
     }
     console.log("Fetching data...");
     const fetchData = async () => {
-      let data = await fetch("https://developer.api.autodesk.com/project/v1/hubs", {
-        method: "GET",
-        headers: { Authorization: `Bearer ${sessionStorage.getItem("token")}` }
-      });
-      console.log("Data:", data.json());
-
-      data = await fetch("https://developer.api.autodesk.com/oss/v2/buckets", {
+      let data = await fetch("https://developer.api.autodesk.com/oss/v2/buckets", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${sessionStorage.getItem("token")}` },
         body: JSON.stringify({ bucketKey: "myBucket", policyKey: "persistent" })
       })
+      let json = await data.json();
+      console.log(json);
     }
     fetchData();
   }, []);
@@ -96,7 +92,7 @@ export default function Home() {
   if (!token) {
     return (
       <div className="float-right my-2 mx-4 space-x-4">
-        <Link href={`https://developer.api.autodesk.com/authentication/v2/authorize?response_type=code&client_id=${clientID}&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fredirect&nonce=1232132&scope=data:read&prompt=login&state=12321321&code_challenge=${codeChallenge}&code_challenge_method=S256`} className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">Login through AutoDesk</Link>
+        <Link href={`https://developer.api.autodesk.com/authentication/v2/authorize?response_type=code&client_id=${clientID}&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fredirect&nonce=1232132&scope=${encodeURIComponent("data:read bucket:create bucket:read")}&prompt=login&state=12321321&code_challenge=${codeChallenge}&code_challenge_method=S256`} className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">Login through AutoDesk</Link>
         <button onClick={() => handleSignOut(auth)} className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">Sign Out</button>
           <button onClick={() => handleAccountSettings(auth)}>Account Settings</button>
       </div>

@@ -13,12 +13,6 @@ export default function Home() {
 
     useEffect(() => {
         // Process Auth
-
-        // DEBUG - REMOVE FROM FROM FINAL VERSION
-        console.log(client_id);
-        console.log(client_secret);
-        console.log(basicAuth);
-        console.log(code);
         
         const fetchToken = async () => {
             if (!code) {
@@ -33,7 +27,7 @@ export default function Home() {
             const response = await fetch('https://developer.api.autodesk.com/authentication/v2/token', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': `Basic ${basicAuth}` },
-                body: new URLSearchParams({ code: code, grant_type: "authorization_code", redirect_uri: "http://localhost:3000/redirect", code_verifier: code_verifier }),
+                body: new URLSearchParams({ code: code, grant_type: "authorization_code", redirect_uri: "http://localhost:3000/redirect", code_verifier: code_verifier, scope: "data:read data:write bucket:create bucket:read" }),
             });
 
             // CREATES AN ERROR UNTIL CODE CHALLENGE IS FIXED
