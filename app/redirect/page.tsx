@@ -26,8 +26,8 @@ export default function Home() {
             }
             const response = await fetch('https://developer.api.autodesk.com/authentication/v2/token', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': `Basic ${basicAuth}` },
-                body: new URLSearchParams({ code: code, grant_type: "authorization_code", redirect_uri: "http://localhost:3000/redirect", code_verifier: code_verifier, scope: "data:read data:write bucket:create bucket:read" }),
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': `Basic ${basicAuth}` , Accept: 'application/json'},
+                body: new URLSearchParams({ grant_type: "client_credentials", redirect_uri: "http://localhost:3000/redirect", scope: "data:read data:write bucket:create bucket:read" }),
             });
 
             // CREATES AN ERROR UNTIL CODE CHALLENGE IS FIXED
