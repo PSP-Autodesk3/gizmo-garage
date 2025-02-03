@@ -7,23 +7,28 @@ import { auth } from '@/app/firebase/config';
 
 
 export default function Filters() {
-    const [values, setValues] = useState([20, 80]);
-    const [tagQuery, updateTagQuery] = useState('');
-    const [query, updateQuery] = useState('');
-    const router = useRouter();
-    const admin = useState(true);
+  const [values, setValues] = useState([20, 80]);
+  const [tagQuery, updateTagQuery] = useState('');
+  const [query, updateQuery] = useState('');
+  const router = useRouter();
+  const admin = useState(true);
 
-      // Displays if all information is valid
-       const handleSignOut = async (e: any) => {
-          sessionStorage.setItem('token', '');
-          signOut(auth);
-        }
-      
-        const handleAccountSettings = async (e: any) => {
-          console.log("Pushed");
-          router.push("/account-settings");
-          console.log("Pushed");
-        }
+  // Displays if all information is valid
+  const handleSignOut = async (e: any) => {
+    sessionStorage.setItem('token', '');
+    signOut(auth);
+  }
+
+  const handleAccountSettings = async (e: any) => {
+    console.log("Pushed");
+    router.push("/account-settings");
+    console.log("Pushed");
+  }
+
+  const handleRangeValues = async (e: any) => {
+    console.log(values);
+  }
+
   return (
     
     <>
@@ -67,7 +72,7 @@ export default function Filters() {
                   className="rounded-full bg-indigo-300 border-indigo-500 border-[4px] hover:shadow-md shadow-indigo-600"
                 />
               )}
-              onFinalChange={() => console.log(values)}
+              onFinalChange={() => handleRangeValues()}
             />
 
           </div>
