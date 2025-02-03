@@ -38,11 +38,18 @@ export default function Home() {
     const fetchData = async () => {
       let data = await fetch("https://developer.api.autodesk.com/oss/v2/buckets", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${sessionStorage.getItem("token")}` },
-        body: JSON.stringify({ bucketKey: "myBucket", policyKey: "persistent" })
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${sessionStorage.getItem("token")}`, "region": "EMEA" },
+        body: JSON.stringify({ "bucketKey": "testbucket", "policyKey": "persistent" })
       })
       let json = await data.json();
-      console.log(json);
+      console.log("Bucket insert:", json);
+      
+      data = await fetch("https://developer.api.autodesk.com/oss/v2/buckets/testbucket/details", {
+        method: "GET",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${sessionStorage.getItem("token")}`, "region": "EMEA" }
+      })
+      json = await data.json();
+      console.log("Bucket response:", json);
     }
     fetchData();
   }, []);
