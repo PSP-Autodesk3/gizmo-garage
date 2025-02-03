@@ -25,8 +25,16 @@ export default function Filters() {
     console.log("Pushed");
   }
 
-  const handleRangeValues = async (e: any) => {
-    console.log(values);
+  const handleRangeValues = async () => {
+    const lower = document.getElementById("lower");
+    const higher = document.getElementById("Higher");
+    
+    if (lower && higher) {
+        lower.innerHTML = values[0].toFixed(1);
+        higher.innerHTML = values[1].toFixed(1);
+    }
+    console.log(values[0], values[1]);
+    console.log(lower, higher);
   }
 
   return (
@@ -38,10 +46,13 @@ export default function Filters() {
       { /* svg here */ }
       <p className='flex justify-end text-3xl mb-10 items-center'>Gizmo Garage</p>
       </div>
+            <div>
+                <p id="lower">{values[0]}</p>
+                <p id="higher">{values[1]}</p>
+            </div>
         <div id="filters">
           <div id="file-size-filter" className='m-10 self-center flex flex-row justify-center'>
             {/* https://www.geeksforgeeks.org/how-to-add-slider-in-next-js/ - Rob*/}
-            
             <Range
               step={0.1}
               min={0}
