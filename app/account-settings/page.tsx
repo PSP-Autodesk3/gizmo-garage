@@ -90,20 +90,19 @@ export default function Settings() {
             <h1 className="text-xl font-bold">Password Reset</h1>
             <p className="mx-2">We have sent an email to {email}.</p>
         </div>
-      <div className="flex flex-col">
-        <button onClick={() => handleSignOut(auth)}>Sign Out</button>
+        <div className="bg-slate-900 w-[65%] rounded-lg p-4 m-auto mt-16">
         {details ? (
           <div>
-            <img src={(details.profileImages["sizeX80"])}></img>
-            <p id="name">Name: {details.firstName} {details.lastName}</p>
-            <p id="email">Email: {details.emailId}</p>
-            <p id="username">Username: {details.userName}</p>
+            <img src={(details.profileImages["sizeX80"])} className="rounded-full m-auto"></img>
+            <div className="lg:grid lg:grid-cols-3 lg:align-center md:text-center gap-8 text-xl my-8">
+                <p id="name"><b>Name:</b> {details.firstName} {details.lastName}</p>
+                <p id="email"><b>Email:</b> {details.emailId}</p>
+                <p id="username"><b>Username:</b> {details.userName}</p>
+            </div>
           </div>
         ) : (
           <p>Loading user details...</p>
         )}
-      </div>
-      <p>Gizmo Garage</p>
       <div id="firebase-settings">
         <form>
           <div className="py-2">
@@ -119,6 +118,8 @@ export default function Settings() {
             />
           </div>
         </form>
+        <div className="md:flex">
+        <button onClick={() => handleSignOut(auth)} className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">Sign Out</button>
         <button 
             type="button"
             className="px-6 py-3 text-lg font-medium bg-indigo-600 mx-4 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500 50" 
@@ -126,7 +127,9 @@ export default function Settings() {
             >
             Reset Password
         </button>
+        </div>
       </div>
+        </div>
     </>
   )
 }
