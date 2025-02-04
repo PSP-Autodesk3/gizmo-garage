@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/app/firebase/config'; 
-
+import Image from "next/image"
 
 
 export default function Filters() {
@@ -13,7 +13,7 @@ export default function Filters() {
   const router = useRouter();
   const admin = useState(true);
 
-  // Displays if all information is valid
+
   const handleSignOut = async (e: any) => {
     sessionStorage.setItem('token', '');
     signOut(auth);
@@ -42,11 +42,16 @@ export default function Filters() {
     <>
     <div>
     <div id="side-bar" className='bg-slate-900 p-6 rounded-lg shadow-lg h-screen'>
-      <div className='flex flex-row justify-between' >
-      { /* svg here */ }
-      <p className='flex justify-end text-3xl mb-10 items-center'>Gizmo Garage</p>
+      <div className='flex flex-row justify-between pb-4' >
+      <Image
+        src="Gizmo.svg"
+        alt="Sample Image"
+        width={75}
+        height={75}
+      />
+      <div className='flex justify-end text-3xl mb-10 items-center'>Gizmo Garage</div>
       </div>
-            <div>
+            <div className='flex flex-row justify-between pl-5 pr-5 text-xl'>
                 <p id="lower">{values[0]}</p>
                 <p id="higher">{values[1]}</p>
             </div>
