@@ -37,14 +37,6 @@ export default function Home() {
     }
   }
 
-  if (loading) {
-    return (
-      <div>
-        <p>Loading...</p>
-      </div>
-    )
-  }
-
   function resetPassword(email: string) {
     sendPasswordResetEmail(auth, email) // Ref: https://stackoverflow.com/a/71025861 - Adam
     .then(()=> {
@@ -61,12 +53,20 @@ export default function Home() {
     });
   }
 
+  if (loading) {
+    return (
+      <div>
+        <p>Loading...</p>
+      </div>
+    )
+  }
+
   return (
     <>
-        <div className="fixed bottom-0 left-50 right-0 m-4 rounded-lg bg-indigo-500 p-2 text-white text-center text-sm popup hidden">
-            <h1 className="text-xl font-bold">Password Reset</h1>
-            <p className="mx-2">We have sent an email to {email}.</p>
-        </div>
+      <div className="fixed bottom-0 left-50 right-0 m-4 rounded-lg bg-indigo-500 p-2 text-white text-center text-sm popup hidden">
+          <h1 className="text-xl font-bold">Password Reset</h1>
+          <p className="mx-2">We have sent an email to {email}.</p>
+      </div>
       <div className="bg-slate-900 p-4 w-[40%] m-auto rounded-lg shadow-lg mt-16">
         <h1 className="text-3xl text-center p-2 font-semibold">Login</h1>
         <form onSubmit={(handleSignIn)}>

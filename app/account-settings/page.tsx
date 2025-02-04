@@ -1,7 +1,6 @@
 "use client";
 
 import { auth } from '@/app/firebase/config';
-import { signOut } from 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -11,11 +10,6 @@ import { sendPasswordResetEmail } from 'firebase/auth';
 export default function Settings() {
   const [user, loading] = useAuthState(auth);
   const [email, setEmail] = useState('');
-  
-  const handleSignOut = async (e: any) => {
-    sessionStorage.setItem('token', '');
-    signOut(auth);
-  }
 
   // Reset password
   function resetPassword(email: string) {
@@ -64,7 +58,7 @@ export default function Settings() {
         <p className="mx-2">We have sent an email to {email}.</p>
       </div>
       <div className="flex flex-col">
-        <button onClick={() => handleSignOut(auth)}>Sign Out</button>
+        <Link href="/signout">Sign Out</Link>
         {/*
         {details ? (
           <div>
