@@ -112,7 +112,7 @@ export default function Home() {
     return (
       <div className="float-right my-2 mx-4 space-x-4">
         <button onClick={() => handleAuthenticateRequest()} className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">
-          Authenticate wiith AutoDesk
+          Authenticate with AutoDesk
         </button>
         <Link href="/signout" className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">
           Sign Out
