@@ -12,7 +12,6 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 
 export default function Home() {
   const clientID = process.env.NEXT_PUBLIC_AUTODESK_CLIENT_ID;
-  const [codeChallenge, setCodeChallenge] = useState();
   const [user, loading] = useAuthState(auth);
   const [token, setToken] = useState(false);
   const router = useRouter();
