@@ -22,31 +22,28 @@ export default function Home() {
   const [values, setValues] = useState([20, 80]);
 
   useEffect(() => {
+    // Checks if the AutoDesk Auth token is set in session storage
     if (sessionStorage.getItem('token') != null && sessionStorage.getItem('token') != '') {
       setToken(true);
     }
-    if (user) {
-      const fetchCode = async () => {
-        const response = await fetch("/api/auth");
-        const data = await response.json();
-        setCodeChallenge(data.code_challenge)
-        sessionStorage.setItem('code_verifier', data.code_verifier);
-      }
-      fetchCode();
-    }
-    console.log("Fetching data...");
+
+    // Fetches data, needs moving to apis and is temporary for testing
     const fetchData = async () => {
+      // POSTs bucket
       let data = await fetch("https://developer.api.autodesk.com/oss/v2/buckets", {
         method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${sessionStorage.getItem("token")}`, "region": "EMEA" },
-        body: JSON.stringify({ "bucketKey": "testbucket", "policyKey": "persistent" })
+        //         From docs                           Auth token from AutoDesk                                      Must be same as all other requests
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${sessionStorage.getItem("token")}`, "region": "US" },
+        body: JSON.stringify({ "bucketKey": "testbucketno1", "policyKey": "persistent" })
       })
       let json = await data.json();
       console.log("Bucket insert:", json);
       
-      data = await fetch("https://developer.api.autodesk.com/oss/v2/buckets/testbucket/details", {
+      // GETs all buckets
+      data = await fetch("https://developer.api.autodesk.com/oss/v2/buckets", {
         method: "GET",
-        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${sessionStorage.getItem("token")}`, "region": "EMEA" }
+        //         From docs                           Auth token from AutoDesk                                      Must be same as all other requests
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${sessionStorage.getItem("token")}`, "region": "US" }
       })
       json = await data.json();
       console.log("Bucket response:", json);
@@ -55,14 +52,14 @@ export default function Home() {
   }, []);
 
   const handleSignOut = async (e: any) => {
+    // Resets token from session storage and logs out of firebase
     sessionStorage.setItem('token', '');
     signOut(auth);
   }
 
   const handleAccountSettings = async (e: any) => {
-    console.log("Pushed");
+    // Directs to account settings page
     router.push("/account-settings");
-    console.log("Pushed");
   }
 
   // Displays if the page is still loading
