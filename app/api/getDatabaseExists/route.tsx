@@ -8,15 +8,18 @@ export async function GET() {
       port: Number(process.env.DB_PORT),
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
-      database: process.env.DB_DATABASE,
     });
 
-    const [rows] = await connection.execute("SELECT * FROM projects");
+    const [rows] = await connection.execute(`
+        SELECT COUNT(*) AS DatabaseExists 
+        FROM INFORMATION_SCHEMA.SCHEMATA 
+        WHERE SCHEMA_NAME = 'gizmo_garage';
+    `);
     await connection.end();
 
     return NextResponse.json(rows);
   } catch (error) {
     console.error("Database error:", error);
-    return NextResponse.json({ error: "Failed to fetch projects" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to check database status" }, { status: 500 });
   }
 }

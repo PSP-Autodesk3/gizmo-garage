@@ -7,7 +7,6 @@ import { Range } from 'react-range';
 
 // For Firebase Auth
 import { auth } from '@/app/firebase/config';
-import { signOut } from 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 export default function Home() {
@@ -197,7 +196,7 @@ export default function Home() {
         <div id="options">
           {admin ? (
             <>
-              <button onClick={() => router.push("/users")}>Admin Settings</button>
+              <button onClick={() => router.push("/admin-settings")}>Admin Settings</button>
             </>
           ) : (
             <></>
