@@ -14,14 +14,12 @@ interface PageProps {
 }
 
 export default function Home({ params }: PageProps) {
-  const clientID = process.env.NEXT_PUBLIC_AUTODESK_CLIENT_ID;
   const [user, loading] = useAuthState(auth);
   const router = useRouter();
   const admin = useState(true);
   const [query, updateQuery] = useState('');
   const [tagQuery, updateTagQuery] = useState('');
   const [values, setValues] = useState([20, 80]);
-  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     // This works, but is just testing. These should be reworked into the actual application.
@@ -160,6 +158,7 @@ export default function Home({ params }: PageProps) {
           
         </div>
       </div>
+      <p>Slugs: {params.slug}</p>
     </>
   )
 }
