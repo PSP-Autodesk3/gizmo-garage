@@ -12,7 +12,8 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 interface Project {
   project_id: Number,
   name: String,
-  ownsProject: Number
+  ownsProject: Number,
+  error: String
 }
 
 export default function Home() {
@@ -33,7 +34,10 @@ export default function Home() {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' }
           })
-          setProjects(await data.json())
+          setProjects(await data.json());
+          if (!data.ok) {
+            setErrorMessage("Database not found, contact your system administrator");
+          }
         }
       }
       fetchData();
@@ -83,6 +87,28 @@ export default function Home() {
         <div>
           <p>Loading...</p>
         </div>
+      </>
+    )
+  }
+
+  if (errorMessage) {
+    if (admin) {
+      return (
+        <>
+          <p>Database not found, please initiate the database in admin settings when ready</p>
+          <button onClick={() => router.push("/admin-settings")}>Admin Settings</button>
+          <Link href="/signout" className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">
+            Sign Out
+          </Link>
+        </>
+      )
+    }
+    return (
+      <>
+        <p>{errorMessage}</p>
+        <Link href="/signout" className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">
+          Sign Out
+        </Link>
       </>
     )
   }
