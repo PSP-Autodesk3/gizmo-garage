@@ -11,9 +11,9 @@ export async function GET() {
     });
 
     const [rows] = await connection.execute(`
-        SELECT COUNT(*) AS DatabaseExists 
-        FROM INFORMATION_SCHEMA.SCHEMATA 
-        WHERE SCHEMA_NAME = 'gizmo_garage';
+      SELECT COUNT(*) AS DatabaseExists 
+      FROM INFORMATION_SCHEMA.SCHEMATA 
+      WHERE SCHEMA_NAME = 'gizmo_garage';
     `);
     await connection.end();
 

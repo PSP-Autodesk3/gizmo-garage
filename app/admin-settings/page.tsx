@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link';
 
 // For Firebase Login Auth
 import { auth } from '@/app/firebase/config';
@@ -59,8 +60,9 @@ export default function Home() {
   // Displays if all information is valid
   return (
     <>
+      <Link href="/signout">Sign Out</Link>
       {(databaseExists == 1) ? (
-        <button onClick={() => setupDatabase()}>Reset Database content</button>
+        <button onClick={() => setupDatabase()}>Reset Database Content</button>
       ) : (
         <button onClick={() => setupDatabase()}>Initialise Database</button>
       )}
