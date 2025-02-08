@@ -23,6 +23,8 @@ export default function Home() {
     getDatabaseExists();
   }
 
+  
+
   const setupDatabase = async () => {
     console.log("Exists:", databaseExists);
     switch (databaseExists) {
@@ -42,6 +44,13 @@ export default function Home() {
     setConfirmModule(false);
     if (response.ok) {
       // Display message
+      const popupAlert = document.querySelector('.popup')
+      popupAlert?.classList.add('show');
+      popupAlert?.classList.remove('hidden');
+      setTimeout(() => {
+          popupAlert?.classList.remove('show');
+          popupAlert?.classList.add('hidden');
+      }, 3000); // Hide after 3 seconds
     }
   }
 
@@ -60,6 +69,9 @@ export default function Home() {
   // Displays if all information is valid
   return (
     <>
+        <div className="fixed bottom-0 left-50 right-0 m-4 rounded-lg bg-indigo-500 p-2 text-white text-center text-sm popup hidden">
+            {(databaseExists == 1) ? ( <h1 className="text-xl font-bold">Database Reset.</h1> ) : ( <h1 className="text-xl font-bold">Database Created.</h1> )}
+        </div>
       <Link href="/signout">Sign Out</Link>
       {(databaseExists == 1) ? (
         <button onClick={() => setupDatabase()}>Reset Database Content</button>
