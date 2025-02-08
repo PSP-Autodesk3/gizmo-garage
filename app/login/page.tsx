@@ -30,19 +30,13 @@ export default function Home() {
 
         if (res && res.user) {
           router.push('/');
+        } else {
+          setError('Invalid email or password');
         }
     } catch (e) {
         console.error(e);
         setError('Invalid email or password');
     }
-  }
-
-  if (loading) {
-    return (
-      <div>
-        <p>Loading...</p>
-      </div>
-    )
   }
 
   function resetPassword(email: string) {
@@ -61,12 +55,20 @@ export default function Home() {
     });
   }
 
+  if (loading) {
+    return (
+      <div>
+        <p>Loading...</p>
+      </div>
+    )
+  }
+
   return (
     <>
-        <div className="fixed bottom-0 left-50 right-0 m-4 rounded-lg bg-indigo-500 p-2 text-white text-center text-sm popup hidden">
-            <h1 className="text-xl font-bold">Password Reset</h1>
-            <p className="mx-2">We have sent an email to {email}.</p>
-        </div>
+      <div className="fixed bottom-0 left-50 right-0 m-4 rounded-lg bg-indigo-500 p-2 text-white text-center text-sm popup hidden">
+          <h1 className="text-xl font-bold">Password Reset</h1>
+          <p className="mx-2">We have sent an email to {email}.</p>
+      </div>
       <div className="bg-slate-900 p-4 w-[40%] m-auto rounded-lg shadow-lg mt-16">
         <h1 className="text-3xl text-center p-2 font-semibold">Login</h1>
         <form onSubmit={(handleSignIn)}>
@@ -95,7 +97,6 @@ export default function Home() {
               />
             </div>
             <button type="submit" className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">Sign in</button>
-            {error && <p>{error}</p>}
             <button 
                 type="button"
                 className="px-6 py-3 text-lg font-medium bg-indigo-600 mx-4 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500 50" 
@@ -103,6 +104,7 @@ export default function Home() {
             >
                 Reset Password
             </button>
+            {error && <p>{error}</p>}
         </form>
         <div className="mt-4">
             <Link href="/register">Not a Member?</Link>
