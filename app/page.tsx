@@ -25,22 +25,33 @@ export default function Home() {
   const [projects, setProjects] = useState<Project[]>([] as Project[]);
 
   useEffect(() => {
-    // Checks if the AutoDesk Auth token is set in session storage before accessing APIs
-    if (sessionStorage.getItem('token') != '') {
-      // Fetches data, needs moving to apis and is temporary for testing
-      const fetchData = async () => {
-        if (user?.email) {
-          let data = await fetch(`/api/getProjects?email=${encodeURIComponent(user?.email)}`, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
-          })
-          setProjects(await data.json());
-          if (!data.ok) {
-            setErrorMessage("Database not found, contact your system administrator");
+    if (user) {
+      const getDatabaseData = async () => {
+        const response = await fetch("/api/getDatabaseExists");
+        const exists = await response.json();
+        console.log(exists);
+        if (exists[0].DatabaseExists != 1) {
+          setErrorMessage("Database not found, contact your system administrator");
+        } 
+        // Checks if the AutoDesk Auth token is set in session storage before accessing APIs
+        else if (sessionStorage.getItem('token') != '') {
+          // Fetches data, needs moving to apis and is temporary for testing
+          const fetchData = async () => {
+            if (user?.email) {
+              let data = await fetch(`/api/getProjects?email=${encodeURIComponent(user?.email)}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+              })
+              setProjects(await data.json());
+              if (!data.ok) {
+                setErrorMessage("Database not found, contact your system administrator");
+              }
+            }
           }
+          fetchData();
         }
       }
-      fetchData();
+      getDatabaseData();
     }
   }, [user]);
 
@@ -95,7 +106,7 @@ export default function Home() {
     if (admin) {
       return (
         <>
-          <p>Database not found, please initiate the database in admin settings when ready</p>
+          <p>Database not found, please initiate the database in admin settings when ready {errorMessage}</p>
           <button onClick={() => router.push("/admin-settings")}>Admin Settings</button>
           <Link href="/signout" className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">
             Sign Out
