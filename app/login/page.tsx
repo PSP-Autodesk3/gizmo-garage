@@ -30,6 +30,8 @@ export default function Home() {
 
         if (res && res.user) {
           router.push('/');
+        } else {
+          setError('Invalid email or password');
         }
     } catch (e) {
         console.error(e);
@@ -95,7 +97,6 @@ export default function Home() {
               />
             </div>
             <button type="submit" className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">Sign in</button>
-            {error && <p>{error}</p>}
             <button 
                 type="button"
                 className="px-6 py-3 text-lg font-medium bg-indigo-600 mx-4 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500 50" 
@@ -103,6 +104,7 @@ export default function Home() {
             >
                 Reset Password
             </button>
+            {error && <p>{error}</p>}
         </form>
         <div className="mt-4">
             <Link href="/register">Not a Member?</Link>
