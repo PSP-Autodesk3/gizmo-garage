@@ -76,7 +76,7 @@ export default function Home() {
   }, []);
 
   // Directs to account settings page
-  const handleAccountSettings = async (e: typeof auth) => {
+  const handleAccountSettings = async () => {
     router.push("/account-settings");
   }
 
@@ -87,7 +87,11 @@ export default function Home() {
 
   // Redirects to project view page when a project is clicked
   const projectClicked = async (e: String) => {
-    router.push(`/project/${e.replace(' ', '+')}`)
+    router.push(`/project/${e.replace(' ', '+')}`);
+  }
+
+  const handleNewProject = async () => {
+    router.push("/new-project");
   }
 
   // Displays if the page is still loading
@@ -180,7 +184,7 @@ export default function Home() {
               <button onClick={() => router.push("/admin-settings")}>Admin Settings</button>
             </>
           )}
-          <button onClick={() => handleAccountSettings(auth)}>Account Settings</button>
+          <button onClick={() => handleAccountSettings()}>Account Settings</button>
           <Link href="/signout">Sign Out</Link>
         </div>
       </div>
@@ -195,7 +199,7 @@ export default function Home() {
             ))
           )}
           <div>
-            <button>Create new Project</button>
+            <button onClick={() => handleNewProject()}>Create new Project</button>
           </div>
         </div>
       </div>
