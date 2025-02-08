@@ -1,101 +1,204 @@
-import Image from "next/image";
+"use client";
+
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+
+// For Firebase Auth
+import { auth } from '@/app/firebase/config';
+import { useAuthState } from 'react-firebase-hooks/auth';
+
+// Format returned by api call to getProjects
+interface Project {
+  project_id: Number,
+  name: String,
+  ownsProject: Number,
+  error: String
+}
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const clientID = process.env.NEXT_PUBLIC_AUTODESK_CLIENT_ID;
+  const [user, loading] = useAuthState(auth);
+  const router = useRouter();
+  const admin = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [projects, setProjects] = useState<Project[]>([] as Project[]);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  useEffect(() => {
+    if (user) {
+      const getDatabaseData = async () => {
+        const response = await fetch("/api/getDatabaseExists");
+        const exists = await response.json();
+        console.log(exists);
+        if (exists[0].DatabaseExists != 1) {
+          setErrorMessage("Database not found, contact your system administrator");
+        } 
+        // Checks if the AutoDesk Auth token is set in session storage before accessing APIs
+        else if (sessionStorage.getItem('token') != '') {
+          // Fetches data, needs moving to apis and is temporary for testing
+          const fetchData = async () => {
+            if (user?.email) {
+              let data = await fetch(`/api/getProjects?email=${encodeURIComponent(user?.email)}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+              })
+              setProjects(await data.json());
+              if (!data.ok) {
+                setErrorMessage("Database not found, contact your system administrator");
+              }
+            }
+          }
+          fetchData();
+        }
+      }
+      getDatabaseData();
+    }
+  }, [user]);
+
+  // useEffect ensures sessionStorage is only accessed by the client to avoid errors
+  useEffect(() => {
+    const getError = async () => {
+      // Gets error message to display on screen
+      let errorSession = sessionStorage.getItem("errorMessage");
+      if (errorSession) {
+        setErrorMessage(errorSession);
+        sessionStorage.removeItem("errorMessage");
+      }
+
+      // Prompts to check console if a description is given
+      errorSession = sessionStorage.getItem("errorDescription");
+      if (errorSession) {
+        console.log("Error Description:", errorSession);
+        sessionStorage.removeItem("errorDescription");
+      }
+    }
+    getError();
+  }, []);
+
+  // Directs to account settings page
+  const handleAccountSettings = async (e: typeof auth) => {
+    router.push("/account-settings");
+  }
+
+  // Keeps client id out of the dom
+  const handleAuthenticateRequest = async () => {
+    router.push(`https://developer.api.autodesk.com/authentication/v2/authorize?response_type=code&client_id=${clientID}&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fredirect&scope=${encodeURIComponent("data:read bucket:create bucket:read")}`);
+  }
+
+  // Redirects to project view page when a project is clicked
+  const projectClicked = async (e: String) => {
+    router.push(`/project/${e.replace(' ', '+')}`)
+  }
+
+  // Displays if the page is still loading
+  if (loading) {
+    // Can be used for lazy loading?
+    return (
+      <>
+        <div>
+          <p>Loading...</p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+      </>
+    )
+  }
+
+  if (errorMessage) {
+    if (admin) {
+      return (
+        <>
+          <p>Database not found, please initiate the database in admin settings when ready {errorMessage}</p>
+          <button onClick={() => router.push("/admin-settings")}>Admin Settings</button>
+          <Link href="/signout" className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">
+            Sign Out
+          </Link>
+        </>
+      )
+    }
+    return (
+      <>
+        <p>{errorMessage}</p>
+        <Link href="/signout" className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">
+          Sign Out
+        </Link>
+      </>
+    )
+  }
+  
+  // Displays if the user is not logged into their account
+  if (!user) {
+    return (
+      <>
+        <div className="bg-slate-900 p-4 w-[40%] m-auto rounded-lg shadow-lg mt-16">
+          <div className="flex flex-col items-center space-y-6">
+            <h1 className="text-4xl text-center font-semibold">
+              Gizmo Garage
+            </h1>
+            <Link href="/login" className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">
+              Sign in to your account
+            </Link>
+            <Link href="/register" className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">
+              Create an account
+            </Link>
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  // Displays if the user doesn't have a valid token
+  if (!sessionStorage.getItem('token')) {
+    return (
+      <div className="float-right my-2 mx-4 space-x-4">
+        <button onClick={() => handleAuthenticateRequest()} className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">
+          Authenticate with AutoDesk
+        </button>
+        {errorMessage && (
+          <div id="error-message">
+            <p>{errorMessage}</p>
+            <p>Open the console to view more details</p>
+          </div>
+        )}
+        <Link href="/signout" className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">
+          Sign Out
+        </Link>
+      </div>
+    )
+  }
+
+  // Displays if all information is valid
+  return (
+    <>
+      <div id="side-bar">
+        <img src="source" alt="Logo"/>
+        <p>Gizmo Garage</p>
+        <div id="filters">
+          {/* Needs filters appropriate to projects, or needs removing */}
+        </div>
+        <div id="options">
+          {admin && (
+            <>
+              <button onClick={() => router.push("/admin-settings")}>Admin Settings</button>
+            </>
+          )}
+          <button onClick={() => handleAccountSettings(auth)}>Account Settings</button>
+          <Link href="/signout">Sign Out</Link>
+        </div>
+      </div>
+      <div id="data">
+        <div id="projects">
+          <h1>Projects</h1>
+          {projects && (
+            projects.map((project, index) => (
+              <div className="project" key={index} onClick={() => projectClicked(project.name)}>
+                <p>{project.name}</p>
+              </div>
+            ))
+          )}
+          <div>
+            <button>Create new Project</button>
+          </div>
+        </div>
+      </div>
+    </>
+  )
 }
