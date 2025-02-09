@@ -1,12 +1,17 @@
 "use client";
 
+// Firebase
+import { auth } from '@/app/firebase/config';
+import { useAuthState } from 'react-firebase-hooks/auth';
+
+// Middleware
+import withAuth from "@/app/lib/withAuth";
+
+// Other
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
-// For Firebase Auth
-import { auth } from '@/app/firebase/config';
-import { useAuthState } from 'react-firebase-hooks/auth';
 
 // Format returned by api call to getProjects
 interface Project {
@@ -16,9 +21,9 @@ interface Project {
   error: String
 }
 
-export default function Home() {
+function Home() {
   const clientID = process.env.NEXT_PUBLIC_AUTODESK_CLIENT_ID;
-  const [user, loading] = useAuthState(auth);
+  const [user] = useAuthState(auth);
   const router = useRouter();
   const admin = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
@@ -76,7 +81,7 @@ export default function Home() {
   }, []);
 
   // Directs to account settings page
-  const handleAccountSettings = async (e: typeof auth) => {
+  const handleAccountSettings = async () => {
     router.push("/account-settings");
   }
 
@@ -88,18 +93,6 @@ export default function Home() {
   // Redirects to project view page when a project is clicked
   const projectClicked = async (e: String) => {
     router.push(`/project/${e.replace(' ', '+')}`)
-  }
-
-  // Displays if the page is still loading
-  if (loading) {
-    // Can be used for lazy loading?
-    return (
-      <>
-        <div>
-          <p>Loading...</p>
-        </div>
-      </>
-    )
   }
 
   if (errorMessage) {
@@ -180,7 +173,7 @@ export default function Home() {
               <button onClick={() => router.push("/admin-settings")}>Admin Settings</button>
             </>
           )}
-          <button onClick={() => handleAccountSettings(auth)}>Account Settings</button>
+          <button onClick={() => handleAccountSettings()}>Account Settings</button>
           <Link href="/signout">Sign Out</Link>
         </div>
       </div>
@@ -202,3 +195,5 @@ export default function Home() {
     </>
   )
 }
+
+export default withAuth(Home);

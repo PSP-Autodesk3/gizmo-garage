@@ -1,18 +1,17 @@
 "use client";
 
-import { useEffect, useState } from 'react'
+// Middleware
+import withAuth from "@/app/lib/withAuth";
+
+// Other
+import { useState } from 'react'
 import Link from 'next/link';
 
-// For Firebase Login Auth
-import { auth } from '@/app/firebase/config';
-import { useAuthState } from 'react-firebase-hooks/auth';
-
-export default function Home() {
-  const [user, loading] = useAuthState(auth);
+function Home() {
   const [databaseExists, setDatabaseExists] = useState(2);
   const [confirmModule, setConfirmModule] = useState(false);
 
-  if (databaseExists === 2 && !loading) {
+  if (databaseExists === 2) {
     const getDatabaseExists = async () => {
       const response = await fetch("/api/getDatabaseExists");
       const exists = await response.json();
@@ -22,8 +21,6 @@ export default function Home() {
     }
     getDatabaseExists();
   }
-
-  
 
   const setupDatabase = async () => {
     console.log("Exists:", databaseExists);
@@ -54,19 +51,6 @@ export default function Home() {
     }
   }
 
-  // Displays if the page is still loading
-  if (loading) {
-    // Can be used for lazy loading?
-    return (
-      <>
-        <div>
-          <p>Loading...</p>
-        </div>
-      </>
-    )
-  }
-
-  // Displays if all information is valid
   return (
     <>
         <div className="fixed bottom-0 left-50 right-0 m-4 rounded-lg bg-indigo-500 p-2 text-white text-center text-sm popup hidden">
@@ -101,3 +85,5 @@ export default function Home() {
     </>
   )
 }
+
+export default withAuth(Home);

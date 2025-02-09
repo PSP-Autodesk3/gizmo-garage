@@ -1,24 +1,24 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { useCreateUserWithEmailAndPassword  } from 'react-firebase-hooks/auth';
+// Firebase
 import { auth } from '@/app/firebase/config';
+import { useCreateUserWithEmailAndPassword  } from 'react-firebase-hooks/auth';
+
+// Middleware
+import withAuth from "@/app/lib/withAuth";
+
+// Other
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-export default function Home() {
+function Home() {
   const [email, setEmail] = useState('');
   const [password1, setPassword1] = useState('');
   const [password2, setPassword2] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true);
   const [createUserWithEmailAndPassword] = useCreateUserWithEmailAndPassword(auth);
   const router = useRouter();
-
-  useEffect(() => {
-
-    setLoading(false);
-  }, []);
 
   const handleSignUp = async (e: any) => {
     e.preventDefault();
@@ -34,16 +34,6 @@ export default function Home() {
         console.error(e);
         setError('Error registering account');
     }
-  }
-
-  if (loading) {
-    return (
-        <>
-            <div>
-                <p>Loading...</p>
-            </div>
-        </>
-    )
   }
 
   return (
@@ -95,3 +85,5 @@ export default function Home() {
     </>
   );
 }
+
+export default withAuth(Home);

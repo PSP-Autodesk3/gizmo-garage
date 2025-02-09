@@ -1,9 +1,13 @@
 "use client";
 
+// Middleware
+import withAuth from "@/app/lib/withAuth";
+
+// Other
 import { useRouter, useSearchParams  } from 'next/navigation';
 import { useEffect } from 'react';
 
-export default function Home() {
+function Home() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const code = searchParams.get("code");
@@ -60,3 +64,5 @@ export default function Home() {
         </div>
     )
 }
+
+export default withAuth(Home);
