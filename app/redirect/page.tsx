@@ -68,7 +68,7 @@ function Home() {
 // Suspense from docs. This makes useSearchParams work
 export default withAuth(function SuspenseWrapper() {
     return (
-        <Suspense fallback={<p>Loading...</p>}>
+        <Suspense fallback={<p>Handling Authentication...</p>}>
             <Home />
         </Suspense>
     );

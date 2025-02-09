@@ -26,7 +26,7 @@ function Home() {
     try {
         if (password1 === password2) {
             createUserWithEmailAndPassword(email, password1);
-            // Needs a check added to see if this is successfully created.
+            // Needs a check added to see if this is successfully created. Duplicate emails are considered
             router.push("/login");
         }
         else setError("Passwords do not match");
