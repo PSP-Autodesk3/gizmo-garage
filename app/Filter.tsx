@@ -49,7 +49,7 @@ export default function Filters() {
         width={75}
         height={75}
       />
-      <div className='flex justify-end text-3xl mb-10 items-center'>Gizmo Garage</div>
+      <div className='flex text-3xl items-center'>Gizmo Garage</div>
       </div>
             <div className='flex flex-row justify-between pl-5 pr-5 text-xl'>
                 <p id="lower">{values[0]}</p>
@@ -72,7 +72,7 @@ export default function Filters() {
                       height: '6px',
                       width: '100%',
                   }}
-                  className='bg-indigo-200'
+                  className='bg-slate-800'
                 >
                   {children}
                 </div>
@@ -85,7 +85,7 @@ export default function Filters() {
                     height: '22px',
                     width: '22px',
                   }}
-                  className="rounded-full bg-indigo-300 border-indigo-500 border-[4px] hover:shadow-md shadow-indigo-600"
+                  className="rounded-full bg-indigo-500 border-indigo-500 border-[4px] "
                 />
               )}
               onFinalChange={() => handleRangeValues()}

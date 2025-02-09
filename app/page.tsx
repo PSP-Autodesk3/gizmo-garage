@@ -3,7 +3,9 @@
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { Range } from 'react-range';
+
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
 
 // For Firebase Login Auth
 import { auth } from '@/app/firebase/config';
@@ -63,9 +65,9 @@ export default function Home() {
     // Can be used for lazy loading?
     return (
       <>
-        <div>
-          <p>Loading...</p>
-        </div>
+        <SkeletonTheme baseColor='#4b5563' enableAnimation >
+          <Skeleton containerClassName='test'/>
+        </SkeletonTheme>
       </>
     )
   }
