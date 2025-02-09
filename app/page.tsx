@@ -29,6 +29,7 @@ function Home() {
   const [loginErrorMessage, setLoginErrorMessage] = useState('');
   const [projects, setProjects] = useState<Project[]>([] as Project[]);
   const [loading, setLoading] = useState(true);
+  const [loadingProjects, setLoadingProjects] = useState(true);
 
   useEffect(() => {
     // Only runs if the user has logged in
@@ -54,6 +55,7 @@ function Home() {
               if (!data.ok) {
                 setDatabaseErrorMessage("Database not found, contact your system administrator");
               }
+              setLoadingProjects(false);
             }
           }
           fetchProjectData();
@@ -100,7 +102,7 @@ function Home() {
     if (admin) {
       return (
         <>
-          <p>Database not found, please initialise the database in admin settings when ready</p>
+          <p>Database not found, please initialise the database in admin settings or start running the server</p>
           <button onClick={() => router.push("/admin-settings")}>Admin Settings</button>
           <Link href="/signout" className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">
             Sign Out
@@ -192,12 +194,16 @@ function Home() {
       <div id="data">
         <div id="projects">
           <h1>Projects</h1>
-          {projects && (
+          {!loadingProjects ? (
             projects.map((project, index) => (
               <div className="project" key={index} onClick={() => router.push(`/project/${project.name.replace(' ', '+')}`)}>
                 <p>{project.name}</p>
               </div>
             ))
+          ) : (
+            <>
+              <p>Skeleton Loading</p>
+            </>
           )}
           <div>
             <button>Create new Project</button>
