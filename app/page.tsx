@@ -30,20 +30,20 @@ function Home() {
   const [projects, setProjects] = useState<Project[]>([] as Project[]);
   const [loading, setLoading] = useState(true);
 
-  // Runs APIs
   useEffect(() => {
     // Only runs if the user has logged in
     if (user) {
+      // Runs APIs
       const getDatabaseData = async () => {
+        // Checks if db exists
         const response = await fetch("/api/getDatabaseExists");
         const exists = await response.json();
-        console.log("Exists:", exists);
-        if (exists[0].DatabaseExists != 1 || exists.error != null) {
+        if (exists[0]?.DatabaseExists !== 1 || exists.error === "Failed to check database status") {
           setDatabaseErrorMessage("Database not found, contact your system administrator");
         } 
         // Checks if the AutoDesk Auth token is set in session storage before accessing APIs
         else if (sessionStorage.getItem('token') != '') {
-          // Fetches data, needs moving to apis and is temporary for testing
+          // Gets projects that the user has access to
           const fetchProjectData = async () => {
             if (user?.email) {
               const data = await fetch(`/api/getProjects?email=${encodeURIComponent(user?.email)}`, {
@@ -163,6 +163,7 @@ function Home() {
     )
   }
 
+  // Displays if all other information is valid
   return (
     <>
       <div id="side-bar">
