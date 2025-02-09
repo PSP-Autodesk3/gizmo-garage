@@ -10,7 +10,7 @@ import { useEffect, useState } from 'react';
 import { Range } from 'react-range';
 
 interface PageProps {
-  params: { slug: string };
+  params: Promise<{ slug: string[] }>;
 }
 
 function Home({ params }: PageProps) {
@@ -19,6 +19,17 @@ function Home({ params }: PageProps) {
   const [query, updateQuery] = useState('');
   const [tagQuery, updateTagQuery] = useState('');
   const [values, setValues] = useState([20, 80]);
+  const [slugs, setSlugs] = useState<string[]>([]);
+
+  // Resolve slugs
+  useEffect(() => {
+    const resolveParams = async () => {
+      const resolvedParams = await params;
+      setSlugs(resolvedParams.slug);
+    };
+
+    resolveParams();
+  }, [params]);
 
   useEffect(() => {
     // This works, but is just testing. These should be reworked into the actual application.
@@ -58,7 +69,14 @@ function Home({ params }: PageProps) {
   return (
     <>
       <div id="side-bar">
-        <img src="source" alt="Logo"/>
+        {/*
+        <Image
+          src="source"
+          alt="Logo"
+          width={25}
+          height={25}
+        />
+        */}
         <p>Gizmo Garage</p>
         <div id="filters">
           <div id="file-size-filter">
@@ -139,7 +157,7 @@ function Home({ params }: PageProps) {
           
         </div>
       </div>
-      <p>Slugs: {params.slug}</p>
+      <p>Slugs: {slugs.join("/")}</p>
     </>
   )
 }

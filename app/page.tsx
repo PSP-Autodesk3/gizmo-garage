@@ -11,14 +11,14 @@ import withAuth from "@/app/lib/withAuth";
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-
+// import Image from 'next/image';
 
 // Format returned by api call to getProjects
 interface Project {
-  project_id: Number,
-  name: String,
-  ownsProject: Number,
-  error: String
+  project_id: number,
+  name: string,
+  ownsProject: number,
+  error: string
 }
 
 function Home() {
@@ -46,7 +46,7 @@ function Home() {
           // Fetches data, needs moving to apis and is temporary for testing
           const fetchProjectData = async () => {
             if (user?.email) {
-              let data = await fetch(`/api/getProjects?email=${encodeURIComponent(user?.email)}`, {
+              const data = await fetch(`/api/getProjects?email=${encodeURIComponent(user?.email)}`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }
               })
@@ -166,7 +166,14 @@ function Home() {
   return (
     <>
       <div id="side-bar">
-        <img src="source" alt="Logo"/>
+        {/*
+        <Image
+          src="source"
+          alt="Logo"
+          width={25}
+          height={25}
+        />
+        */}
         <p>Gizmo Garage</p>
         <div id="filters">
           {/* Needs filters appropriate to projects, or needs removing */}
@@ -186,7 +193,7 @@ function Home() {
           <h1>Projects</h1>
           {projects && (
             projects.map((project, index) => (
-              <div className="project" key={index} onClick={(e) => router.push(`/project/${project.name.replace(' ', '+')}`)}>
+              <div className="project" key={index} onClick={() => router.push(`/project/${project.name.replace(' ', '+')}`)}>
                 <p>{project.name}</p>
               </div>
             ))

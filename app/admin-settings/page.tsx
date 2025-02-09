@@ -4,23 +4,26 @@
 import withAuth from "@/app/lib/withAuth";
 
 // Other
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link';
 
 function Home() {
   const [databaseExists, setDatabaseExists] = useState(2);
   const [confirmModule, setConfirmModule] = useState(false);
 
-  if (databaseExists === 2) {
-    const getDatabaseExists = async () => {
-      const response = await fetch("/api/getDatabaseExists");
-      const exists = await response.json();
-      if (exists[0].DatabaseExists != null) {
-        setDatabaseExists(exists[0].DatabaseExists);
+  useEffect(() => {
+    if (databaseExists === 2) {
+      const getDatabaseExists = async () => {
+        const response = await fetch("/api/getDatabaseExists");
+        const exists = await response.json();
+        if (exists[0].DatabaseExists != null) {
+          setDatabaseExists(exists[0].DatabaseExists);
+        }
       }
+      getDatabaseExists();
     }
-    getDatabaseExists();
-  }
+  }, [databaseExists])
+
 
   const setupDatabase = async () => {
     console.log("Exists:", databaseExists);

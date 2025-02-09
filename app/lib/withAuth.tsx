@@ -10,16 +10,15 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function withAuth(WrappedComponent: React.ComponentType<any>) {
-  return function ProtectedRoute(props: any) {
+export default function withAuth<T extends object>(
+  WrappedComponent: React.ComponentType<T>
+) {
+  return function ProtectedRoute(props: T) {
     const [user, loading] = useAuthState(auth);
     const [sessionToken, setSessionToken] = useState<string | null>(null);
     const [sessionLoading, setSessionLoading] = useState<boolean>(true);
     const router = useRouter();
     const pathname = usePathname();
-
-    // List of routes that are exempt from this middleware
-    const protectedRoutes = ["/", "/login", "/register", "/redirect", "/admin-settings"];
 
     useEffect(() => {
       setSessionToken(sessionStorage.getItem("token"));
@@ -27,6 +26,9 @@ export default function withAuth(WrappedComponent: React.ComponentType<any>) {
     }, []);
 
     useEffect(() => {
+      // List of routes that are exempt from this middleware
+      const protectedRoutes = ["/", "/login", "/register", "/redirect", "/admin-settings"];
+
       const checkRedirect = async () => {
         // If nothing is loading
         if (!sessionLoading && !loading) {

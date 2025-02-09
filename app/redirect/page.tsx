@@ -5,7 +5,7 @@ import withAuth from "@/app/lib/withAuth";
 
 // Other
 import { useRouter, useSearchParams  } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 
 function Home() {
     const router = useRouter();
@@ -56,7 +56,7 @@ function Home() {
 
         fetchToken();
         router.push("/");
-    }, [code, basicAuth])
+    }, [code, basicAuth, error, errorDescription, router])
 
     return (
         <div>
@@ -65,4 +65,11 @@ function Home() {
     )
 }
 
-export default withAuth(Home);
+// Suspense from docs. This makes useSearchParams work
+export default withAuth(function SuspenseWrapper() {
+    return (
+        <Suspense fallback={<p>Loading...</p>}>
+            <Home />
+        </Suspense>
+    );
+});
