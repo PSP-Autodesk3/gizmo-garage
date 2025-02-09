@@ -25,17 +25,18 @@ function Home() {
   const clientID = process.env.NEXT_PUBLIC_AUTODESK_CLIENT_ID;
   const [user] = useAuthState(auth);
   const router = useRouter();
-  const admin = useState(true);
+  const admin = useState(true); // Needs a check once implemented
   const [errorMessage, setErrorMessage] = useState('');
   const [projects, setProjects] = useState<Project[]>([] as Project[]);
 
   useEffect(() => {
+    // Only displays if a user has logged in as the message is different for admins
     if (user) {
       const getDatabaseData = async () => {
         const response = await fetch("/api/getDatabaseExists");
         const exists = await response.json();
-        console.log(exists);
-        if (exists[0].DatabaseExists != 1) {
+        console.log("Exists:", exists);
+        if (exists[0].DatabaseExists != 1 || exists.error != null) {
           setErrorMessage("Database not found, contact your system administrator");
         } 
         // Checks if the AutoDesk Auth token is set in session storage before accessing APIs
@@ -99,7 +100,7 @@ function Home() {
     if (admin) {
       return (
         <>
-          <p>Database not found, please initiate the database in admin settings when ready {errorMessage}</p>
+          <p>Database not found, please initialise the database in admin settings when ready</p>
           <button onClick={() => router.push("/admin-settings")}>Admin Settings</button>
           <Link href="/signout" className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">
             Sign Out
