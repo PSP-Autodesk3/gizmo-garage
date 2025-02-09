@@ -5,11 +5,17 @@ import { signOut } from 'firebase/auth';
 import { auth } from '@/app/firebase/config'; 
 import Image from "next/image"
 
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
+
+import { useAuthState } from 'react-firebase-hooks/auth';
+
 
 export default function Filters() {
   const [values, setValues] = useState([20, 80]);
   const [tagQuery, updateTagQuery] = useState('');
   const [query, updateQuery] = useState('');
+  const [user, loading] = useAuthState(auth);
   const router = useRouter();
   const admin = useState(true);
 
@@ -35,6 +41,43 @@ export default function Filters() {
     }
     console.log(values[0], values[1]);
     console.log(lower, higher);
+  }
+
+
+  if (loading) {
+    return (
+      <>
+      <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
+         <div>
+      <div id="side-bar" className='bg-slate-900 p-6 rounded-lg shadow-lg h-screen'>
+      <div className='flex flex-row justify-center pb-4' >
+        <Skeleton height={75} width={280}/>
+      </div>
+      <div className='pb-4'>
+        <Skeleton height={120}/> 
+      </div>
+        <div id="filters">
+          <div className='pb-4'>
+            <Skeleton height={100}/>
+          </div>
+          <div className='pb-4'>
+            <Skeleton height={100}/>
+          </div>
+
+          <div className='pb-4'>
+            <Skeleton height={50}/>
+          </div>
+
+          <div className='pb-4'>
+            <Skeleton height={150}/>
+          </div>
+        </div>
+      </div>
+      
+      </div>
+      </SkeletonTheme>
+      </>
+    )
   }
 
   return (

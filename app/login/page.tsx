@@ -7,6 +7,10 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { sendPasswordResetEmail } from 'firebase/auth';
 
+//skeleton loading
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
+
 export default function Home() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -39,9 +43,15 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div>
-        <p>Loading...</p>
-      </div>
+      <>
+        <div className="flex justify-center p-4 w-[30%] m-auto rounded-lg shadow-lg mt-16">
+            <div className="flex flex-col items-center space-y-6">
+                <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.25}>
+                  <Skeleton width={500} height={500}/>
+                </SkeletonTheme>
+            </div>
+        </div>
+      </>
     )
   }
 
@@ -60,6 +70,7 @@ export default function Home() {
         alert(err.message);
     });
   }
+
 
   return (
     <>
@@ -94,15 +105,17 @@ export default function Home() {
                   required
               />
             </div>
-            <button type="submit" className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">Sign in</button>
-            {error && <p>{error}</p>}
-            <button 
-                type="button"
-                className="px-6 py-3 text-lg font-medium bg-indigo-600 mx-4 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500 50" 
-                onClick={() => resetPassword(email)}
-            >
-                Reset Password
-            </button>
+            <div className='flex'>
+              <button type="submit" className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">Sign in</button>
+              {error && <p>{error}</p>}
+              <button 
+                  type="button"
+                  className="px-6 py-3 text-lg font-medium bg-indigo-600 mx-4 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500 50" 
+                  onClick={() => resetPassword(email)}
+              >
+                  Reset Password
+              </button>
+            </div>
         </form>
         <div className="mt-4">
             <Link href="/register">Not a Member?</Link>
