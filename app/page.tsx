@@ -22,27 +22,29 @@ interface Project {
 }
 
 function Home() {
-  const clientID = process.env.NEXT_PUBLIC_AUTODESK_CLIENT_ID;
-  const [user] = useAuthState(auth);
+  const [user, loadingAuth] = useAuthState(auth);
   const router = useRouter();
-  const admin = useState(true); // Needs a check once implemented
-  const [errorMessage, setErrorMessage] = useState('');
+  const admin = useState(true); // Needs a check once implemented into db as currently this makes everyone admin
+  const [databaseErrorMessage, setDatabaseErrorMessage] = useState('');
+  const [loginErrorMessage, setLoginErrorMessage] = useState('');
   const [projects, setProjects] = useState<Project[]>([] as Project[]);
+  const [loading, setLoading] = useState(true);
 
+  // Runs APIs
   useEffect(() => {
-    // Only displays if a user has logged in as the message is different for admins
+    // Only runs if the user has logged in
     if (user) {
       const getDatabaseData = async () => {
         const response = await fetch("/api/getDatabaseExists");
         const exists = await response.json();
         console.log("Exists:", exists);
         if (exists[0].DatabaseExists != 1 || exists.error != null) {
-          setErrorMessage("Database not found, contact your system administrator");
+          setDatabaseErrorMessage("Database not found, contact your system administrator");
         } 
         // Checks if the AutoDesk Auth token is set in session storage before accessing APIs
         else if (sessionStorage.getItem('token') != '') {
           // Fetches data, needs moving to apis and is temporary for testing
-          const fetchData = async () => {
+          const fetchProjectData = async () => {
             if (user?.email) {
               let data = await fetch(`/api/getProjects?email=${encodeURIComponent(user?.email)}`, {
                 method: 'GET',
@@ -50,24 +52,22 @@ function Home() {
               })
               setProjects(await data.json());
               if (!data.ok) {
-                setErrorMessage("Database not found, contact your system administrator");
+                setDatabaseErrorMessage("Database not found, contact your system administrator");
               }
             }
           }
-          fetchData();
+          fetchProjectData();
         }
       }
       getDatabaseData();
     }
-  }, [user]);
 
-  // useEffect ensures sessionStorage is only accessed by the client to avoid errors
-  useEffect(() => {
+    // Checks if the autodesk authentication returned an error
     const getError = async () => {
       // Gets error message to display on screen
       let errorSession = sessionStorage.getItem("errorMessage");
       if (errorSession) {
-        setErrorMessage(errorSession);
+        setLoginErrorMessage(errorSession);
         sessionStorage.removeItem("errorMessage");
       }
 
@@ -78,25 +78,25 @@ function Home() {
         sessionStorage.removeItem("errorDescription");
       }
     }
-    getError();
-  }, []);
+    // Removes the need to check if the app isn't in a position to receive this error
+    if (user && !sessionStorage.getItem('token')) {
+      getError();
+    }
+    setLoading(false);
+  }, [user]);
 
-  // Directs to account settings page
-  const handleAccountSettings = async () => {
-    router.push("/account-settings");
+  // Displays if any of the details are loading
+  if (loading || loadingAuth) {
+    return (
+      <>
+        <p>Loading Resources...</p>
+      </>
+    )
   }
 
-  // Keeps client id out of the dom
-  const handleAuthenticateRequest = async () => {
-    router.push(`https://developer.api.autodesk.com/authentication/v2/authorize?response_type=code&client_id=${clientID}&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fredirect&scope=${encodeURIComponent("data:read bucket:create bucket:read")}`);
-  }
-
-  // Redirects to project view page when a project is clicked
-  const projectClicked = async (e: String) => {
-    router.push(`/project/${e.replace(' ', '+')}`)
-  }
-
-  if (errorMessage) {
+  // Displays if the user is logged in, but the database doesn't exist
+  if (databaseErrorMessage) {
+    // Message for admin
     if (admin) {
       return (
         <>
@@ -108,9 +108,10 @@ function Home() {
         </>
       )
     }
+    // Message for other users
     return (
       <>
-        <p>{errorMessage}</p>
+        <p>{databaseErrorMessage}</p>
         <Link href="/signout" className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">
           Sign Out
         </Link>
@@ -143,12 +144,15 @@ function Home() {
   if (!sessionStorage.getItem('token')) {
     return (
       <div className="float-right my-2 mx-4 space-x-4">
-        <button onClick={() => handleAuthenticateRequest()} className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">
+        <button
+          onClick={() => router.push(`https://developer.api.autodesk.com/authentication/v2/authorize?response_type=code&client_id=${process.env.NEXT_PUBLIC_AUTODESK_CLIENT_ID}&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fredirect&scope=${encodeURIComponent("data:read bucket:create bucket:read")}`)}
+          className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+        >
           Authenticate with AutoDesk
         </button>
-        {errorMessage && (
+        {loginErrorMessage && (
           <div id="error-message">
-            <p>{errorMessage}</p>
+            <p>{loginErrorMessage}</p>
             <p>Open the console to view more details</p>
           </div>
         )}
@@ -159,7 +163,6 @@ function Home() {
     )
   }
 
-  // Displays if all information is valid
   return (
     <>
       <div id="side-bar">
@@ -174,7 +177,7 @@ function Home() {
               <button onClick={() => router.push("/admin-settings")}>Admin Settings</button>
             </>
           )}
-          <button onClick={() => handleAccountSettings()}>Account Settings</button>
+          <button onClick={() => router.push("/account-settings")}>Account Settings</button>
           <Link href="/signout">Sign Out</Link>
         </div>
       </div>
@@ -183,7 +186,7 @@ function Home() {
           <h1>Projects</h1>
           {projects && (
             projects.map((project, index) => (
-              <div className="project" key={index} onClick={() => projectClicked(project.name)}>
+              <div className="project" key={index} onClick={(e) => router.push(`/project/${project.name.replace(' ', '+')}`)}>
                 <p>{project.name}</p>
               </div>
             ))
