@@ -1,13 +1,17 @@
 "use client"
 
-import { useEffect } from "react";
-import { useRouter } from 'next/navigation';
-
-// For Firebase Auth
+// Firebase
 import { auth } from '@/app/firebase/config';
 import { signOut } from 'firebase/auth';
 
-export default function Home() {
+// Middleware
+import withAuth from "@/app/lib/withAuth";
+
+// Other
+import { useEffect } from "react";
+import { useRouter } from 'next/navigation';
+
+function Home() {
     const router = useRouter();
 
     useEffect(() => {
@@ -16,7 +20,6 @@ export default function Home() {
             await signOut(auth);
             router.push("/");
         };
-
         handleSignOut();
     }, [router]);
 
@@ -26,3 +29,5 @@ export default function Home() {
         </>
     )
 }
+
+export default withAuth(Home);

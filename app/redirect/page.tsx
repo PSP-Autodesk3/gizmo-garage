@@ -1,9 +1,13 @@
 "use client";
 
-import { useRouter, useSearchParams  } from 'next/navigation';
-import { useEffect } from 'react';
+// Middleware
+import withAuth from "@/app/lib/withAuth";
 
-export default function Home() {
+// Other
+import { useRouter, useSearchParams  } from 'next/navigation';
+import { useEffect, Suspense } from 'react';
+
+function Home() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const code = searchParams.get("code");
@@ -52,7 +56,7 @@ export default function Home() {
 
         fetchToken();
         router.push("/");
-    }, [code, basicAuth])
+    }, [code, basicAuth, error, errorDescription, router])
 
     return (
         <div>
@@ -60,3 +64,12 @@ export default function Home() {
         </div>
     )
 }
+
+// Suspense from docs. This makes useSearchParams work
+export default withAuth(function SuspenseWrapper() {
+    return (
+        <Suspense fallback={<p>Handling Authentication...</p>}>
+            <Home />
+        </Suspense>
+    );
+});

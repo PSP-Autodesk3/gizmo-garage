@@ -1,25 +1,35 @@
 "use client";
 
+// Middleware
+import withAuth from "@/app/lib/withAuth";
+
+// Other
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Range } from 'react-range';
 
-// For Firebase Auth
-import { auth } from '@/app/firebase/config';
-import { useAuthState } from 'react-firebase-hooks/auth';
-
 interface PageProps {
-  params: { slug: string };
+  params: Promise<{ slug: string[] }>;
 }
 
-export default function Home({ params }: PageProps) {
-  const [user, loading] = useAuthState(auth);
+function Home({ params }: PageProps) {
   const router = useRouter();
   const admin = useState(true);
   const [query, updateQuery] = useState('');
   const [tagQuery, updateTagQuery] = useState('');
   const [values, setValues] = useState([20, 80]);
+  const [slugs, setSlugs] = useState<string[]>([]);
+
+  // Resolve slugs
+  useEffect(() => {
+    const resolveParams = async () => {
+      const resolvedParams = await params;
+      setSlugs(resolvedParams.slug);
+    };
+
+    resolveParams();
+  }, [params]);
 
   useEffect(() => {
     // This works, but is just testing. These should be reworked into the actual application.
@@ -49,35 +59,24 @@ export default function Home({ params }: PageProps) {
       }
       fetchData();
     }
-  }, [user]);
+  }, []);
 
   // Directs to account settings page
-  const handleAccountSettings = async (e: typeof auth) => {
+  const handleAccountSettings = async () => {
     router.push("/account-settings");
   }
 
-  // Displays if the page is still loading
-  if (loading) {
-    // Can be used for lazy loading?
-    return (
-      <>
-        <div>
-          <p>Loading...</p>
-        </div>
-      </>
-    )
-  }
-  
-  // Displays if the user is not logged into their account or doesn't have a valid token
-  if (!user || !sessionStorage.getItem('token')) {
-    router.push("/");
-  }
-
-  // Displays if all information is valid
   return (
     <>
       <div id="side-bar">
-        <img src="source" alt="Logo"/>
+        {/*
+        <Image
+          src="source"
+          alt="Logo"
+          width={25}
+          height={25}
+        />
+        */}
         <p>Gizmo Garage</p>
         <div id="filters">
           <div id="file-size-filter">
@@ -146,7 +145,7 @@ export default function Home({ params }: PageProps) {
               <button onClick={() => router.push("/admin-settings")}>Admin Settings</button>
             </>
           )}
-          <button onClick={() => handleAccountSettings(auth)}>Account Settings</button>
+          <button onClick={() => handleAccountSettings()}>Account Settings</button>
           <Link href="/signout">Sign Out</Link>
         </div>
       </div>
@@ -158,7 +157,9 @@ export default function Home({ params }: PageProps) {
           
         </div>
       </div>
-      <p>Slugs: {params.slug}</p>
+      <p>Slugs: {slugs.join("/")}</p>
     </>
   )
 }
+
+export default withAuth(Home);
