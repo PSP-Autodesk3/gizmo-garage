@@ -1,56 +1,62 @@
 "use client";
 
-import { useRouter, useSearchParams  } from 'next/navigation';
-import { useEffect } from 'react';
+// Middleware
+import withAuth from "@/app/lib/withAuth";
 
-export default function Home() {
+// Other
+import { useRouter, useSearchParams  } from 'next/navigation';
+import { useEffect, Suspense } from 'react';
+
+function Home() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const code = searchParams.get("code");
+    const error = searchParams.get("error");
+    const errorDescription = searchParams.get("error_description");
     const client_id = process.env.NEXT_PUBLIC_AUTODESK_CLIENT_ID;
     const client_secret = process.env.NEXT_PUBLIC_AUTODESK_CLIENT_SECRET;
     const basicAuth = btoa(`${client_id}:${client_secret}`);
 
     useEffect(() => {
-        // Process Auth
-
-        // DEBUG - REMOVE FROM FROM FINAL VERSION
-        console.log(client_id);
-        console.log(client_secret);
-        console.log(basicAuth);
-        console.log(code);
-        
+        // Translates auth code into token.
         const fetchToken = async () => {
+            // If the code hasn't been returned, there is an error.
             if (!code) {
-                console.error('Authorization code is missing.');
-                return;
-            }
-            const code_verifier = sessionStorage.getItem('code_verifier');
-            if (!code_verifier) {
-                console.error('PKCE is missing.');
-                return;
-            }
-            const response = await fetch('https://developer.api.autodesk.com/authentication/v2/token', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': `Basic ${basicAuth}` },
-                body: new URLSearchParams({ code: code, grant_type: "authorization_code", redirect_uri: "http://localhost:3000/redirect", code_verifier: code_verifier }),
-            });
+                // Identify message to display to user.
+                let errorMessage = "Authorization code was not returned by AutoDesks servers.";
+                if (error) {
+                    errorMessage = "Authorization failed.";
+                }
+                sessionStorage.setItem("errorMessage", errorMessage);
 
-            // CREATES AN ERROR UNTIL CODE CHALLENGE IS FIXED
-            const data = await response.json();
-            if (!response.ok) {
-                console.error('Error response:', data);
-            } else {
-                console.log('Access token data:', data);
-                sessionStorage.setItem('token', data.access_token);
+                // Set description for more details if supplied.
+                if (errorDescription) {
+                    sessionStorage.setItem("errorDescription", errorDescription);
+                }
+                return;
             }
+            // If AutoDesks redirect is okay.
+            else {
+                // API call to exchange auth for token.
+                const response = await fetch('https://developer.api.autodesk.com/authentication/v2/token', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': `Basic ${basicAuth}` , Accept: 'application/json'},
+                    body: new URLSearchParams({ grant_type: "client_credentials", redirect_uri: "http://localhost:3000/redirect", scope: "data:read data:write bucket:create bucket:read" }),
+                });
     
-            console.log(response);
+                // Handle response.
+                const data = await response.json();
+                if (data.access_token && response.ok) {
+                    sessionStorage.setItem('token', data.access_token);
+                } else {
+                    sessionStorage.setItem("errorMessage", "Error exchanging Auth for token.");
+                }
+            }
         }
 
         fetchToken();
         router.push("/");
-    }, [code, basicAuth])
+    }, [code, basicAuth, error, errorDescription, router])
 
     return (
         <div>
@@ -58,3 +64,12 @@ export default function Home() {
         </div>
     )
 }
+
+// Suspense from docs. This makes useSearchParams work
+export default withAuth(function SuspenseWrapper() {
+    return (
+        <Suspense fallback={<p>Handling Authentication...</p>}>
+            <Home />
+        </Suspense>
+    );
+});

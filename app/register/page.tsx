@@ -1,32 +1,32 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { useCreateUserWithEmailAndPassword  } from 'react-firebase-hooks/auth';
+// Firebase
 import { auth } from '@/app/firebase/config';
+import { useCreateUserWithEmailAndPassword  } from 'react-firebase-hooks/auth';
+
+// Middleware
+import withAuth from "@/app/lib/withAuth";
+
+// Other
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-export default function Home() {
+function Home() {
   const [email, setEmail] = useState('');
   const [password1, setPassword1] = useState('');
   const [password2, setPassword2] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true);
   const [createUserWithEmailAndPassword] = useCreateUserWithEmailAndPassword(auth);
   const router = useRouter();
 
-  useEffect(() => {
-
-    setLoading(false);
-  }, []);
-
-  const handleSignUp = async (e: any) => {
+  const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
         if (password1 === password2) {
             createUserWithEmailAndPassword(email, password1);
-            // Needs a check added to see if this is successfully created.
+            // Needs a check added to see if this is successfully created. Duplicate emails are considered
             router.push("/login");
         }
         else setError("Passwords do not match");
@@ -36,20 +36,10 @@ export default function Home() {
     }
   }
 
-  if (loading) {
-    return (
-        <>
-            <div>
-                <p>Loading...</p>
-            </div>
-        </>
-    )
-  }
-
   return (
     <>
         <div className="bg-slate-900 p-4 w-[40%] m-auto rounded-lg shadow-lg mt-16">
-            <h1 className="text-3xl text-center p-2 font-semibold">Login</h1>
+            <h1 className="text-3xl text-center p-2 font-semibold">Sign up</h1>
             <form onSubmit={(handleSignUp)}>
                 <div className="py-2">
                     <label className="text-xl" htmlFor="email">Email:</label>
@@ -87,7 +77,7 @@ export default function Home() {
                         required
                     />
                 </div>
-                <button type="submit" className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">Sign in</button>
+                <button type="submit" className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">Sign up</button>
                 {error && <p>{error}</p>}
             </form>
             <Link href="/login">Already a Member?</Link>
@@ -95,3 +85,5 @@ export default function Home() {
     </>
   );
 }
+
+export default withAuth(Home);
