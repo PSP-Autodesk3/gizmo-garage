@@ -37,8 +37,8 @@ function Home() {
         <h1 className="text-xl font-bold">Password Reset</h1>
         <p className="mx-2">We have sent an email to {email}.</p>
       </div>
-      <div className="flex flex-col">
-        <Link href="/signout">Sign Out</Link>
+      <div className="p-4">
+        <Link className=" px-6 py-3 text-lg font-medium bg-indigo-600 mx-4 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500 50" href="/signout">Sign Out</Link>
         {/*
         {details ? (
           <div>
@@ -55,7 +55,7 @@ function Home() {
       <p>Gizmo Garage</p>
       <div id="firebase-settings">
         <form>
-          <div className="py-2">
+          <div className="py-2 max-w-[20%]">
             <label htmlFor="email" className="text-xl">Email:</label>
             <input
               className="text-white w-full bg-slate-800 p-2 my-2 rounded-lg"

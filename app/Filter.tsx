@@ -167,13 +167,13 @@ export default function Filters() {
         <div id="options" className='flex flex-col p-6'>
           {admin ? (
             <>
-              <button  className='p-1 text-white transition-colors duration-300 hover:text-gray-400' onClick={() => router.push("/users")}>Admin Settings</button>
+              <button  className='p-1 text-white transition-colors duration-300 hover:text-gray-400' onClick={() => router.push("/admin-settings")}>Admin Settings</button>
             </>
           ) : (
             <></>
           )}
-          <button className='p-1 text-white transition-colors duration-300 hover:text-gray-400' onClick={() => handleAccountSettings(auth)}>Account Settings</button>
-          <button  className='p-1 text-white transition-colors duration-300 hover:text-gray-400' onClick={() => handleSignOut(auth)}>Sign Out</button>
+          <button className='p-1 text-white transition-colors duration-300 hover:text-gray-400' onClick={() => router.push("/account-settings")}>Account Settings</button>
+          <button  className='p-1 text-white transition-colors duration-300 hover:text-gray-400' onClick={() => router.push('/signout')}>Sign Out</button>
         </div>
       </div>
       

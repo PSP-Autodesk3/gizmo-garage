@@ -59,11 +59,12 @@ function Home() {
         <div className="fixed bottom-0 left-50 right-0 m-4 rounded-lg bg-indigo-500 p-2 text-white text-center text-sm popup hidden">
             {(databaseExists == 1) ? ( <h1 className="text-xl font-bold">Database Reset.</h1> ) : ( <h1 className="text-xl font-bold">Database Created.</h1> )}
         </div>
-      <Link href="/signout">Sign Out</Link>
+        
+      <Link className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50" href="/signout">Sign Out</Link>
       {(databaseExists == 1) ? (
-        <button onClick={() => setupDatabase()}>Reset Database Content</button>
+        <button className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50" onClick={() => setupDatabase()}>Reset Database Content</button>
       ) : (
-        <button onClick={() => setupDatabase()}>Initialise Database</button>
+        <button className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50" onClick={() => setupDatabase()}>Initialise Database</button>
       )}
       <div id="search">
 
@@ -74,12 +75,13 @@ function Home() {
       {(confirmModule) && (
         <>
         {/* Still needs styling, this is just a rough representation of what I was looking to do */}
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="fixed inset-0 flex items-center justify-center bg-opacity-50 bg-slate-900 p-4 w-[40%] h-[40%] m-auto rounded-3xl shadow-lg mt-16">
             <div className="text-center">
-              <p>This will clear all data. <strong>This action is irreversible.</strong> Are you sure you want to continue?</p>
+              <h1 className='text-3xl'>This will clear all data.</h1> 
+              <strong>This action is irreversible.</strong> <p>Are you sure you want to continue?</p>
               <div className="mt-4">
-                <button onClick={confirmSetupDatabase}>Yes</button>
-                <button onClick={() => setConfirmModule(false)}>Cancel</button>
+                <button className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50" onClick={confirmSetupDatabase}>Yes</button>
+                <button className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50" onClick={() => setConfirmModule(false)}>Cancel</button>
               </div>
             </div>
           </div>

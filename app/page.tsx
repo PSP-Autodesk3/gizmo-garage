@@ -163,41 +163,50 @@ function Home() {
   // Displays if all other information is valid
   return (
     <>
-      <div id="side-bar">
+    <div className='flex m-auto'>
+    <div id="side-bar">
         <div id="filters">
           {/* Needs filters appropriate to projects, or needs removing */}
           <Filters/>
         </div>
-        <div id="options">
-          {admin && (
-            <>
-              <button onClick={() => router.push("/admin-settings")}>Admin Settings</button>
-            </>
-          )}
-          <button onClick={() => router.push("/account-settings")}>Account Settings</button>
-          <Link href="/signout">Sign Out</Link>
-        </div>
       </div>
-      <div id="data">
+      <div id="data" className='flex flex-row '>
         <div id="projects">
-          <h1>Projects</h1>
+          <div className="flex flex-row justify-between">
+            <h1 className='p-10 text-4xl text-white transition-colors duration-300 hover:text-gray-400 pb-10'>Projects</h1>
+            <button className="self-center flex justify-end px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">Create new Project</button>
+          </div>
           {!loadingProjects ? (
-            projects.map((project, index) => (
-              <div className="project" key={index} onClick={() => router.push(`/project/${project.name.replace(' ', '+')}`)}>
-                <p>{project.name}</p>
+              projects.map((project, index) => (
+                <div className="project" key={index} onClick={() => router.push(`/project/${project.name.replace(' ', '+')}`)}>
+                    <div id="folders">
+                    <div className="bg-slate-900 p-4 m-auto rounded-lg shadow-lg mt-16 flex flex-row justify-between">
+                      <div className='p-2 pr-10'>
+                        <p>Name: {project.name} </p>
+                        <p>Version: </p>
+                        <p>Date: </p>
+                      </div>
+                      <div className='content-center'>
+                        <button className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">View</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <>
+              <div>
+                <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
+                    <Skeleton width={400} height={100}/>
+                </SkeletonTheme>
               </div>
-            ))
-          ) : (
-            <>
-              <p>Skeleton Loading</p>
-            </>
-          )}
+              </>
+            )}
           <div>
-            <button>Create new Project</button>
           </div>
         </div>
-      </div>
-     
+      </div>    
+    </div>
     </>
   )
 }
