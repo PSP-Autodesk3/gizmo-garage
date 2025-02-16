@@ -9,6 +9,9 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Range } from 'react-range';
 
+//Filter component
+import Filters from "./Filter"
+
 interface PageProps {
   params: Promise<{ slug: string[] }>;
 }
@@ -68,96 +71,18 @@ function Home({ params }: PageProps) {
 
   return (
     <>
-      <div id="side-bar">
-        {/*
-        <Image
-          src="source"
-          alt="Logo"
-          width={25}
-          height={25}
-        />
-        */}
-        <p>Gizmo Garage</p>
-        <div id="filters">
-          <div id="file-size-filter">
-            {/* https://www.geeksforgeeks.org/how-to-add-slider-in-next-js/ - Rob*/}
-            <Range
-              step={0.1}
-              min={0}
-              max={100}
-              values={values}
-              onChange={(newValues) => setValues(newValues)}
-              renderTrack={({ props, children }) => (
-                <div
-                  {...props}
-                  style={{
-                      ...props.style,
-                      height: '6px',
-                      width: '50%',
-                      backgroundColor: '#ccc'
-                  }}
-                >
-                  {children}
-                </div>
-              )}
-              renderThumb={({ props }) => (
-                <div
-                  {...props}
-                  style={{
-                    ...props.style,
-                    height: '42px',
-                    width: '42px',
-                    backgroundColor: '#999'
-                  }}
-                />
-              )}
-              onFinalChange={() => console.log(values)}
-            />
+    <div id='Filter' className='flex'>
+    <Filters/>
+        <div id="data">
+          <div id="folders">
+            
           </div>
-          <div id="tags">
-            <label htmlFor="tag-search">Tags</label>
-            <input
-              type="text"
-              placeholder="Search"
-              name="tag-search"
-              value={tagQuery}
-              onChange={(e) => updateTagQuery(e.target.value)}
-            />
-            <div id="applied-tags">
-
-            </div>
+          <div id="files">
+            
           </div>
-          <div id="search">
-            <label htmlFor="search=bar">Search</label>
-            <input
-              type="text"
-              placeholder="Search"
-              name="search"
-              value={query}
-              onChange={(e) => updateQuery(e.target.value)}
-            />
-          </div>
-          <button>Submit</button>
         </div>
-        <div id="options">
-          {admin && (
-            <>
-              <button onClick={() => router.push("/admin-settings")}>Admin Settings</button>
-            </>
-          )}
-          <button onClick={() => handleAccountSettings()}>Account Settings</button>
-          <Link href="/signout">Sign Out</Link>
-        </div>
-      </div>
-      <div id="data">
-        <div id="folders">
-          
-        </div>
-        <div id="files">
-          
-        </div>
-      </div>
-      <p>Slugs: {slugs.join("/")}</p>
+        <p>Slugs: {slugs.join("/")}</p>
+    </div>
     </>
   )
 }
