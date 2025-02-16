@@ -193,8 +193,12 @@ export default function Home() {
           <h1>Projects</h1>
           {projects && (
             projects.map((project, index) => (
-              <div className="project" key={index} onClick={() => projectClicked(project.name)}>
-                <p>{project.name}</p>
+              <div className="project" key={index} >
+                <button
+                  onClick={() => projectClicked(project.name)}
+                >
+                  {project.name}
+                </button>
               </div>
             ))
           )}
