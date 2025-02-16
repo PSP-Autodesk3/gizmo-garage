@@ -80,10 +80,7 @@ function Home() {
         sessionStorage.removeItem("errorDescription");
       }
     }
-    // Removes the need to check if the app isn't in a position to receive this error
-    if (user && !sessionStorage.getItem('token')) {
-      getError();
-    }
+    getError();
     setLoading(false);
   }, [user]);
 
@@ -196,8 +193,12 @@ function Home() {
           <h1>Projects</h1>
           {!loadingProjects ? (
             projects.map((project, index) => (
-              <div className="project" key={index} onClick={() => router.push(`/project/${project.name.replace(' ', '+')}`)}>
-                <p>{project.name}</p>
+              <div className="project" key={index} >
+                <button
+                  onClick={() => router.push(`/project/${project.name.replace(/ /g, '+')}`)}
+                >
+                  {project.name}
+                </button>
               </div>
             ))
           ) : (
@@ -206,7 +207,7 @@ function Home() {
             </>
           )}
           <div>
-            <button>Create new Project</button>
+            <button onClick={() => router.push("/new-project")}>Create new Project</button>
           </div>
         </div>
       </div>
