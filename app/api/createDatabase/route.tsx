@@ -57,7 +57,7 @@ export async function POST() {
         name VARCHAR(255) NOT NULL,
         project_id INT NOT NULL,
         FOREIGN KEY (project_id) REFERENCES projects(project_id),
-        parent_folder_id INT NOT NULL,
+        parent_folder_id INT,
         FOREIGN KEY (parent_folder_id) REFERENCES folder(folder_id)
       );
     `);
