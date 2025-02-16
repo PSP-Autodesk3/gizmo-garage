@@ -1,14 +1,17 @@
 "use client";
 
+// Firebase
 import { auth } from '@/app/firebase/config';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import Link from 'next/link';
-import { useState } from 'react';
 import { sendPasswordResetEmail } from 'firebase/auth';
 
+// Middleware
+import withAuth from "@/app/lib/withAuth";
 
-export default function Settings() {
-  const [user, loading] = useAuthState(auth);
+// Other
+import Link from 'next/link';
+import { useState } from 'react';
+
+function Home() {
   const [email, setEmail] = useState('');
 
   // Reset password
@@ -28,29 +31,6 @@ export default function Settings() {
     });
   }
 
-  // Returns if loading
-  if (loading) {
-    return (
-      <>
-        <div>
-          <p>Loading...</p>
-        </div>
-      </>
-    );
-  }
-
-  // Returns if the user is not logged into their account
-  if (!user) {
-    return (
-      <>
-        <div>
-          <Link href="/login">Log in to your account</Link>
-        </div>
-      </>
-    )
-  }
-
-  // Returns if the user is logged in
   return (
     <>
       <div className="fixed bottom-0 left-50 right-0 m-4 rounded-lg bg-indigo-500 p-2 text-white text-center text-sm popup hidden">
@@ -99,3 +79,5 @@ export default function Settings() {
     </>
   )
 }
+
+export default withAuth(Home);

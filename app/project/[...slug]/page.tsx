@@ -1,25 +1,24 @@
 "use client";
 
+// Middleware
+import withAuth from "@/app/lib/withAuth";
+
+// Other
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Range } from 'react-range';
 
-// For Firebase Auth
-import { auth } from '@/app/firebase/config';
-import { useAuthState } from 'react-firebase-hooks/auth';
-
 interface PageProps {
   params: Promise<{ slug: string[] }>;
 }
-
+  
 interface Folder {
   folder_id: number;
   name: string;
 }
 
-export default function Home({ params }: PageProps) {
-  const [user, loading] = useAuthState(auth);
+function Home({ params }: PageProps) {
   const router = useRouter();
   const pathname = usePathname();
   const admin = useState(true);
@@ -91,28 +90,17 @@ export default function Home({ params }: PageProps) {
     router.push(route);
   }
 
-  // Displays if the page is still loading
-  if (loading) {
-    // Can be used for lazy loading?
-    return (
-      <>
-        <div>
-          <p>Loading...</p>
-        </div>
-      </>
-    )
-  }
-  
-  // Displays if the user is not logged into their account or doesn't have a valid token
-  if (!user || !sessionStorage.getItem('token')) {
-    router.push("/");
-  }
-
-  // Displays if all information is valid
   return (
     <>
       <div id="side-bar">
-        <img src="source" alt="Logo"/>
+        {/*
+        <Image
+          src="source"
+          alt="Logo"
+          width={25}
+          height={25}
+        />
+        */}
         <p>Gizmo Garage</p>
         <div id="filters">
           <div id="file-size-filter">
@@ -229,3 +217,5 @@ export default function Home({ params }: PageProps) {
     </>
   )
 }
+
+export default withAuth(Home);

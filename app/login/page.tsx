@@ -1,26 +1,26 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
+// Firebase
 import { auth } from '@/app/firebase/config';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { sendPasswordResetEmail } from 'firebase/auth';
 
-export default function Home() {
+// Middleware
+import withAuth from "@/app/lib/withAuth";
+
+// Other
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+
+function Home() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true);
   const [signInWithEmailAndPassword] = useSignInWithEmailAndPassword(auth);
   const router = useRouter();
-
-  useEffect(() => {
-
-    setLoading(false);
-  }, []);
-
-  const handleSignIn = async (e: any) => {
+  
+  const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
@@ -53,14 +53,6 @@ export default function Home() {
     .catch((err) => {
         alert(err.message);
     });
-  }
-
-  if (loading) {
-    return (
-      <div>
-        <p>Loading...</p>
-      </div>
-    )
   }
 
   return (
@@ -113,3 +105,5 @@ export default function Home() {
     </>
   );
 }
+
+export default withAuth(Home);
