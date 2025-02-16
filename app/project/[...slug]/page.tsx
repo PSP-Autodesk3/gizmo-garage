@@ -95,48 +95,50 @@ function Home({ params }: PageProps) {
 
   return (
     <>
-      <div id='Filter' className='flex'>
-        <Filters/>
-      <div>
-      <div id="data">
-        <div id="breadcrumbs" className='flex flex-row'>
-          <p>Breadcrumbs:&nbsp;&nbsp;&nbsp;</p>
-          <button
-            onClick={() => {router.push(`/project/${project.replace(/%2B/g, '+')}`);}}
-          >
-            {project.replace(/%2B/g, ' ')}
-          </button>
-          {Array.isArray(routes) && routes.length > 0 && (
-            routes.map((route, index) => (
-              <>
-                <p>&nbsp;&nbsp;&gt;&nbsp;&nbsp;</p>
-                <button
-                  key={route}
-                  onClick={() => goneBack(index)}
-                >
-                  {route.replace(/%2B/g, ' ')}
-                </button>
-              </>
-            ))
-          )}
+      <div className='flex m-auto'>
+        <div id='Filter' className='flex'>
+          <Filters/>
         </div>
-        <div id="folders">
-          {Array.isArray(folders) && folders.length > 0 && (
-            folders.map((folder) => (
-              <>
-                <div key={folder.folder_id}>
+        <div id="data">
+          <div id="breadcrumbs" className='flex flex-row'>
+            <p>Breadcrumbs:&nbsp;&nbsp;&nbsp;</p>
+            <button
+              onClick={() => {router.push(`/project/${project.replace(/%2B/g, '+')}`);}}
+            >
+              {project.replace(/%2B/g, ' ')}
+            </button>
+            {Array.isArray(routes) && routes.length > 0 && (
+              routes.map((route, index) => (
+                <>
+                  <p>&nbsp;&nbsp;&gt;&nbsp;&nbsp;</p>
                   <button
-                  onClick={() => {router.push(pathname + `/${folder.name.replace(/ /g, '+')}`);}}
+                    key={route}
+                    onClick={() => goneBack(index)}
                   >
-                    {folder.name}
+                    {route.replace(/%2B/g, ' ')}
                   </button>
-                </div>
-              </>
-            ))
-          )}
-        </div>
-        <div id="files">
-          
+                </>
+              ))
+            )}
+          </div>
+          <div id="folders">
+            {Array.isArray(folders) && folders.length > 0 && (
+              folders.map((folder) => (
+                <>
+                  <div key={folder.folder_id}>
+                    <button
+                    onClick={() => {router.push(pathname + `/${folder.name.replace(/ /g, '+')}`);}}
+                    >
+                      {folder.name}
+                    </button>
+                  </div>
+                </>
+              ))
+            )}
+          </div>
+          <div id="files">
+            
+          </div>
         </div>
       </div>
     </>
