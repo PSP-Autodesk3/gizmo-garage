@@ -81,26 +81,8 @@ function Home() {
       }
     }
     getError();
-  }, []);
-
-  // Directs to account settings page
-  const handleAccountSettings = async () => {
-    router.push("/account-settings");
-  }
-
-  // Keeps client id out of the dom
-  const handleAuthenticateRequest = async () => {
-    router.push(`https://developer.api.autodesk.com/authentication/v2/authorize?response_type=code&client_id=${clientID}&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fredirect&scope=${encodeURIComponent("data:read bucket:create bucket:read")}`);
-  }
-
-  // Redirects to project view page when a project is clicked
-  const projectClicked = async (e: String) => {
-    router.push(`/project/${e.replace(' ', '+')}`);
-  }
-
-  const handleNewProject = async () => {
-    router.push("/new-project");
-  }
+    setLoading(false);
+  }, [user]);
 
   // Displays if any of the details are loading
   if (loading || loadingAuth) {
@@ -225,7 +207,7 @@ function Home() {
             </>
           )}
           <div>
-            <button onClick={() => handleNewProject()}>Create new Project</button>
+            <button onClick={() => router.push("/new-project")}>Create new Project</button>
           </div>
         </div>
       </div>
