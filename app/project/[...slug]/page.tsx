@@ -71,6 +71,7 @@ function Home({ params }: PageProps) {
         setProject(resolved.slug[0]);
         setRoutes(resolved.slug.slice(1));
 
+        // Gets the current folder or project ID
         let query = await fetch("/api/getCurrentFileID", {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -78,10 +79,9 @@ function Home({ params }: PageProps) {
         });
 
         let response = await query.json();
-        console.log("Response", response);
 
+        // Assigns the returned ID to the correct variables
         let id = 0; let type = 0;
-
         if (response[0].folder_id) {
           console.log("Folder");
           id = response[0].folder_id;
@@ -91,6 +91,7 @@ function Home({ params }: PageProps) {
           type = 1;
         }
 
+        // Gets folders
         query = await fetch("/api/getFolders", {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -99,8 +100,8 @@ function Home({ params }: PageProps) {
 
         response = await query.json();
         setFolders(response);
-        console.log("Response", response);
 
+        // Gets files
         query = await fetch("/api/getObjects", {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -109,7 +110,6 @@ function Home({ params }: PageProps) {
 
         response = await query.json();
         setFiles(response);
-        console.log("Response", response);
       }
     };
 

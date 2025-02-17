@@ -15,10 +15,10 @@ export default function Filters({ query, onQueryChange, values, onValuesChange }
   const admin = useState(true);
 
   const handleRangeValues = async () => {
-    if (values ) {
+    if (values) {
       const lower = document.getElementById("lower");
       const higher = document.getElementById("Higher");
-  
+
       if (lower && higher) {
         lower.innerHTML = values[0].toFixed(1);
         higher.innerHTML = values[1].toFixed(1);
@@ -29,7 +29,6 @@ export default function Filters({ query, onQueryChange, values, onValuesChange }
   return (
     <>
       <div id="side-bar" className='bg-slate-900 p-6 rounded-lg shadow-lg h-screen flex flex-col justify-between'>
-
         <div>
           <div className='flex flex-row justify-between pb-4' >
             <Image
@@ -40,7 +39,6 @@ export default function Filters({ query, onQueryChange, values, onValuesChange }
             />
             <div className='flex text-3xl items-center'>Gizmo Garage</div>
           </div>
-
           {values && onValuesChange && (
             <div id='Filters'>
               <div className='flex flex-row justify-between pl-5 pr-5 text-xl'>
@@ -85,7 +83,6 @@ export default function Filters({ query, onQueryChange, values, onValuesChange }
               </div>
             </div>
           )}
-
           {onQueryChange && (
             <div id="search" className='p-4'>
               <label htmlFor="search=bar">Search</label>
@@ -100,22 +97,34 @@ export default function Filters({ query, onQueryChange, values, onValuesChange }
             </div>
           )}
         </div>
-
         <div className='flex flex-col justify-between'>
           <div id="options" className='flex flex-col p-6 mt-auto'>
             {admin ? (
               <>
-                <button className='p-1 text-white transition-colors duration-300 hover:text-gray-400' onClick={() => router.push("/admin-settings")}>Admin Settings</button>
+                <button
+                  className='p-1 text-white transition-colors duration-300 hover:text-gray-400'
+                  onClick={() => router.push("/admin-settings")}
+                >
+                  Admin Settings
+                </button>
               </>
             ) : (
               <></>
             )}
-            <button className='p-1 text-white transition-colors duration-300 hover:text-gray-400' onClick={() => router.push("/account-settings")}>Account Settings</button>
-            <button className='p-1 text-white transition-colors duration-300 hover:text-gray-400' onClick={() => router.push('/signout')}>Sign Out</button>
+            <button
+              className='p-1 text-white transition-colors duration-300 hover:text-gray-400'
+              onClick={() => router.push("/account-settings")}
+            >
+              Account Settings
+            </button>
+            <button
+              className='p-1 text-white transition-colors duration-300 hover:text-gray-400'
+              onClick={() => router.push('/signout')}
+            >
+              Sign Out
+            </button>
           </div>
         </div>
-
-
       </div>
     </>
   )
