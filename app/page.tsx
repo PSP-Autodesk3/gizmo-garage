@@ -48,7 +48,7 @@ function Home() {
         const exists = await response.json();
         if (exists[0]?.DatabaseExists !== 1 || exists.error === "Failed to check database status") {
           setDatabaseErrorMessage("Database not found, contact your system administrator");
-        } 
+        }
         // Checks if the AutoDesk Auth token is set in session storage before accessing APIs
         else if (sessionStorage.getItem('token') != '') {
           // Gets projects that the user has access to
@@ -124,12 +124,12 @@ function Home() {
       </>
     )
   }
-  
+
   // Displays if the user is not logged into their account
   if (!user) {
     return (
       <>
-        <SigningIn/>
+        <SigningIn />
       </>
     )
   }
@@ -164,7 +164,7 @@ function Home() {
         <div id="side-bar">
           <div id="filters">
             {/* Needs filters appropriate to projects, or needs removing */}
-            <Filters/>
+            <Filters />
           </div>
         </div>
         <div id="data" className='flex flex-row '>
@@ -179,38 +179,38 @@ function Home() {
               </button>
             </div>
             {!loadingProjects ? (
-                projects.map((project, index) => (
-                  <div className="project" key={index}>
-                      <div id="folders">
-                      <div className="bg-slate-900 p-4 m-auto rounded-lg shadow-lg mt-16 flex flex-row justify-between">
-                        <div className='p-2 pr-10'>
-                          <p>Name: {project.name} </p>
-                          <p>Version: </p>
-                          <p>Date: </p>
-                        </div>
-                        <div className='content-center'>
-                          <button
-                            className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
-                            onClick={() => router.push(`/project/${project.name.replace(/ /g, '+')}`)}
-                          >
-                            View
-                          </button>
-                        </div>
+              projects.map((project, index) => (
+                <div className="project" key={index}>
+                  <div id="folders">
+                    <div className="bg-slate-900 p-4 m-auto rounded-lg shadow-lg mt-16 flex flex-row justify-between">
+                      <div className='p-2 pr-10'>
+                        <p>Name: {project.name} </p>
+                        <p>Version: </p>
+                        <p>Date: </p>
+                      </div>
+                      <div className='content-center'>
+                        <button
+                          className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                          onClick={() => router.push(`/project/${project.name.replace(/ /g, '+')}`)}
+                        >
+                          View
+                        </button>
                       </div>
                     </div>
                   </div>
-                ))
-              ) : (
-                <>
+                </div>
+              ))
+            ) : (
+              <>
                 <div>
                   <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
-                      <Skeleton width={400} height={100}/>
+                    <Skeleton width={400} height={100} />
                   </SkeletonTheme>
                 </div>
-                </>
-              )}
+              </>
+            )}
           </div>
-        </div>    
+        </div>
       </div>
     </>
   )

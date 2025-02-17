@@ -17,18 +17,18 @@ function Home() {
   // Reset password
   function resetPassword(email: string) {
     sendPasswordResetEmail(auth, email) // Ref: https://stackoverflow.com/a/71025861 - Adam
-    .then(()=> {
-      const popupAlert = document.querySelector('.popup')
-      popupAlert?.classList.add('show');
-      popupAlert?.classList.remove('hidden');
-      setTimeout(() => {
+      .then(() => {
+        const popupAlert = document.querySelector('.popup')
+        popupAlert?.classList.add('show');
+        popupAlert?.classList.remove('hidden');
+        setTimeout(() => {
           popupAlert?.classList.remove('show');
           popupAlert?.classList.add('hidden');
-      }, 3000); // Hide after 3 seconds
-    })
-    .catch((err) => {
+        }, 3000); // Hide after 3 seconds
+      })
+      .catch((err) => {
         alert(err.message);
-    });
+      });
   }
 
   return (
@@ -68,12 +68,12 @@ function Home() {
             />
           </div>
         </form>
-        <button 
-            type="button"
-            className="px-6 py-3 text-lg font-medium bg-indigo-600 mx-4 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500 50" 
-            onClick={() => resetPassword(email)}
-            >
-            Reset Password
+        <button
+          type="button"
+          className="px-6 py-3 text-lg font-medium bg-indigo-600 mx-4 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500 50"
+          onClick={() => resetPassword(email)}
+        >
+          Reset Password
         </button>
       </div>
     </>

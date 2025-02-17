@@ -1,7 +1,5 @@
-import { Range } from 'react-range';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { signOut } from 'firebase/auth';
 import { auth } from '@/app/firebase/config'; 
 import Image from "next/image"
 
@@ -12,24 +10,10 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 
 
 export default function Filters() {
-  const [values, setValues] = useState([20, 80]);
-  const [tagQuery, updateTagQuery] = useState('');
   const [query, updateQuery] = useState('');
   const [user, loading] = useAuthState(auth);
   const router = useRouter();
   const admin = useState(true);
-
-
-  const handleSignOut = async (e: any) => {
-    sessionStorage.setItem('token', '');
-    signOut(auth);
-  }
-
-  const handleAccountSettings = async (e: any) => {
-    console.log("Pushed");
-    router.push("/account-settings");
-    console.log("Pushed");
-  }
 
   if (loading) {
     return (
