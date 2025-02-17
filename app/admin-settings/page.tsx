@@ -2,6 +2,7 @@
 
 // Middleware
 import withAuth from "@/app/lib/withAuth";
+import Filter from '../Filter';
 
 // Other
 import { useState, useEffect } from 'react'
@@ -56,6 +57,8 @@ function Home() {
 
   return (
     <>
+    
+    <Filter />
   <div className="flex flex-col items-center justify-center min-h-screen space-y-4">
   <Link className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
     href="/signout">Sign Out</Link>
