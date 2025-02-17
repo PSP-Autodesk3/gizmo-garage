@@ -5,9 +5,7 @@ import withAuth from "@/app/lib/withAuth";
 
 // Other
 import { useRouter, usePathname } from 'next/navigation';
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { Range } from 'react-range';
 
 //Filter component
 import Filters from "./Filter"
@@ -34,6 +32,7 @@ function Home({ params }: PageProps) {
   const [routes, setRoutes] = useState<string[]>([]);
   const [folders, setFolders] = useState<Folder[]>([]);
   const [files, setFiles] = useState<File[]>([]);
+  const [query, setQuery] = useState<string>('');
 
   useEffect(() => {
     // This works, but is just testing. These should be reworked into the actual application.
@@ -127,7 +126,7 @@ function Home({ params }: PageProps) {
     <>
       <div className='flex m-auto'>
         <div id='Filter' className='flex'>
-          <Filters />
+          <Filters onQueryChange={setQuery} />
         </div>
         <div id="data">
           <div id="breadcrumbs" className='flex flex-row'>
