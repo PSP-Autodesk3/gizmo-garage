@@ -130,15 +130,14 @@ function Home({ params }: PageProps) {
           <Filters />
         </div>
         <div id="data">
-          <div id="breadcrumbs" className='flex flex-row'>
-            <p>Breadcrumbs:&nbsp;&nbsp;&nbsp;</p>
+          <div id="breadcrumbs" className="flex flex-row p-4 rounded-lg mx-8 my-4 bg-slate-800">
             <button
-              onClick={() => { router.push(`/`); }}
+              className="text-3xl text-center" onClick={() => { router.push(`/`); }}
             >
               Home
             </button>
-            <p>&nbsp;&nbsp;&gt;&nbsp;&nbsp;</p>
-            <button
+            <h1 className="text-3xl text-center">&nbsp;&nbsp;&gt;&nbsp;&nbsp;</h1>
+            <button className="text-3xl text-center"
               onClick={() => { router.push(`/project/${project.replace(/%2B/g, '+')}`); }}
             >
               {project.replace(/%2B/g, ' ')}
@@ -146,8 +145,9 @@ function Home({ params }: PageProps) {
             {Array.isArray(routes) && routes.length > 0 && (
               routes.map((route, index) => (
                 <>
-                  <p>&nbsp;&nbsp;&gt;&nbsp;&nbsp;</p>
+                  <h1 className="text-center text-3xl">&nbsp;&nbsp;&gt;&nbsp;&nbsp;</h1>
                   <button
+                    className="text-center text-3xl"
                     key={route}
                     onClick={() => goneBack(index)}
                   >
@@ -157,13 +157,15 @@ function Home({ params }: PageProps) {
               ))
             )}
           </div>
-          <div id="folders">
-            <h1>Folders</h1>
+          <div id="folders" className="mx-8 my-4">
+            <h1 className="text-3xl my-4">Folders:</h1>
+            <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
             {Array.isArray(folders) && folders.length > 0 && (
               folders.map((folder) => (
                 <>
                   <div key={folder.folder_id}>
                     <button
+                      className="bg-slate-800 rounded-lg text-xl my-4 px-4 py-2"
                       onClick={() => { router.push(pathname + `/${folder.name.replace(/ /g, '+')}`); }}
                     >
                       {folder.name}
@@ -172,17 +174,20 @@ function Home({ params }: PageProps) {
                 </>
               ))
             )}
-            <button>
+            </div>
+            <button className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 flex justify-center">
               Create New Folder
             </button>
           </div>
-          <div id="files">
-            <h1>Files</h1>
+          <div id="files" className="mx-8 my-4">
+            <h1 className="my-4 text-3xl">Files</h1>
+            <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
             {Array.isArray(files) && files.length > 0 && (
               files.map((file) => (
                 <>
                   <div key={file.object_id}>
                     <button
+                      className="bg-slate-800 rounded-lg text-xl my-4 px-4 py-2"
                       onClick={() => { }}
                     >
                       {file.name}
@@ -191,7 +196,8 @@ function Home({ params }: PageProps) {
                 </>
               ))
             )}
-            <button>
+            </div>
+            <button className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 flex justify-center">
               Create New Item
             </button>
           </div>

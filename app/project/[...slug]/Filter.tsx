@@ -7,7 +7,6 @@ import Image from "next/image"
 
 export default function Filters() {
   const [values, setValues] = useState([20, 80]);
-  const [tagQuery, updateTagQuery] = useState('');
   const [query, updateQuery] = useState('');
   const router = useRouter();
   const admin = useState(true);
@@ -80,21 +79,6 @@ export default function Filters() {
                   )}
                   onFinalChange={() => handleRangeValues()}
                 />
-              </div>
-
-              <div id="tags" className='p-4'>
-                <label htmlFor="tag-search">Tags</label>
-                <input
-                  className='text-white w-full p-2 my-2 rounded-lg bg-slate-800'
-                  type="text"
-                  placeholder="Search"
-                  name="tag-search"
-                  value={tagQuery}
-                  onChange={(e) => updateTagQuery(e.target.value)}
-                />
-                <div id="applied-tags" className='p-4'>
-
-                </div>
               </div>
 
               <div id="search" className='p-4'>
