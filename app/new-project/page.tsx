@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useEffect } from 'react';
 
 // For Firebase Auth
 import { auth } from '@/app/firebase/config';
@@ -26,6 +27,7 @@ export default function Home() {
                     headers: { 'Content-Type': 'application/json' },
                 })
                 response = await getUser.json();
+                console.log("Dbug Reponse:", response)
 
                 if (response[0].user_id) {
                     const id = response[0].user_id;
@@ -46,9 +48,11 @@ export default function Home() {
         }
     }
 
-    if (!user || !sessionStorage.getItem('token')) {
-        router.push("/");
-    }
+    useEffect(() => {
+        if (!user || !sessionStorage.getItem('token')) {
+            router.push("/");
+        }
+    }, [user])
 
     return (
         <>

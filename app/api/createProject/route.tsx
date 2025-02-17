@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       database: process.env.DB_DATABASE,
     });
 
-    await connection.execute("INSERT INTO projects (name, owner) VALUES (?, ?)", [name, id]);
+    await connection.execute("INSERT INTO Projects (name, owner) VALUES (?, ?)", [name, id]);
     
     await connection.end();
 

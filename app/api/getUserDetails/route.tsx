@@ -16,8 +16,8 @@ export async function GET(request: Request) {
 
     const [rows] = await connection.execute(`
         SELECT *
-        FROM users
-        WHERE users.email = ?
+        FROM Users
+        WHERE Users.email = ?
     `, [email]);
     await connection.end();
 
