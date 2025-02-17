@@ -11,6 +11,13 @@ import withAuth from "@/app/lib/withAuth";
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
+
+//components
+import Filters from './Filter';
+import SigningIn from './signingIn';
 // import Image from 'next/image';
 
 // Format returned by api call to getProjects
@@ -41,7 +48,7 @@ function Home() {
         const exists = await response.json();
         if (exists[0]?.DatabaseExists !== 1 || exists.error === "Failed to check database status") {
           setDatabaseErrorMessage("Database not found, contact your system administrator");
-        } 
+        }
         // Checks if the AutoDesk Auth token is set in session storage before accessing APIs
         else if (sessionStorage.getItem('token') != '') {
           // Gets projects that the user has access to
@@ -117,24 +124,12 @@ function Home() {
       </>
     )
   }
-  
+
   // Displays if the user is not logged into their account
   if (!user) {
     return (
       <>
-        <div className="bg-slate-900 p-4 w-[40%] m-auto rounded-lg shadow-lg mt-16">
-          <div className="flex flex-col items-center space-y-6">
-            <h1 className="text-4xl text-center font-semibold">
-              Gizmo Garage
-            </h1>
-            <Link href="/login" className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">
-              Sign in to your account
-            </Link>
-            <Link href="/register" className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">
-              Create an account
-            </Link>
-          </div>
-        </div>
+        <SigningIn />
       </>
     )
   }
@@ -165,49 +160,55 @@ function Home() {
   // Displays if all other information is valid
   return (
     <>
-      <div id="side-bar">
-        {/*
-        <Image
-          src="source"
-          alt="Logo"
-          width={25}
-          height={25}
-        />
-        */}
-        <p>Gizmo Garage</p>
-        <div id="filters">
-          {/* Needs filters appropriate to projects, or needs removing */}
+      <div className='flex m-auto'>
+        <div id="side-bar">
+          <div id="filters">
+            {/* Needs filters appropriate to projects, or needs removing */}
+            <Filters />
+          </div>
         </div>
-        <div id="options">
-          {admin && (
-            <>
-              <button onClick={() => router.push("/admin-settings")}>Admin Settings</button>
-            </>
-          )}
-          <button onClick={() => router.push("/account-settings")}>Account Settings</button>
-          <Link href="/signout">Sign Out</Link>
-        </div>
-      </div>
-      <div id="data">
-        <div id="projects">
-          <h1>Projects</h1>
-          {!loadingProjects ? (
-            projects.map((project, index) => (
-              <div className="project" key={index} >
-                <button
-                  onClick={() => router.push(`/project/${project.name.replace(/ /g, '+')}`)}
-                >
-                  {project.name}
-                </button>
-              </div>
-            ))
-          ) : (
-            <>
-              <p>Skeleton Loading</p>
-            </>
-          )}
-          <div>
-            <button onClick={() => router.push("/new-project")}>Create new Project</button>
+        <div id="data" className='flex flex-row '>
+          <div id="projects">
+            <div className="flex flex-row justify-between">
+              <h1 className='p-10 text-4xl text-white transition-colors duration-300 hover:text-gray-400 pb-10'>Projects</h1>
+              <button
+                className="self-center flex justify-end px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                onClick={() => router.push("/new-project")}
+              >
+                Create new Project
+              </button>
+            </div>
+            {!loadingProjects ? (
+              projects.map((project, index) => (
+                <div className="project" key={index}>
+                  <div id="folders">
+                    <div className="bg-slate-900 p-4 m-auto rounded-lg shadow-lg mt-16 flex flex-row justify-between">
+                      <div className='p-2 pr-10'>
+                        <p>Name: {project.name} </p>
+                        <p>Version: </p>
+                        <p>Date: </p>
+                      </div>
+                      <div className='content-center'>
+                        <button
+                          className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                          onClick={() => router.push(`/project/${project.name.replace(/ /g, '+')}`)}
+                        >
+                          View
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <>
+                <div>
+                  <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
+                    <Skeleton width={400} height={100} />
+                  </SkeletonTheme>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>

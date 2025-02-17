@@ -5,6 +5,10 @@ import { auth } from '@/app/firebase/config';
 import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { sendPasswordResetEmail } from 'firebase/auth';
 
+//skeleton loading
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
+
 // Middleware
 import withAuth from "@/app/lib/withAuth";
 
@@ -54,6 +58,7 @@ function Home() {
         alert(err.message);
     });
   }
+
 
   return (
     <>

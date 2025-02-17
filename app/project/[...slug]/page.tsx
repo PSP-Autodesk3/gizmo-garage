@@ -9,6 +9,9 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Range } from 'react-range';
 
+//Filter component
+import Filters from "./Filter"
+
 interface PageProps {
   params: Promise<{ slug: string[] }>;
 }
@@ -92,126 +95,50 @@ function Home({ params }: PageProps) {
 
   return (
     <>
-      <div id="side-bar">
-        {/*
-        <Image
-          src="source"
-          alt="Logo"
-          width={25}
-          height={25}
-        />
-        */}
-        <p>Gizmo Garage</p>
-        <div id="filters">
-          <div id="file-size-filter">
-            {/* https://www.geeksforgeeks.org/how-to-add-slider-in-next-js/ - Rob*/}
-            <Range
-              step={0.1}
-              min={0}
-              max={100}
-              values={values}
-              onChange={(newValues) => setValues(newValues)}
-              renderTrack={({ props, children }) => (
-                <div
-                  {...props}
-                  style={{
-                      ...props.style,
-                      height: '6px',
-                      width: '50%',
-                      backgroundColor: '#ccc'
-                  }}
-                >
-                  {children}
-                </div>
-              )}
-              renderThumb={({ props }) => (
-                <div
-                  {...props}
-                  style={{
-                    ...props.style,
-                    height: '42px',
-                    width: '42px',
-                    backgroundColor: '#999'
-                  }}
-                />
-              )}
-              onFinalChange={() => console.log(values)}
-            />
-          </div>
-          <div id="tags">
-            <label htmlFor="tag-search">Tags</label>
-            <input
-              type="text"
-              placeholder="Search"
-              name="tag-search"
-              value={tagQuery}
-              onChange={(e) => updateTagQuery(e.target.value)}
-            />
-            <div id="applied-tags">
-
-            </div>
-          </div>
-          <div id="search">
-            <label htmlFor="search=bar">Search</label>
-            <input
-              type="text"
-              placeholder="Search"
-              name="search"
-              value={query}
-              onChange={(e) => updateQuery(e.target.value)}
-            />
-          </div>
-          <button>Submit</button>
+      <div className='flex m-auto'>
+        <div id='Filter' className='flex'>
+          <Filters/>
         </div>
-        <div id="options">
-          {admin && (
-            <>
-              <button onClick={() => router.push("/admin-settings")}>Admin Settings</button>
-            </>
-          )}
-          <button onClick={() => router.push("/account-settings")}>Account Settings</button>
-          <Link href="/signout">Sign Out</Link>
-        </div>
-      </div>
-      <div id="data">
-        <div id="breadcrumbs" className='flex flex-row'>
-          <p>Breadcrumbs:&nbsp;&nbsp;&nbsp;</p>
-          <button
-            onClick={() => {router.push(`/project/${project.replace(/%2B/g, '+')}`);}}
-          >
-            {project.replace(/%2B/g, ' ')}
-          </button>
-          {Array.isArray(routes) && routes.length > 0 && (
-            routes.map((route, index) => (
-              <>
-                <p>&nbsp;&nbsp;&gt;&nbsp;&nbsp;</p>
-                <button
-                  key={route}
-                  onClick={() => goneBack(index)}
-                >
-                  {route.replace(/%2B/g, ' ')}
-                </button>
-              </>
-            ))
-          )}
-        </div>
-        <div id="folders">
-          {Array.isArray(folders) && folders.length > 0 && (
-            folders.map((folder) => (
-              <>
-                <div key={folder.folder_id}>
+        <div id="data">
+          <div id="breadcrumbs" className='flex flex-row'>
+            <p>Breadcrumbs:&nbsp;&nbsp;&nbsp;</p>
+            <button
+              onClick={() => {router.push(`/project/${project.replace(/%2B/g, '+')}`);}}
+            >
+              {project.replace(/%2B/g, ' ')}
+            </button>
+            {Array.isArray(routes) && routes.length > 0 && (
+              routes.map((route, index) => (
+                <>
+                  <p>&nbsp;&nbsp;&gt;&nbsp;&nbsp;</p>
                   <button
-                  onClick={() => {router.push(pathname + `/${folder.name.replace(/ /g, '+')}`);}}
+                    key={route}
+                    onClick={() => goneBack(index)}
                   >
-                    {folder.name}
+                    {route.replace(/%2B/g, ' ')}
                   </button>
-                </div>
-              </>
-            ))
-          )}
-        </div>
-        <div id="files">
-          
+                </>
+              ))
+            )}
+          </div>
+          <div id="folders">
+            {Array.isArray(folders) && folders.length > 0 && (
+              folders.map((folder) => (
+                <>
+                  <div key={folder.folder_id}>
+                    <button
+                    onClick={() => {router.push(pathname + `/${folder.name.replace(/ /g, '+')}`);}}
+                    >
+                      {folder.name}
+                    </button>
+                  </div>
+                </>
+              ))
+            )}
+          </div>
+          <div id="files">
+            
+          </div>
         </div>
       </div>
     </>

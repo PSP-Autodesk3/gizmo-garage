@@ -17,18 +17,18 @@ function Home() {
   // Reset password
   function resetPassword(email: string) {
     sendPasswordResetEmail(auth, email) // Ref: https://stackoverflow.com/a/71025861 - Adam
-    .then(()=> {
-      const popupAlert = document.querySelector('.popup')
-      popupAlert?.classList.add('show');
-      popupAlert?.classList.remove('hidden');
-      setTimeout(() => {
+      .then(() => {
+        const popupAlert = document.querySelector('.popup')
+        popupAlert?.classList.add('show');
+        popupAlert?.classList.remove('hidden');
+        setTimeout(() => {
           popupAlert?.classList.remove('show');
           popupAlert?.classList.add('hidden');
-      }, 3000); // Hide after 3 seconds
-    })
-    .catch((err) => {
+        }, 3000); // Hide after 3 seconds
+      })
+      .catch((err) => {
         alert(err.message);
-    });
+      });
   }
 
   return (
@@ -37,8 +37,8 @@ function Home() {
         <h1 className="text-xl font-bold">Password Reset</h1>
         <p className="mx-2">We have sent an email to {email}.</p>
       </div>
-      <div className="flex flex-col">
-        <Link href="/signout">Sign Out</Link>
+      <div className="p-4">
+        <Link className=" px-6 py-3 text-lg font-medium bg-indigo-600 mx-4 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500 50" href="/signout">Sign Out</Link>
         {/*
         {details ? (
           <div>
@@ -55,7 +55,7 @@ function Home() {
       <p>Gizmo Garage</p>
       <div id="firebase-settings">
         <form>
-          <div className="py-2">
+          <div className="py-2 max-w-[20%]">
             <label htmlFor="email" className="text-xl">Email:</label>
             <input
               className="text-white w-full bg-slate-800 p-2 my-2 rounded-lg"
@@ -68,12 +68,12 @@ function Home() {
             />
           </div>
         </form>
-        <button 
-            type="button"
-            className="px-6 py-3 text-lg font-medium bg-indigo-600 mx-4 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500 50" 
-            onClick={() => resetPassword(email)}
-            >
-            Reset Password
+        <button
+          type="button"
+          className="px-6 py-3 text-lg font-medium bg-indigo-600 mx-4 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500 50"
+          onClick={() => resetPassword(email)}
+        >
+          Reset Password
         </button>
       </div>
     </>
