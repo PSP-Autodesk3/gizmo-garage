@@ -101,6 +101,18 @@ export default function Filters() {
                 </div>
               </div>
 
+              <div id="search" className='p-4'>
+                <label htmlFor="search=bar">Search</label>
+                <input
+                className='text-white w-full p-2 my-2 rounded-lg bg-slate-800'
+                  type="text"
+                  placeholder="Search"
+                  name="search"
+                  value={query}
+                  onChange={(e) => updateQuery(e.target.value)}
+                />
+              </div>
+
                 <div className="flex justify-center">
                       <button className='px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 flex justify-center'>Submit</button>
                 </div>
