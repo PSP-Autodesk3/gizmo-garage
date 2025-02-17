@@ -44,14 +44,6 @@ export async function POST() {
     `);
 
     await connection.execute(`
-      CREATE TABLE IF NOT EXISTS Object (
-        object_id INT PRIMARY KEY AUTO_INCREMENT,
-        author INT NOT NULL,
-        FOREIGN KEY (author) REFERENCES Users(user_id)
-      );
-    `);
-
-    await connection.execute(`
       CREATE TABLE IF NOT EXISTS Folder (
         folder_id INT PRIMARY KEY AUTO_INCREMENT,
         name VARCHAR(255) NOT NULL,
@@ -63,31 +55,39 @@ export async function POST() {
     `);
 
     await connection.execute(`
-      CREATE TABLE IF NOT EXISTS Item (
-        item_id INT PRIMARY KEY AUTO_INCREMENT,
-        name VARCHAR(255) NOT NULL,
+      CREATE TABLE IF NOT EXISTS Object (
+        object_id INT PRIMARY KEY AUTO_INCREMENT,
+        author INT NOT NULL,
+        FOREIGN KEY (author) REFERENCES Users(user_id),
         folder_id INT NOT NULL,
-        FOREIGN KEY (folder_id) REFERENCES Folder(folder_id)
+        FOREIGN KEY (folder_id) REFERENCES Folder(folder_id),
+        bucket_id INT NOT NULL
       );
     `);
 
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS Version (
         version_id INT PRIMARY KEY AUTO_INCREMENT,
-        item_id INT NOT NULL,
-        FOREIGN KEY (item_id) REFERENCES Item(item_id),
-        year INT NOT NULL,
-        month INT NOT NULL,
-        iteration INT NOT NULL
+        object_id INT NOT NULL,
+        FOREIGN KEY (object_id) REFERENCES Object(object_id),
+        version INT NOT NULL,
+        date_time DATETIME NOT NULL
       );
     `);
 
     await connection.execute(`
-      CREATE TABLE IF NOT EXISTS Version_Object (
-        version_id int NOT NULL,
-        FOREIGN KEY (version_id) REFERENCES Version(version_id),
-        object_id int NOT NULL,
-        FOREIGN KEY (object_id) REFERENCES Object(object_id)
+      CREATE TABLE IF NOT EXISTS Tag (
+        tag_id INT PRIMARY KEY AUTO_INCREMENT,
+        tag VARCHAR(255) NOT NULL
+      );
+    `);
+
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS Object_Tag (
+        object_id INT NOT NULL,
+        FOREIGN KEY (object_id) REFERENCES Object(object_id),
+        tag_id INT NOT NULL,
+        FOREIGN KEY (tag_id) REFERENCES Tag(tag_id)
       );
     `);
     await connection.end();

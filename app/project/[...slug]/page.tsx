@@ -21,16 +21,19 @@ interface Folder {
   name: string;
 }
 
+interface File {
+  object_id: number;
+  name: string;
+}
+
 function Home({ params }: PageProps) {
   const router = useRouter();
   const pathname = usePathname();
   const admin = useState(true);
-  const [query, updateQuery] = useState('');
-  const [tagQuery, updateTagQuery] = useState('');
-  const [values, setValues] = useState([20, 80]);
   const [project, setProject] = useState('');
   const [routes, setRoutes] = useState<string[]>([]);
   const [folders, setFolders] = useState<Folder[]>([]);
+  const [files, setFiles] = useState<File[]>([]);
 
   useEffect(() => {
     // This works, but is just testing. These should be reworked into the actual application.
@@ -63,28 +66,39 @@ function Home({ params }: PageProps) {
     }
     */}
 
-      const fetchFolders = async () => {
+      const fetchData = async () => {
         const resolved = await params;
         if (resolved) {
           setProject(resolved.slug[0]);
           setRoutes(resolved.slug.slice(1));
 
-          const query = await fetch("/api/getFolders", {
+          let query = await fetch("/api/getFolders", {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ project: resolved.slug[0], routes: resolved.slug.slice(1) }),
           });
 
-          console.log("Project:", project);
-          console.log("Routes:", routes);
-
-          const response = await query.json();
+          let response = await query.json();
           setFolders(response);
           console.log("Response", response);
+
+          query = await fetch("/api/getObjects", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ project: resolved.slug[0], routes: resolved.slug.slice(1) }),
+          });
+
+          response = await query.json();
+          setFiles(response);
+          console.log("Response", response);
+
+          console.log("Projects:", project);
+          console.log("Files:", files);
+          console.log("Routes:", routes);
         }
       };
 
-      fetchFolders();
+      fetchData();
   }, []);
 
   const goneBack = async (num: number) => {
@@ -102,6 +116,12 @@ function Home({ params }: PageProps) {
         <div id="data">
           <div id="breadcrumbs" className='flex flex-row'>
             <p>Breadcrumbs:&nbsp;&nbsp;&nbsp;</p>
+            <button
+              onClick={() => {router.push(`/`);}}
+            >
+              Home
+            </button>
+            <p>&nbsp;&nbsp;&gt;&nbsp;&nbsp;</p>
             <button
               onClick={() => {router.push(`/project/${project.replace(/%2B/g, '+')}`);}}
             >
@@ -122,6 +142,7 @@ function Home({ params }: PageProps) {
             )}
           </div>
           <div id="folders">
+            <h1>Folders</h1>
             {Array.isArray(folders) && folders.length > 0 && (
               folders.map((folder) => (
                 <>
@@ -137,7 +158,20 @@ function Home({ params }: PageProps) {
             )}
           </div>
           <div id="files">
-            
+            <h1>Files</h1>
+            {Array.isArray(files) && files.length > 0 && (
+              files.map((file) => (
+                <>
+                  <div key={file.object_id}>
+                    <button
+                    onClick={() => {}}
+                    >
+                      {file.name}
+                    </button>
+                  </div>
+                </>
+              ))
+            )}
           </div>
         </div>
       </div>
