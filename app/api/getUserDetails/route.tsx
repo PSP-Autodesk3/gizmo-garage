@@ -14,7 +14,7 @@ export async function GET(request: Request) {
         database: process.env.DB_DATABASE,
     });
 
-    const [rows] = await connection.execute(`
+    const [rows]: [any[], any] = await connection.execute(`
         SELECT *
         FROM Users
         WHERE Users.email = ?
