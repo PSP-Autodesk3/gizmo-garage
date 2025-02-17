@@ -26,7 +26,6 @@ function Home() {
 
 
   const setupDatabase = async () => {
-    console.log("Exists:", databaseExists);
     switch (databaseExists) {
       case 0:
         confirmSetupDatabase();
@@ -74,7 +73,6 @@ function Home() {
       </div>
       {(confirmModule) && (
         <>
-        {/* Still needs styling, this is just a rough representation of what I was looking to do */}
           <div className="fixed inset-0 flex items-center justify-center bg-opacity-50 bg-slate-900 p-4 w-[40%] h-[40%] m-auto rounded-3xl shadow-lg mt-16">
             <div className="text-center">
               <h1 className='text-3xl'>This will clear all data.</h1> 

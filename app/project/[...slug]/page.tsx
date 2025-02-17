@@ -5,7 +5,7 @@ import withAuth from "@/app/lib/withAuth";
 
 // Other
 import { useRouter, usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback  } from 'react';
 
 //Filter component
 import Filters from "../../Filter"
@@ -33,6 +33,56 @@ function Home({ params }: PageProps) {
   const [files, setFiles] = useState<File[]>([]);
   const [query, setQuery] = useState<string>('');
   const [values, setValues] = useState([20, 80]);
+  const [confirmModule, setConfirmModule] = useState(false);
+  const [folderName, setFolderName] = useState('');
+  const [id, setID] = useState(0);
+  const [type, setType] = useState(0);
+
+  const getData = useCallback(async () => {
+    const resolved = await params;
+    if (resolved) {
+      setProject(resolved.slug[0]);
+      setRoutes(resolved.slug.slice(1));
+
+      // Get current folder or project ID
+      let query = await fetch("/api/getCurrentFileID", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ project: resolved.slug[0], routes: resolved.slug.slice(1) }),
+      });
+
+      let response = await query.json();
+
+      setID(0);
+      setType(0);
+      if (response[0].folder_id) {
+        setID(response[0].folder_id);
+      } else {
+        setID(response[0].project_id);
+        setType(1);
+      }
+
+      // Get folders
+      query = await fetch("/api/getFolders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, type }),
+      });
+
+      response = await query.json();
+      setFolders(response);
+
+      // Get files
+      query = await fetch("/api/getObjects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, type }),
+      });
+
+      response = await query.json();
+      setFiles(response);
+    }
+  }, [params, id, type]);
 
   useEffect(() => {
     // This works, but is just testing. These should be reworked into the actual application.
@@ -64,62 +114,29 @@ function Home({ params }: PageProps) {
       fetchData();
     }
     */}
-
-    const fetchData = async () => {
-      const resolved = await params;
-      if (resolved) {
-        setProject(resolved.slug[0]);
-        setRoutes(resolved.slug.slice(1));
-
-        // Gets the current folder or project ID
-        let query = await fetch("/api/getCurrentFileID", {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ project: resolved.slug[0], routes: resolved.slug.slice(1) }),
-        });
-
-        let response = await query.json();
-
-        // Assigns the returned ID to the correct variables
-        let id = 0; let type = 0;
-        if (response[0].folder_id) {
-          console.log("Folder");
-          id = response[0].folder_id;
-        } else {
-          console.log("Project");
-          id = response[0].project_id;
-          type = 1;
-        }
-
-        // Gets folders
-        query = await fetch("/api/getFolders", {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id, type }),
-        })
-
-        response = await query.json();
-        setFolders(response);
-
-        // Gets files
-        query = await fetch("/api/getObjects", {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id, type }),
-        })
-
-        response = await query.json();
-        setFiles(response);
-      }
-    };
-
-    fetchData();
   }, []);
+
+  useEffect(() => {
+    getData();
+  }, [getData]);
 
   const goneBack = async (num: number) => {
     const selectedFolders = routes.slice(0, (num + 1)).join('/');
     const route = `/project/${project.replace(/%2B/g, '+')}/${selectedFolders.replace(/%2B/g, '+')}`;
     router.push(route);
+  }
+
+  const newFolder = async (e: any) => {
+    e.preventDefault();
+
+    await fetch("/api/createFolder", {
+      method: "POST",
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ folderName, project, id, type }),
+    });
+
+    getData();
+    setConfirmModule(false);
   }
 
   return (
@@ -171,7 +188,9 @@ function Home({ params }: PageProps) {
                 </>
               ))
             )}
-            <button>
+            <button
+              onClick={() => setConfirmModule(true)}
+            >
               Create New Folder
             </button>
           </div>
@@ -195,6 +214,36 @@ function Home({ params }: PageProps) {
             </button>
           </div>
         </div>
+        {(confirmModule) && (
+          <>
+            <div className="fixed inset-0 flex items-center justify-center bg-opacity-50 bg-slate-900 p-4 w-[40%] h-[40%] m-auto rounded-3xl shadow-lg mt-16">
+              <form className="text-center" onSubmit={(e) => newFolder(e)}>
+                <h1 className='text-3xl'>Folder name</h1>
+                <input
+                  name="folder-name"
+                  type="text"
+                  value={folderName}
+                  onChange={(e) => setFolderName(e.target.value)}
+                  className="w-full mt-4 p-2 rounded-lg"
+                  placeholder="Enter folder name"
+                />
+                <div className="mt-4">
+                  <button
+                    className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                  >
+                    Create
+                  </button>
+                  <button
+                    className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                    onClick={() => setConfirmModule(false)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </>
+        )}
       </div>
     </>
   )
