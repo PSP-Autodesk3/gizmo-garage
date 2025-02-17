@@ -27,7 +27,7 @@ function Home() {
 
     try {
         if ((password1 === password2)) {
-            if (password1.length < 6) {
+            if (password1.length >= 6) {
                 if (password1 && password1.trim() != "" && email && email.trim() != "" && fName && fName.trim() != "" && lName && lName.trim() != "") {
                     const result = await createUserWithEmailAndPassword(email, password1);
     

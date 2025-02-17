@@ -16,8 +16,8 @@ export async function POST(request: Request) {
 
     const [rows] = await connection.execute(`
       SELECT *
-      FROM Folder
-      WHERE Folder.parent_folder_id ${type === 1 ? "IS NULL AND Folder.project_id " : "" }= ?
+      FROM Object
+      WHERE Object.folder_id ${type === 1 ? "IS NULL AND Object.project_id " : "" }= ?
     `, [id]);
     
     await connection.end();
