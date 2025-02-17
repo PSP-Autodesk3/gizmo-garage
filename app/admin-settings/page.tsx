@@ -56,22 +56,25 @@ function Home() {
 
   return (
     <>
-        <div className="fixed bottom-0 left-50 right-0 m-4 rounded-lg bg-indigo-500 p-2 text-white text-center text-sm popup hidden">
-            {(databaseExists == 1) ? ( <h1 className="text-xl font-bold">Database Reset.</h1> ) : ( <h1 className="text-xl font-bold">Database Created.</h1> )}
-        </div>
-        
-      <Link className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50" href="/signout">Sign Out</Link>
-      {(databaseExists == 1) ? (
-        <button className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50" onClick={() => setupDatabase()}>Reset Database Content</button>
-      ) : (
-        <button className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50" onClick={() => setupDatabase()}>Initialise Database</button>
-      )}
-      <div id="search">
+  <div className="flex flex-col items-center justify-center min-h-screen space-y-4">
+  <Link className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+    href="/signout">Sign Out</Link>
+  {databaseExists == 1 ? (
+    <button className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+      onClick={() => setupDatabase()}
+    >
+      Reset Database Content  </button>
+  ) : (
+    <button className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+      onClick={() => setupDatabase()}
+    >
+      Initialise Database </button>
+  )}
+</div>
 
-      </div>
-      <div id="users">
-
-      </div>
+      <div id="search"> </div>
+      <div id="users"> </div>
+      
       {(confirmModule) && (
         <>
         {/* Still needs styling, this is just a rough representation of what I was looking to do */}
