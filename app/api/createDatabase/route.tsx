@@ -25,6 +25,11 @@ export async function POST() {
       );
     `);
 
+    // Just for development, delete for final version
+    await connection.execute(`
+      INSERT INTO Users (user_id, email, fname, lname) VALUES (1,'test@test.test','First','Last');
+    `);
+
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS Projects (
         project_id INT PRIMARY KEY AUTO_INCREMENT,

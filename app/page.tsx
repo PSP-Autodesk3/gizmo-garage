@@ -37,6 +37,7 @@ function Home() {
   const [projects, setProjects] = useState<Project[]>([] as Project[]);
   const [loading, setLoading] = useState(true);
   const [loadingProjects, setLoadingProjects] = useState(true);
+  const [query, setQuery] = useState<string>('');
 
   useEffect(() => {
     // Only runs if the user has logged in
@@ -164,7 +165,7 @@ function Home() {
         <div id="side-bar">
           <div id="filters">
             {/* Needs filters appropriate to projects, or needs removing */}
-            <Filters />
+            <Filters query={query} onQueryChange={setQuery} />
           </div>
         </div>
         <div id="data" className='flex flex-row '>

@@ -26,6 +26,7 @@ export default function Home() {
                     headers: { 'Content-Type': 'application/json' },
                 })
                 response = await getUser.json();
+                console.log("Response", response);
 
                 if (response[0].user_id) {
                     const id = response[0].user_id;

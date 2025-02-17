@@ -1,67 +1,39 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { auth } from '@/app/firebase/config';
 import Image from "next/image"
-
-import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
-import 'react-loading-skeleton/dist/skeleton.css'
-
-import { useAuthState } from 'react-firebase-hooks/auth';
+import { Range } from 'react-range';
 
 interface FiltersProps {
-  onQueryChange: React.Dispatch<React.SetStateAction<string>>;
+  query?: string;
+  onQueryChange?: React.Dispatch<React.SetStateAction<string>>;
+  values?: number[];
+  onValuesChange?: React.Dispatch<React.SetStateAction<number[]>>;
 }
 
-export default function Filters({ onQueryChange }: FiltersProps) {
-  const [user, loading] = useAuthState(auth);
+export default function Filters({ query, onQueryChange, values, onValuesChange }: FiltersProps) {
   const router = useRouter();
   const admin = useState(true);
 
-  if (loading) {
-    return (
-      <>
-        <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
-          <div>
-            <div id="side-bar" className='bg-slate-900 p-6 rounded-lg shadow-lg h-screen'>
-              <div className='flex flex-row justify-center pb-4' >
-                <Skeleton height={75} width={280} />
-              </div>
-              <div className='pb-4'>
-                <Skeleton height={120} />
-              </div>
-              <div id="filters">
-                <div className='pb-4'>
-                  <Skeleton height={100} />
-                </div>
-                <div className='pb-4'>
-                  <Skeleton height={100} />
-                </div>
-
-                <div className='pb-4'>
-                  <Skeleton height={50} />
-                </div>
-
-                <div className='pb-4'>
-                  <Skeleton height={150} />
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </SkeletonTheme>
-      </>
-    )
+  const handleRangeValues = async () => {
+    if (values ) {
+      const lower = document.getElementById("lower");
+      const higher = document.getElementById("Higher");
+  
+      if (lower && higher) {
+        lower.innerHTML = values[0].toFixed(1);
+        higher.innerHTML = values[1].toFixed(1);
+      }
+    }
   }
 
   return (
-
     <>
       <div id="side-bar" className='bg-slate-900 p-6 rounded-lg shadow-lg h-screen flex flex-col justify-between'>
 
         <div>
           <div className='flex flex-row justify-between pb-4' >
             <Image
-              src="Gizmo.svg"
+              src="/Gizmo.svg"
               alt="Sample Image"
               width={75}
               height={75}
@@ -69,16 +41,64 @@ export default function Filters({ onQueryChange }: FiltersProps) {
             <div className='flex text-3xl items-center'>Gizmo Garage</div>
           </div>
 
-          <div id="search" className='p-4'>
-            <label htmlFor="search=bar">Search</label>
-            <input
-              className='text-white w-full p-2 my-2 rounded-lg bg-slate-800'
-              type="text"
-              placeholder="Search"
-              name="search"
-              onChange={(e) => onQueryChange(e.target.value)}
-            />
-          </div>
+          {values && onValuesChange && (
+            <div id='Filters'>
+              <div className='flex flex-row justify-between pl-5 pr-5 text-xl'>
+                <p id="lower">{values[0]}</p>
+                <p id="higher">{values[1]}</p>
+              </div>
+
+              <div id="file-size-filter" className='m-10 self-center flex flex-row justify-center'>
+                {/* https://www.geeksforgeeks.org/how-to-add-slider-in-next-js/ - Rob*/}
+                <Range
+                  step={0.1}
+                  min={0}
+                  max={100}
+                  values={values}
+                  onChange={(newValues) => onValuesChange(newValues)}
+                  renderTrack={({ props, children }) => (
+                    <div
+                      {...props}
+                      style={{
+                        ...props.style,
+                        height: '6px',
+                        width: '100%',
+                      }}
+                      className='bg-slate-800'
+                    >
+                      {children}
+                    </div>
+                  )}
+                  renderThumb={({ props }) => (
+                    <div
+                      {...props}
+                      style={{
+                        ...props.style,
+                        height: '22px',
+                        width: '22px',
+                      }}
+                      className="rounded-full bg-indigo-500 border-indigo-500 border-[4px] "
+                    />
+                  )}
+                  onFinalChange={() => handleRangeValues()}
+                />
+              </div>
+            </div>
+          )}
+
+          {onQueryChange && (
+            <div id="search" className='p-4'>
+              <label htmlFor="search=bar">Search</label>
+              <input
+                className='text-white w-full p-2 my-2 rounded-lg bg-slate-800'
+                type="text"
+                placeholder="Search"
+                name="search"
+                value={query}
+                onChange={(e) => onQueryChange(e.target.value)}
+              />
+            </div>
+          )}
         </div>
 
         <div className='flex flex-col justify-between'>

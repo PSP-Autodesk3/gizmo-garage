@@ -8,7 +8,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 //Filter component
-import Filters from "./Filter"
+import Filters from "../../Filter"
 
 interface PageProps {
   params: Promise<{ slug: string[] }>;
@@ -27,12 +27,12 @@ interface File {
 function Home({ params }: PageProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const admin = useState(true);
   const [project, setProject] = useState('');
   const [routes, setRoutes] = useState<string[]>([]);
   const [folders, setFolders] = useState<Folder[]>([]);
   const [files, setFiles] = useState<File[]>([]);
   const [query, setQuery] = useState<string>('');
+  const [values, setValues] = useState([20, 80]);
 
   useEffect(() => {
     // This works, but is just testing. These should be reworked into the actual application.
@@ -126,7 +126,7 @@ function Home({ params }: PageProps) {
     <>
       <div className='flex m-auto'>
         <div id='Filter' className='flex'>
-          <Filters onQueryChange={setQuery} />
+          <Filters query={query} onQueryChange={setQuery} values={values} onValuesChange={setValues} />
         </div>
         <div id="data">
           <div id="breadcrumbs" className='flex flex-row'>
