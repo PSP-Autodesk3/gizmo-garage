@@ -58,25 +58,46 @@ function Home() {
   return (
     <>
     
-    <Filter />
-  <div className="flex flex-col items-center justify-center min-h-screen space-y-4">
-  <Link className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
-    href="/signout">Sign Out</Link>
-  {databaseExists == 1 ? (
-    <button className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
-      onClick={() => setupDatabase()}
-    >
-      Reset Database Content  </button>
-  ) : (
-    <button className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
-      onClick={() => setupDatabase()}
-    >
-      Initialise Database </button>
-  )}
+    <div className="flex m-auto">
+  {/* Sidebar */}
+  <div id="side-bar">
+    <div id="filters">
+      <Filter />
+    </div>
+  </div>
+
+  {/* Main Content Centered */}
+  <div className="flex flex-1 justify-center items-center min-h-screen">
+    <div className="flex flex-col space-y-4 items-center">
+      <Link
+        className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+        href="/signout"
+      >
+        Sign Out
+      </Link>
+
+      {databaseExists == 1 ? (
+        <button
+          className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+          onClick={() => setupDatabase()}
+        >
+          Reset Database Content
+        </button>
+      ) : (
+        <button
+          className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+          onClick={() => setupDatabase()}
+        >
+          Initialise Database
+        </button>
+      )}
+    </div>
+  </div>
 </div>
 
       <div id="search"> </div>
       <div id="users"> </div>
+      
       
       {(confirmModule) && (
         <>
