@@ -4,7 +4,7 @@ import mysql from "mysql2/promise";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { project, routes } = body;
+    const { id, type } = body;
     
     const connection = await mysql.createConnection({
       host: process.env.DB_HOST,
@@ -14,27 +14,9 @@ export async function POST(request: Request) {
       database: process.env.DB_DATABASE,
     });
 
-    let sql = `
-        FROM folder
-        JOIN projects ON folder.project_id = projects.project_id
-        WHERE folder.parent_folder_id IS NULL and projects.name = ?
-    `;
-
-    const params: (string | number)[] = [project.replace(/%2B/g, ' ')];
-
-    for (let i = 0; i < routes.length; i++) {
-        sql = `
-            FROM folder
-            WHERE folder.parent_folder_id = (
-            SELECT folder.folder_id
-        `
-        + sql + `AND folder.name = ?)`;
-        params.push(routes[i].replace(/%2B/g, ' '));
-    }
-
-    sql = "SELECT folder.folder_id, folder.name" + sql;
-
-    const [rows] = await connection.execute(sql, params);
+    const [rows] = await connection.execute(`
+      
+    `, []);
     
     await connection.end();
 

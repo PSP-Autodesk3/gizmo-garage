@@ -15,31 +15,26 @@ export async function POST(request: Request) {
     });
 
     let sql = `
-        FROM Folder
-        JOIN Projects ON Folder.project_id = Projects.project_id
-        WHERE Folder.parent_folder_id IS NULL and Projects.name = ?
+        SELECT Projects.project_id
+        FROM Projects
+        WHERE Projects.name = ?
     `;
 
     const params: (string | number)[] = [project.replace(/%2B/g, ' ')];
 
-    for (let i = 0; i < routes.length - 1; i++) {
-      sql = `
-        FROM Folder
-        WHERE Folder.parent_folder_id = (
-        SELECT Folder.folder_id
-      `
-      + sql + `AND folder.name = ?)`;
-      params.push(routes[i].replace(/%2B/g, ' '));
+    for (let i = 0; i < routes.length; i++) {
+        sql = `
+            SELECT Folder.folder_id
+            FROM Folder
+            ${i === 0 ? `WHERE Folder.project_id = (` : `WHERE Folder.parent_folder_id = (`}
+            ${sql}
+            ${i === 0 ? `) AND Folder.parent_folder_id IS NULL AND Folder.name = ?` : `) AND Folder.name = ?`}
+        `
+        params.push(routes[i].replace(/%2B/g, ' '));
     }
 
-    sql = `
-    SELECT object.object_id, object.name
-    FROM Object
-    WHERE object.folder_id = (
-    SELECT folder.folder_id
-    ` + sql + ")";
-
-    console.log(sql);
+    console.log("Sql:", sql);
+    console.log("Params:", params);
 
     const [rows] = await connection.execute(sql, params);
     
@@ -48,6 +43,6 @@ export async function POST(request: Request) {
     return NextResponse.json(rows);
   } catch (error) {
     console.error("Database error:", error);
-    return NextResponse.json({ error: "Failed to retrieve files" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to retrieve folders" }, { status: 500 });
   }
 }
