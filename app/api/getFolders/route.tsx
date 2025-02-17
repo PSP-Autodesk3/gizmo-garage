@@ -15,8 +15,10 @@ export async function POST(request: Request) {
     });
 
     const [rows] = await connection.execute(`
-      
-    `, []);
+      SELECT *
+      FROM Folder
+      WHERE folder.parent_folder_id ${type === 1 ? "IS NULL AND folder.project_id " : "" }= ?
+    `, [id]);
     
     await connection.end();
 

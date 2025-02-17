@@ -81,28 +81,36 @@ function Home({ params }: PageProps) {
         let response = await query.json();
         console.log("Response", response);
 
-        {/*
+        let id = 0; let type = 0;
+
+        if (response[0].folder_id) {
+          console.log("Folder");
+          id = response[0].folder_id;
+        } else {
+          console.log("Project");
+          id = response[0].project_id;
+          type = 1;
+        }
+
+        query = await fetch("/api/getFolders", {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, type }),
+        })
+
+        response = await query.json();
         setFolders(response);
         console.log("Response", response);
 
-        if (resolved.slug.length > 1) {
-          query = await fetch("/api/getObjects", {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ project: resolved.slug[0], routes: resolved.slug.slice(1) }),
-          });
+        query = await fetch("/api/getObjects", {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, type }),
+        })
 
-          response = await query.json();
-          setFiles(response);
-          console.log("Response", response);
-        }
-
-        console.log("Projects:", project);
-        console.log("Files:", files);
-        console.log("Routes:", routes);
-
-        console.log("Pathname:", pathname.split('/').length);
-        */}
+        response = await query.json();
+        setFiles(response);
+        console.log("Response", response);
       }
     };
 
@@ -168,27 +176,25 @@ function Home({ params }: PageProps) {
               Create New Folder
             </button>
           </div>
-          {Array.isArray(files) && pathname.split('/').length > 3 &&
-            <div id="files">
-              <h1>Files</h1>
-              {files.length > 0 && (
-                files.map((file) => (
-                  <>
-                    <div key={file.object_id}>
-                      <button
-                        onClick={() => { }}
-                      >
-                        {file.name}
-                      </button>
-                    </div>
-                  </>
-                ))
-              )}
-              <button>
-                Create New Item
-              </button>
-            </div>
-          }
+          <div id="files">
+            <h1>Files</h1>
+            {Array.isArray(files) && files.length > 0 && (
+              files.map((file) => (
+                <>
+                  <div key={file.object_id}>
+                    <button
+                      onClick={() => { }}
+                    >
+                      {file.name}
+                    </button>
+                  </div>
+                </>
+              ))
+            )}
+            <button>
+              Create New Item
+            </button>
+          </div>
         </div>
       </div>
     </>

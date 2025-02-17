@@ -4,7 +4,7 @@ import mysql from "mysql2/promise";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { project, routes } = body;
+    const { id, type } = body;
     
     const connection = await mysql.createConnection({
       host: process.env.DB_HOST,
@@ -14,40 +14,17 @@ export async function POST(request: Request) {
       database: process.env.DB_DATABASE,
     });
 
-    let sql = `
-        FROM Folder
-        JOIN Projects ON Folder.project_id = Projects.project_id
-        WHERE Folder.parent_folder_id IS NULL and Projects.name = ?
-    `;
-
-    const params: (string | number)[] = [project.replace(/%2B/g, ' ')];
-
-    for (let i = 0; i < routes.length - 1; i++) {
-      sql = `
-        FROM Folder
-        WHERE Folder.parent_folder_id = (
-        SELECT Folder.folder_id
-      `
-      + sql + `AND folder.name = ?)`;
-      params.push(routes[i].replace(/%2B/g, ' '));
-    }
-
-    sql = `
-    SELECT object.object_id, object.name
-    FROM Object
-    WHERE object.folder_id = (
-    SELECT folder.folder_id
-    ` + sql + ")";
-
-    console.log(sql);
-
-    const [rows] = await connection.execute(sql, params);
+    const [rows] = await connection.execute(`
+      SELECT *
+      FROM object
+      WHERE object.folder_id ${type === 1 ? "IS NULL AND object.project_id " : "" }= ?
+    `, [id]);
     
     await connection.end();
 
     return NextResponse.json(rows);
   } catch (error) {
     console.error("Database error:", error);
-    return NextResponse.json({ error: "Failed to retrieve files" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to retrieve folders" }, { status: 500 });
   }
 }
