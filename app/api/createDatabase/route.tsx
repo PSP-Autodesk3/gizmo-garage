@@ -57,8 +57,11 @@ export async function POST() {
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS Object (
         object_id INT PRIMARY KEY AUTO_INCREMENT,
+        name varchar(50) NOT NULL,
         author INT NOT NULL,
         FOREIGN KEY (author) REFERENCES Users(user_id),
+        project_id INT NOT NULL,
+        FOREIGN KEY (project_id) REFERENCES Projects(project_id
         folder_id INT NOT NULL,
         FOREIGN KEY (folder_id) REFERENCES Folder(folder_id),
         bucket_id INT NOT NULL
