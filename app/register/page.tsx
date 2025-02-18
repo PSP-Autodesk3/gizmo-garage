@@ -1,49 +1,59 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { useCreateUserWithEmailAndPassword  } from 'react-firebase-hooks/auth';
+// Firebase
 import { auth } from '@/app/firebase/config';
+import { useCreateUserWithEmailAndPassword  } from 'react-firebase-hooks/auth';
+
+// Middleware
+import withAuth from "@/app/lib/withAuth";
+
+// Other
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-export default function Home() {
+function Home() {
   const [email, setEmail] = useState('');
+  const [fName, setFName] = useState('');
+  const [lName, setLName] = useState('');
   const [password1, setPassword1] = useState('');
   const [password2, setPassword2] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true);
   const [createUserWithEmailAndPassword] = useCreateUserWithEmailAndPassword(auth);
   const router = useRouter();
 
-  useEffect(() => {
-
-    setLoading(false);
-  }, []);
-
-  const handleSignUp = async (e: any) => {
+  const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
-        if (password1 === password2) {
-            createUserWithEmailAndPassword(email, password1);
-            // Needs a check added to see if this is successfully created.
-            router.push("/login");
+        if ((password1 === password2)) {
+            if (password1.length >= 6) {
+                if (password1 && password1.trim() != "" && email && email.trim() != "" && fName && fName.trim() != "" && lName && lName.trim() != "") {
+                    const result = await createUserWithEmailAndPassword(email, password1);
+    
+                    console.log("Result:", result)
+                    
+                    if (result?.user) {
+                        const response = await fetch("/api/createUser", {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email, fName, lName }),
+                        })
+                        if (response.status == 200) {
+                            router.push("/");
+                        }
+                    }
+                    else setError("Account creation failed. Please try again.");
+                } 
+                else setError("Missing credentials.");
+            }
+            else setError("Password must be at least 6 characters in length");
         }
         else setError("Passwords do not match");
     } catch (e) {
         console.error(e);
         setError('Error registering account');
     }
-  }
-
-  if (loading) {
-    return (
-        <>
-            <div>
-                <p>Loading...</p>
-            </div>
-        </>
-    )
   }
 
   return (
@@ -60,6 +70,30 @@ export default function Home() {
                         name="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        required
+                    />
+                </div>
+                <div className="py-2">
+                    <label className="text-xl" htmlFor="fName">First Name:</label>
+                    <input
+                        className="text-white w-full p-2 my-2 rounded-lg bg-slate-800"
+                        type="text"
+                        placeholder="First Name"
+                        name="fName"
+                        value={fName}
+                        onChange={(e) => setFName(e.target.value)}
+                        required
+                    />
+                </div>
+                <div className="py-2">
+                    <label className="text-xl" htmlFor="lName">Last Name:</label>
+                    <input
+                        className="text-white w-full p-2 my-2 rounded-lg bg-slate-800"
+                        type="text"
+                        placeholder="Last Name"
+                        name="lName"
+                        value={lName}
+                        onChange={(e) => setLName(e.target.value)}
                         required
                     />
                 </div>
@@ -95,3 +129,5 @@ export default function Home() {
     </>
   );
 }
+
+export default withAuth(Home);

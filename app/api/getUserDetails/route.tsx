@@ -14,13 +14,10 @@ export async function GET(request: Request) {
         database: process.env.DB_DATABASE,
     });
 
-    const [rows] = await connection.execute(`
-        SELECT Projects.project_id, Projects.name, 
-        CASE WHEN Projects.owner = Users.user_id THEN 1 ELSE 0 END AS ownsProject
-        FROM Projects
-        INNER JOIN Users ON Users.email = ?
-        LEFT JOIN Editor ON Editor.project_id = Projects.project_id AND Editor.user_id = Users.user_id
-        WHERE Projects.owner = Users.user_id OR Editor.user_id IS NOT NULL;
+    const [rows]: [any[], any] = await connection.execute(`
+        SELECT *
+        FROM Users
+        WHERE Users.email = ?
     `, [email]);
     await connection.end();
 

@@ -25,29 +25,26 @@ export async function POST() {
       );
     `);
 
+    // Just for development, delete for final version
+    await connection.execute(`
+      INSERT INTO Users (user_id, email, fname, lname) VALUES (1,'test@test.test','First','Last');
+    `);
+
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS Projects (
         project_id INT PRIMARY KEY AUTO_INCREMENT,
         name VARCHAR(255) NOT NULL,
         owner INT NOT NULL,
-        FOREIGN KEY (owner) REFERENCES users(user_id)
+        FOREIGN KEY (owner) REFERENCES Users(user_id)
       );
     `);
 
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS Editor (
         user_id INT NOT NULL,
-        FOREIGN KEY (user_id) REFERENCES users(user_id),
+        FOREIGN KEY (user_id) REFERENCES Users(user_id),
         project_id INT NOT NULL, 
-        FOREIGN KEY (project_id) REFERENCES projects(project_id)
-      );
-    `);
-
-    await connection.execute(`
-      CREATE TABLE IF NOT EXISTS Object (
-        object_id INT PRIMARY KEY AUTO_INCREMENT,
-        author INT NOT NULL,
-        FOREIGN KEY (author) REFERENCES users(user_id)
+        FOREIGN KEY (project_id) REFERENCES Projects(project_id)
       );
     `);
 
@@ -56,38 +53,49 @@ export async function POST() {
         folder_id INT PRIMARY KEY AUTO_INCREMENT,
         name VARCHAR(255) NOT NULL,
         project_id INT NOT NULL,
-        FOREIGN KEY (project_id) REFERENCES projects(project_id),
-        parent_folder_id INT NOT NULL,
-        FOREIGN KEY (parent_folder_id) REFERENCES folder(folder_id)
+        FOREIGN KEY (project_id) REFERENCES Projects(project_id),
+        parent_folder_id INT,
+        FOREIGN KEY (parent_folder_id) REFERENCES Folder(folder_id)
       );
     `);
 
     await connection.execute(`
-      CREATE TABLE IF NOT EXISTS Item (
-        item_id INT PRIMARY KEY AUTO_INCREMENT,
-        name VARCHAR(255) NOT NULL,
-        folder_id INT NOT NULL,
-        FOREIGN KEY (folder_id) REFERENCES folder(folder_id)
+      CREATE TABLE IF NOT EXISTS Object (
+        object_id INT PRIMARY KEY AUTO_INCREMENT,
+        name varchar(50) NOT NULL,
+        author INT NOT NULL,
+        FOREIGN KEY (author) REFERENCES Users(user_id),
+        project_id INT NOT NULL,
+        FOREIGN KEY (project_id) REFERENCES Projects(project_id),
+        folder_id INT,
+        FOREIGN KEY (folder_id) REFERENCES Folder(folder_id),
+        bucket_id INT DEFAULT NULL
       );
     `);
 
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS Version (
         version_id INT PRIMARY KEY AUTO_INCREMENT,
-        item_id INT NOT NULL,
-        FOREIGN KEY (item_id) REFERENCES item(item_id),
-        year INT NOT NULL,
-        month INT NOT NULL,
-        iteration INT NOT NULL
+        object_id INT NOT NULL,
+        FOREIGN KEY (object_id) REFERENCES Object(object_id),
+        version INT NOT NULL,
+        date_time DATETIME NOT NULL
       );
     `);
 
     await connection.execute(`
-      CREATE TABLE IF NOT EXISTS Version_Object (
-        version_id int NOT NULL,
-        FOREIGN KEY (version_id) REFERENCES version(version_id),
-        object_id int NOT NULL,
-        FOREIGN KEY (object_id) REFERENCES object(object_id)
+      CREATE TABLE IF NOT EXISTS Tag (
+        tag_id INT PRIMARY KEY AUTO_INCREMENT,
+        tag VARCHAR(255) NOT NULL
+      );
+    `);
+
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS Object_Tag (
+        object_id INT NOT NULL,
+        FOREIGN KEY (object_id) REFERENCES Object(object_id),
+        tag_id INT NOT NULL,
+        FOREIGN KEY (tag_id) REFERENCES Tag(tag_id)
       );
     `);
     await connection.end();
