@@ -12,13 +12,12 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
-import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
-import 'react-loading-skeleton/dist/skeleton.css'
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton' //used a skeleton loading package from here https://www.npmjs.com/package/react-loading-skeleton
+import 'react-loading-skeleton/dist/skeleton.css' //used it to create a nicer loading screen while making get calls
 
 //components
 import Filters from './Filter';
 import SigningIn from './signingIn';
-// import Image from 'next/image';
 
 // Format returned by api call to getProjects
 interface Project {
@@ -37,6 +36,7 @@ function Home() {
   const [projects, setProjects] = useState<Project[]>([] as Project[]);
   const [loading, setLoading] = useState(true);
   const [loadingProjects, setLoadingProjects] = useState(true);
+  const [filteredProjects, setFilteredProjects] = useState<Project[]>([] as Project[]);
 
   useEffect(() => {
     // Only runs if the user has logged in
@@ -179,7 +179,7 @@ function Home() {
               </button>
             </div>
             {!loadingProjects ? (
-              projects.map((project, index) => (
+              filteredProjects.map((project, index) => (
                 <div className="project" key={index}>
                   <div id="folders">
                     <div className="bg-slate-900 p-4 m-auto rounded-lg shadow-lg mt-16 flex flex-row justify-between">

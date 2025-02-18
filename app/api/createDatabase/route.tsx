@@ -46,6 +46,7 @@ export async function POST() {
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS Object (
         object_id INT PRIMARY KEY AUTO_INCREMENT,
+        bucket_id varchar(50) NOT NULL,
         author INT NOT NULL,
         FOREIGN KEY (author) REFERENCES users(user_id)
       );
@@ -90,6 +91,8 @@ export async function POST() {
         FOREIGN KEY (object_id) REFERENCES object(object_id)
       );
     `);
+
+    
     await connection.end();
 
     return NextResponse.json({ message: "Database created successfully" });
