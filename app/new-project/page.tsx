@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useEffect } from 'react';
 
 // For Firebase Auth
 import { auth } from '@/app/firebase/config';
@@ -20,12 +21,13 @@ export default function Home() {
                 headers: { 'Content-Type': 'application/json' }
             });
             let response = await exists.json();
-            if (response[0].ProjectExists == 0 && user?.email) {
+            if (response[0]?.ProjectExists == 0 && user?.email) {
                 const getUser = await fetch(`/api/getUserDetails?email=${encodeURIComponent(user?.email)}`, {
                     method: 'GET',
                     headers: { 'Content-Type': 'application/json' },
                 })
                 response = await getUser.json();
+                console.log("Response", response);
 
                 if (response[0].user_id) {
                     const id = response[0].user_id;
@@ -41,14 +43,19 @@ export default function Home() {
                         console.log("Error:", response.error);
                     }
                 }
-                console.log("Failed to find account in db");
+            } else {
+                console.log("Failed to find user in database.")
             }
+        } else {
+            console.log("Error: Already exists.")
         }
     }
 
-    if (!user || !sessionStorage.getItem('token')) {
-        router.push("/");
-    }
+    useEffect(() => {
+        if (!user || !sessionStorage.getItem('token')) {
+            router.push("/");
+        }
+    }, [user])
 
     return (
         <>

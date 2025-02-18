@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       database: process.env.DB_DATABASE,
     });
 
-    await connection.execute("INSERT INTO users (email, fname, lname) VALUES (?, ?, ?)", [email, fName, lName]);
+    await connection.execute("INSERT INTO Users (email, fname, lname) VALUES (?, ?, ?)", [email, fName, lName]);
     
     await connection.end();
 

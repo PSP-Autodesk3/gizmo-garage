@@ -14,11 +14,11 @@ export async function POST(request: Request) {
       database: process.env.DB_DATABASE,
     });
 
-    await connection.execute("INSERT INTO projects (name, owner) VALUES (?, ?)", [name, id]);
+    await connection.execute("INSERT INTO Projects (name, owner) VALUES (?, ?)", [name, id]);
     
     await connection.end();
 
-    return NextResponse.json({ message: "Database created successfully" });
+    return NextResponse.json({ message: "Project created successfully" });
   } catch (error) {
     console.error("Database error:", error);
     return NextResponse.json({ error: "Failed to create project" }, { status: 500 });
