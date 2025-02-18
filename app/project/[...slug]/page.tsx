@@ -137,86 +137,101 @@ function Home({ params }: PageProps) {
 
     getData();
     setConfirmModule(false);
+	setFolderName("");
   }
 
   return (
     <>
+	
       <div className='flex m-auto'>
-        <div id='Filter' className='flex'>
+        <div id='Filter'>
           <Filters query={query} onQueryChange={setQuery} values={values} onValuesChange={setValues} />
         </div>
         <div id="data">
-          <div id="breadcrumbs" className='flex flex-row'>
-            <p>Breadcrumbs:&nbsp;&nbsp;&nbsp;</p>
-            <button
-              onClick={() => { router.push(`/`); }}
-            >
-              Home
-            </button>
-            <p>&nbsp;&nbsp;&gt;&nbsp;&nbsp;</p>
-            <button
-              onClick={() => { router.push(`/project/${project.replace(/%2B/g, '+')}`); }}
-            >
-              {project.replace(/%2B/g, ' ')}
-            </button>
-            {Array.isArray(routes) && routes.length > 0 && (
-              routes.map((route, index) => (
-                <>
-                  <p>&nbsp;&nbsp;&gt;&nbsp;&nbsp;</p>
-                  <button
-                    key={route}
-                    onClick={() => goneBack(index)}
-                  >
-                    {route.replace(/%2B/g, ' ')}
-                  </button>
-                </>
-              ))
-            )}
+            {(!confirmModule) && (
+				<div id="breadcrumbs" className="flex flex-row text-2xl p-4 rounded-lg mx-8 my-4">
+				<button
+				  onClick={() => { router.push(`/`); }}
+				>
+				  Home
+				</button>
+				<h1>&nbsp;&nbsp;&gt;&nbsp;&nbsp;</h1>
+				<button
+				  onClick={() => { router.push(`/project/${project.replace(/%2B/g, '+')}`); }}
+				>
+				  {project.replace(/%2B/g, ' ')}
+				</button>
+				{Array.isArray(routes) && routes.length > 0 && (
+				  routes.map((route, index) => (
+					<>
+					  <h1>&nbsp;&nbsp;&gt;&nbsp;&nbsp;</h1>
+					  <button
+						key={route}
+						onClick={() => goneBack(index)}
+					  >
+						{route.replace(/%2B/g, ' ')}
+					  </button>
+					</>
+				  ))
+				)}
+				</div>
+			)}
+		{(!confirmModule) && (
+          <div className="bg-slate-800 mx-8 my-4 w-full rounded-lg p-4">
+            <div id="folders" className="mx-8 my-4">
+              <h1 className="text-3xl my-4">Folders:</h1>
+              <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
+              {Array.isArray(folders) && folders.length > 0 && (
+                folders.map((folder) => (
+                  <>
+                    <div key={folder.folder_id}>
+                      <button
+                        className="bg-slate-900 rounded-lg text-xl my-4 px-4 py-2"
+                        onClick={() => { router.push(pathname + `/${folder.name.replace(/ /g, '+')}`); }}
+                      >
+                        {folder.name}
+                      </button>
+                    </div>
+                  </>
+                ))
+              )}
+              
+            </div>
+			<button
+                onClick={() => setConfirmModule(true)}
+				className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 flex justify-center"
+              >
+                Create New Folder
+              </button>
+            <div id="files" className=" my-4">
+              <h1 className="my-4 text-3xl">Files</h1>
+              <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
+              {Array.isArray(files) && files.length > 0 && (
+                files.map((file) => (
+                  <>
+                    <div key={file.object_id}>
+                      <button
+                        className="bg-slate-900 rounded-lg text-xl my-4 px-4 py-2"
+                        onClick={() => { }}
+                      >
+                        {file.name}
+                      </button>
+                    </div>
+                  </>
+                ))
+              )}
+              </div>
+              <button className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 flex justify-center">
+                Create New Item
+              </button>
+            </div>
           </div>
-          <div id="folders">
-            <h1>Folders</h1>
-            {Array.isArray(folders) && folders.length > 0 && (
-              folders.map((folder) => (
-                <>
-                  <div key={folder.folder_id}>
-                    <button
-                      onClick={() => { router.push(pathname + `/${folder.name.replace(/ /g, '+')}`); }}
-                    >
-                      {folder.name}
-                    </button>
-                  </div>
-                </>
-              ))
-            )}
-            <button
-              onClick={() => setConfirmModule(true)}
-            >
-              Create New Folder
-            </button>
           </div>
-          <div id="files">
-            <h1>Files</h1>
-            {Array.isArray(files) && files.length > 0 && (
-              files.map((file) => (
-                <>
-                  <div key={file.object_id}>
-                    <button
-                      onClick={() => { }}
-                    >
-                      {file.name}
-                    </button>
-                  </div>
-                </>
-              ))
-            )}
-            <button>
-              Create New Item
-            </button>
-          </div>
-        </div>
+		)}
+
         {(confirmModule) && (
           <>
-            <div className="fixed inset-0 flex items-center justify-center bg-opacity-50 bg-slate-900 p-4 w-[40%] h-[40%] m-auto rounded-3xl shadow-lg mt-16">
+            <div className="fixed inset-0 flex border-indigo-600 border-2 items-center justify-center bg-slate-900 p-4 w-[40%] h-[40%] m-auto rounded-lg shadow-lg mt-16">
               <form className="text-center" onSubmit={(e) => newFolder(e)}>
                 <h1 className='text-3xl'>Folder name</h1>
                 <input
@@ -224,8 +239,9 @@ function Home({ params }: PageProps) {
                   type="text"
                   value={folderName}
                   onChange={(e) => setFolderName(e.target.value)}
-                  className="w-full mt-4 p-2 rounded-lg"
+                  className="w-full mt-4 p-2 rounded-lg bg-slate-800"
                   placeholder="Enter folder name"
+				  id="dir-name-input"
                 />
                 <div className="mt-4">
                   <button
@@ -244,6 +260,7 @@ function Home({ params }: PageProps) {
             </div>
           </>
         )}
+      </div>
       </div>
     </>
   )
