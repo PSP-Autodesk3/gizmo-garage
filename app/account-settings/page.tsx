@@ -87,16 +87,11 @@ function Home() {
             <button
               type="submit"
               className="px-6 py-3 text-lg font-medium bg-indigo-600 mx-4 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500 50"
-            >
-              Save
-            </button>
+            > Save</button>
           </form>
-          <p 
-            className="text-indigo-500 hover:underline cursor-pointer mt-3"
+          <p className="text-indigo-500 hover:underline cursor-pointer mt-3"
             onClick={() => resetPassword(email)}
-          >
-            Reset Password
-          </p>
+          > Reset Password</p>
         </div>
       </div>
     </>
