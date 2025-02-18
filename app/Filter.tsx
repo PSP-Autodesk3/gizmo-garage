@@ -2,12 +2,18 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from "next/image"
 import { Range } from 'react-range';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 interface FiltersProps {
   query?: string;
   onQueryChange?: React.Dispatch<React.SetStateAction<string>>;
   values?: number[];
   onValuesChange?: React.Dispatch<React.SetStateAction<number[]>>;
+}
+
+interface NavItemProps {
+  name: string,
+  link: string
 }
 
 export default function Filters({ query, onQueryChange, values, onValuesChange }: FiltersProps) {
@@ -25,7 +31,6 @@ export default function Filters({ query, onQueryChange, values, onValuesChange }
       }
     }
   }
-
   return (
     <>
       <div id="side-bar" className='bg-slate-900 p-6 rounded-lg shadow-lg h-screen flex flex-col justify-between'>
@@ -99,6 +104,9 @@ export default function Filters({ query, onQueryChange, values, onValuesChange }
         </div>
         <div className='flex flex-col justify-between'>
           <div id="options" className='flex flex-col p-6 mt-auto'>
+            {navItems.map((item, index) => (
+              <NavItems key={index} name={item.name} link={item.link} />
+            ))}
             {admin ? (
               <>
                 <button
