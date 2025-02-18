@@ -243,9 +243,26 @@ function Home() {
             ) : (
               <>
                 <div>
-                  <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
-                    <Skeleton width={400} height={100} />
-                  </SkeletonTheme>
+                  <div className='pb-4'>
+                    <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
+                      <Skeleton width={400} height={100} />
+                    </SkeletonTheme>
+                  </div>
+                  <div className='pb-4'>
+                    <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
+                      <Skeleton width={400} height={100} />
+                    </SkeletonTheme>
+                  </div>
+                  <div className='pb-4'>
+                    <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
+                      <Skeleton width={400} height={100} />
+                    </SkeletonTheme>
+                  </div>
+                  <div className='pb-4'>
+                    <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
+                      <Skeleton width={400} height={100} />
+                    </SkeletonTheme>
+                  </div>
                 </div>
               </>
             )}
