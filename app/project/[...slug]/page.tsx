@@ -43,6 +43,7 @@ function Home({ params }: PageProps) {
   const [type, setType] = useState(0);
   const [user] = useAuthState(auth);
   const [itemName, setItemName] = useState('');
+  const [moduleType, setModuleType] = useState(0); // 1 = Folder, 2 = Item
 
   const getData = useCallback(async () => {
     const resolved = await params;
@@ -156,37 +157,14 @@ function Home({ params }: PageProps) {
 		});
 	}
 	getData();
+	setConfirmModule(false);
+	setItemName("");
   }
 
   return (
     <>
 	
       <div className='flex m-auto'>
-		{/* MAKE THIS LOOK NICER LATER :KEKW: */}
-		<form className="text-center" onSubmit={(e) => newItem(e)}>
-                <h1 className='text-3xl'>Item name</h1>
-                <input
-                  name="item-name"
-                  type="text"
-                  value={itemName}
-                  onChange={(e) => setItemName(e.target.value)}
-                  className="w-full mt-4 p-2 rounded-lg bg-slate-800"
-                  placeholder="Enter Item name"
-                />
-                <div className="mt-4">
-                  <button
-                    className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
-                  >
-                    Create
-                  </button>
-                  <button
-                    className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
-                    onClick={() => setConfirmModule(false)}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
         <div id='Filter'>
           <Filters query={query} onQueryChange={setQuery} values={values} onValuesChange={setValues} />
         </div>
@@ -241,7 +219,7 @@ function Home({ params }: PageProps) {
               
             </div>
 			<button
-                onClick={() => setConfirmModule(true)}
+                onClick={() => {setModuleType(1), setConfirmModule(true)}}
 				className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 flex justify-center"
               >
                 Create New Folder
@@ -264,7 +242,10 @@ function Home({ params }: PageProps) {
                 ))
               )}
               </div>
-              <button className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 flex justify-center">
+              <button 
+			  className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 flex justify-center"
+			  onClick={() => {setModuleType(2), setConfirmModule(true)}}
+			  >
                 Create New Item
               </button>
             </div>
@@ -275,7 +256,8 @@ function Home({ params }: PageProps) {
         {(confirmModule) && (
           <>
             <div className="fixed inset-0 flex border-indigo-600 border-2 items-center justify-center bg-slate-900 p-4 w-[40%] h-[40%] m-auto rounded-lg shadow-lg mt-16">
-              <form className="text-center" onSubmit={(e) => newFolder(e)}>
+              {(moduleType === 1) && (
+				<form className="text-center" onSubmit={(e) => newFolder(e)}>
                 <h1 className='text-3xl'>Folder name</h1>
                 <input
                   name="folder-name"
@@ -300,6 +282,33 @@ function Home({ params }: PageProps) {
                   </button>
                 </div>
               </form>
+			  )}
+			  {(moduleType === 2) && (
+				<form className="text-center" onSubmit={(e) => newItem(e)}>
+                <h1 className='text-3xl'>Item name</h1>
+                <input
+                  name="item-name"
+                  type="text"
+                  value={itemName}
+                  onChange={(e) => setItemName(e.target.value)}
+                  className="w-full mt-4 p-2 rounded-lg bg-slate-800"
+                  placeholder="Enter Item name"
+                />
+                <div className="mt-4">
+                  <button
+                    className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                  >
+                    Create
+                  </button>
+                  <button
+                    className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                    onClick={() => setConfirmModule(false)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              	</form>
+			  )}
             </div>
           </>
         )}

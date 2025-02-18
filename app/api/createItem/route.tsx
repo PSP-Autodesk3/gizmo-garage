@@ -32,4 +32,4 @@ export async function POST(request: Request) {
         console.error("Database error:", err);
         return NextResponse.json({ error: "Failed to create item" }, { status: 500 });
     }
-}
+} 
