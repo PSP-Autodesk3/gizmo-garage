@@ -38,7 +38,8 @@ function Home() {
   const [projects, setProjects] = useState<Project[]>([] as Project[]);
   const [loading, setLoading] = useState(true);
   const [loadingProjects, setLoadingProjects] = useState(true);
-  
+  const [query, setQuery] = useState<string>('');
+
   useEffect(() => {
     // Only runs if the user has logged in
     if (user) {
@@ -164,12 +165,7 @@ function Home() {
     <div className='flex m-auto'>
     <div id="side-bar">
     <div id="filters">
-    <Filters
-    navItems={[
-	  { name: "Sign Out", link: "/signout" },
-      { name: 'Settings', link: '/account-settings' }
-    ]}
-    />          
+    <Filters query={query} onQueryChange={setQuery} />       
     </div>
     </div>
     <div id="data" className='flex flex-row '>
