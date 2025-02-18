@@ -69,7 +69,7 @@ export async function POST() {
         FOREIGN KEY (project_id) REFERENCES Projects(project_id),
         folder_id INT,
         FOREIGN KEY (folder_id) REFERENCES Folder(folder_id),
-        bucket_id INT NOT NULL
+        bucket_id INT DEFAULT NULL
       );
     `);
 

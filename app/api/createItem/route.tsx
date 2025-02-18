@@ -4,7 +4,7 @@ import mysql from "mysql2/promise";
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const {itemName, email, projectId, FolderId} = body;
+        const {itemName, email, project, type, id} = body;
         // Connect to DB
         const connection = await mysql.createConnection({
             host: process.env.DB_HOST,
@@ -13,14 +13,19 @@ export async function POST(request: Request) {
             password: process.env.DB_PASSWORD,
             database: process.env.DB_DATABASE,
         });
+
+        // Insert item into Object table
+        const params: (string | number | null)[] = [itemName, email, project];
+        if (type !== 1) {params.push(id);} else {params.push(null);}
+
         await connection.execute(`
             INSERT INTO Object
-            (name, author, project_id, folder_id, bucket_id)
+            (name, author, project_id, folder_id)
             VALUES (?, 
             (SELECT user_id FROM Users WHERE email = ?),
             (SELECT project_id FROM Projects WHERE name = ?), 
-            ?, NULL)
-        `, [itemName, email, projectId, FolderId]);
+            ?)
+        `, params);
         await connection.end();
         return NextResponse.json({ message: "Item created successfully" });
     } catch(err) {

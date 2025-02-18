@@ -152,15 +152,41 @@ function Home({ params }: PageProps) {
 		await fetch("/api/createItem", {
 			method: "POST",
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ itemName, email:user.email, projectId, FolderId }),
+			body: JSON.stringify({ itemName, email:user.email, project, id, type }),
 		});
 	}
+	getData();
   }
 
   return (
     <>
 	
       <div className='flex m-auto'>
+		{/* MAKE THIS LOOK NICER LATER :KEKW: */}
+		<form className="text-center" onSubmit={(e) => newItem(e)}>
+                <h1 className='text-3xl'>Item name</h1>
+                <input
+                  name="item-name"
+                  type="text"
+                  value={itemName}
+                  onChange={(e) => setItemName(e.target.value)}
+                  className="w-full mt-4 p-2 rounded-lg bg-slate-800"
+                  placeholder="Enter Item name"
+                />
+                <div className="mt-4">
+                  <button
+                    className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                  >
+                    Create
+                  </button>
+                  <button
+                    className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                    onClick={() => setConfirmModule(false)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
         <div id='Filter'>
           <Filters query={query} onQueryChange={setQuery} values={values} onValuesChange={setValues} />
         </div>
@@ -243,32 +269,6 @@ function Home({ params }: PageProps) {
               </button>
             </div>
           </div>
-
-			  {/* MAKE THIS LOOK NICER LATER :KEKW: */}
-			  <form className="text-center" onSubmit={(e) => newFolder(e)}>
-                <h1 className='text-3xl'>Item name</h1>
-                <input
-                  name="item-name"
-                  type="text"
-                  value={itemName}
-                  onChange={(e) => setItemName(e.target.value)}
-                  className="w-full mt-4 p-2 rounded-lg bg-slate-800"
-                  placeholder="Enter Item name"
-                />
-                <div className="mt-4">
-                  <button
-                    className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
-                  >
-                    Create
-                  </button>
-                  <button
-                    className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
-                    onClick={() => setConfirmModule(false)}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
           </div>
 		)}
 
