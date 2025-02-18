@@ -11,11 +11,6 @@ interface FiltersProps {
   onValuesChange?: React.Dispatch<React.SetStateAction<number[]>>;
 }
 
-interface NavItemProps {
-  name: string,
-  link: string
-}
-
 export default function Filters({ query, onQueryChange, values, onValuesChange }: FiltersProps) {
   const router = useRouter();
   const admin = useState(true);
@@ -104,10 +99,7 @@ export default function Filters({ query, onQueryChange, values, onValuesChange }
         </div>
         <div className='flex flex-col justify-between'>
           <div id="options" className='flex flex-col p-6 mt-auto'>
-            {navItems.map((item, index) => (
-              <NavItems key={index} name={item.name} link={item.link} />
-            ))}
-            {admin ? (
+            {admin && (
               <>
                 <button
                   className='p-1 text-white transition-colors duration-300 hover:text-gray-400'
@@ -116,8 +108,6 @@ export default function Filters({ query, onQueryChange, values, onValuesChange }
                   Admin Settings
                 </button>
               </>
-            ) : (
-              <></>
             )}
             <button
               className='p-1 text-white transition-colors duration-300 hover:text-gray-400'
