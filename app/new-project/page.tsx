@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useEffect } from 'react';
+import Permissions from '../projectPermissions';
 
 // For Firebase Auth
 import { auth } from '@/app/firebase/config';
@@ -67,6 +68,7 @@ export default function Home() {
                     onChange={(e) => setName(e.target.value)}
                 />
                 <button>Submit</button>
+                <Permissions />
             </form>
         </>
     )
