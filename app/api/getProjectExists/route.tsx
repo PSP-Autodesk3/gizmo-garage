@@ -25,7 +25,7 @@ export async function GET(request: Request) {
     `, [name]);
     await connection.end();
 
-    return NextResponse.json(rows);
+    return NextResponse.json(rows, { status: 200});
   } catch (error) {
     console.error("Database error:", error);
     return NextResponse.json({ error: "Failed to check database status" }, { status: 500 });
