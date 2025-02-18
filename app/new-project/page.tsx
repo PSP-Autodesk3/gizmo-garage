@@ -27,21 +27,21 @@ export default function Home() {
                     headers: { 'Content-Type': 'application/json' },
                 })
                 response = await getUser.json();
-                console.log("Dbug Reponse:", response)
-            }
-            // Check for valid response
-            if (Array.isArray(response) && response.length > 0 && response[0].user_id) {
-                const id = response[0].user_id;
-                const createProject = await fetch(`/api/createProject`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, id }),
-                })
-                response = await createProject.json();
-                if (response.error == null) {
-                    router.push("/");
-                } else {
-                    console.log("Error:", response.error);
+                console.log("Response", response);
+
+                if (response[0].user_id) {
+                    const id = response[0].user_id;
+                    const createProject = await fetch(`/api/createProject`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, id }),
+                    })
+                    response = await createProject.json();
+                    if (response.error == null) {
+                        router.push("/");
+                    } else {
+                        console.log("Error:", response.error);
+                    }
                 }
             } else {
                 console.log("Failed to find user in database.")
