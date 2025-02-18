@@ -15,12 +15,9 @@ export async function GET(request: Request) {
     });
 
     const [rows] = await connection.execute(`
-        SELECT Projects.project_id, Projects.name,
-        CASE WHEN Projects.owner = Users.user_id THEN 1 ELSE 0 END AS ownsProject
-        FROM Projects
-        INNER JOIN Users ON Users.email = ?
-        LEFT JOIN Editor ON Editor.project_id = Projects.project_id AND Editor.user_id = Users.user_id
-        WHERE Projects.owner = Users.user_id OR Editor.user_id IS NOT NULL;
+        SELECT project_id, tag.tag
+        FROM Project_Tag
+        INNER JOIN tag ON Project_Tag.tag_id = tag.tag_id;
     `, [email]);
     await connection.end();
     return NextResponse.json(rows);

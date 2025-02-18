@@ -25,9 +25,14 @@ interface Project {
   project_id: number,
   name: string,
   ownsProject: number,
-  error: string
+  error: string,
+  tags: projectTags[]
 }
 
+interface projectTags {
+  project_id: number,
+  tag: string
+}
 function Home() {
   const [user, loadingAuth] = useAuthState(auth);
   const router = useRouter();
@@ -38,6 +43,7 @@ function Home() {
   const [loading, setLoading] = useState(true);
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([] as Project[]);
+  const [projectTags, setProjectTags] = useState<projectTags[]>([] as projectTags[])
   const [query, setQuery] = useState<string>('');
 
   useEffect(() => {
@@ -70,9 +76,27 @@ function Home() {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }
               })
+              const tagData = await fetch(`/api/getProjectTags?email=${encodeURIComponent(user?.email)}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+              })
               const result = await data.json();
+              const tagResult = await tagData.json();
+
+              console.log(result);
               setProjects(result);
               setFilteredProjects(result);
+              setProjectTags(tagResult);
+              console.log(tagResult);
+
+
+              //assigns tags to projects
+              result.forEach((project: Project) => {
+                console.log("tag:", project.project_id);
+                project.tags = tagResult.filter((tag: projectTags) => tag.project_id === project.project_id);
+                console.log(project.tags);
+              });
+
               if (!data.ok) {
                 setDatabaseErrorMessage("Database not found, contact your system administrator");
               }
@@ -200,6 +224,9 @@ function Home() {
                         <p>Name: {project.name} </p>
                         <p>Version: </p>
                         <p>Date: </p>
+                        <p>Tags: {project.tags.map((tag, index) => (
+                          <span className='rounded-full m-2 p-2 bg-blue-600' key={index}>{tag.tag}</span>
+                        ))}</p>
                       </div>
                       <div className='content-center'>
                         <button
