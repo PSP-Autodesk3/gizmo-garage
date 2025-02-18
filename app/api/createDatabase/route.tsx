@@ -25,6 +25,11 @@ export async function POST() {
       );
     `);
 
+    // Just for development, delete for final version
+    await connection.execute(`
+      INSERT INTO Users (user_id, email, fname, lname) VALUES (1,'test@test.test','First','Last');
+    `);
+
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS Projects (
         project_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -62,7 +67,7 @@ export async function POST() {
         FOREIGN KEY (author) REFERENCES Users(user_id),
         project_id INT NOT NULL,
         FOREIGN KEY (project_id) REFERENCES Projects(project_id),
-        folder_id INT NOT NULL,
+        folder_id INT,
         FOREIGN KEY (folder_id) REFERENCES Folder(folder_id),
         bucket_id INT NOT NULL
       );

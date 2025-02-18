@@ -33,9 +33,6 @@ export async function POST(request: Request) {
         params.push(routes[i].replace(/%2B/g, ' '));
     }
 
-    console.log("Sql:", sql);
-    console.log("Params:", params);
-
     const [rows] = await connection.execute(sql, params);
     
     await connection.end();
