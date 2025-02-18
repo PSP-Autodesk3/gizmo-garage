@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useEffect } from 'react';
+import BackBtnBar from '@/app/backBtnBar';
 
 // For Firebase Auth
 import { auth } from '@/app/firebase/config';
@@ -68,6 +69,7 @@ export default function Home() {
 
     return (
             <div>
+                <BackBtnBar />
             <div className="bg-slate-900 py-4 px-8 rounded-lg flex flex-row w-[50%] m-auto my-16 justify-center items-center">
                 <form onSubmit={(e) => newProjectSubmitted(e)}>
                     <label htmlFor="name" className="text-2xl my-8">Project Name:</label>
