@@ -250,6 +250,7 @@ function Home({ params }: PageProps) {
           </>
         )}
       </div>
+      </div>
     </>
   )
 }
