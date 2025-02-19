@@ -162,31 +162,31 @@ function Home({ params }: PageProps) {
   }
 
   const newItem = async (e: any) => {
-	e.preventDefault();
-  // Check dupes 
-  const alreadyExists = await fetch ("/api/getItemExists", {
-    method: "POST",
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name: itemName, projectid: project, folderid: id, type }),
-  });
-  let resp = await alreadyExists.json();
-  if (resp[0].ItemExists === 1) {
-    setDuplicate(2);
-    setTimeout(() => {
-      setDuplicate(0);
-    }, 3000);
-  } else {
-	  if (user) {
-      await fetch("/api/createItem", {
-        method: "POST",
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ itemName, email:user.email, project, id, type }),
-      });
+    e.preventDefault();
+    // Check dupes 
+    const alreadyExists = await fetch ("/api/getItemExists", {
+      method: "POST",
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: itemName, projectid: project, folder_id: id, type }),
+    });
+    let resp = await alreadyExists.json();
+    if (resp[0].ItemExists === 1) {
+      setDuplicate(2);
+      setTimeout(() => {
+        setDuplicate(0);
+      }, 3000);
+    } else {
+      if (user) {
+        await fetch("/api/createItem", {
+          method: "POST",
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ itemName, email:user.email, project, id, type }),
+        });
+      }
     }
-	}
-	getData();
-	setConfirmModule(false);
-	setItemName("");
+    getData();
+    setConfirmModule(false);
+    setItemName("");
   }
 
   return (
