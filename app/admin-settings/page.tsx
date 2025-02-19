@@ -105,7 +105,7 @@ function Home() {
       </div>
       {(confirmModule) && (
         <>
-          <div className="fixed inset-0 flex items-center justify-center bg-opacity-95 bg-slate-900 p-4 w-[40%] h-[40%] m-auto rounded-3xl shadow-lg p-8">
+          <div className="fixed inset-0 flex items-center justify-center bg-opacity-95 bg-slate-900 w-[40%] h-[40%] m-auto rounded-3xl shadow-lg p-8">
             <div className="text-center">
               <h1 className='text-3xl'>This will clear all data.</h1> 
               <strong>This action is irreversible.</strong> <p>Are you sure you want to continue?</p>
