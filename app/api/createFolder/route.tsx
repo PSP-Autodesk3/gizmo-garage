@@ -13,7 +13,7 @@ export async function POST(request: Request) {
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
     });
-    // "Test", "New"
+
     const params: (string | number)[] = [folderName, project];
     if (type !== 1) params.push(id);
     params.push(project);
