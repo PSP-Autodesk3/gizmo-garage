@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { Console } from 'console';
+import { send } from 'process';
+import { useEffect, useState } from 'react';
 
 interface PermissionsProps {
     project?: string;
@@ -7,7 +9,7 @@ interface PermissionsProps {
 export default function Permissions({ project }: PermissionsProps) {
     const [emails, updateEmails] = useState<string[]>([]);
 
-    useState(() => {
+    useEffect(() => {
         if (project) {
             const getAccounts = async () => {
                 const response = await fetch(`/api/getProjectEditors?project=${project}`, {
@@ -19,7 +21,7 @@ export default function Permissions({ project }: PermissionsProps) {
             }
             getAccounts();
         }
-    })
+    }, [project])
 
     if (project) {
         return (
@@ -35,12 +37,12 @@ export default function Permissions({ project }: PermissionsProps) {
                                 </tr>
                             </thead>
                             <tbody>
-                            {emails.map((email) => (
-                                <tr key={email}>
-                                    <td>{email}</td>
-                                    <button>Delete</button>
-                                </tr>
-                            ))}
+                                {emails.map((email) => (
+                                    <tr key={email}>
+                                        <td>{email}</td>
+                                        <button>Delete</button>
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                     </>
@@ -53,13 +55,54 @@ export default function Permissions({ project }: PermissionsProps) {
     }
     return (
         <EmailSender />
-    ); 
+    );
 }
 
-const EmailSender = async () => {
-    return (
-        <form action="">
+const EmailSender = () => {
+    const [email, setEmail] = useState("");
+    const [editors, setEditors] = useState<string[]>([]);
 
-        </form>
+    const validateEmail = (email: string) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
+    const sendInvite = async (e: any) => {
+        e.preventDefault();
+
+        if (!editors.includes(email)) {
+            if (validateEmail(email)) {
+                const div = document.getElementById("emails");
+                const p = document.createElement("p");
+                p.innerHTML = email;
+                div?.appendChild(p);
+                setEditors([...editors, email]);
+
+
+            } else {
+                console.log("Invalid email");
+            }
+        } else {
+            console.log("Email already exists");
+        }
+    }
+
+    return (
+        <>
+            <form>
+                <p>Invite to project</p>
+                <input
+                    type="email"
+                    placeholder="Enter email to invite"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                />
+                <button type="button" onClick={sendInvite}>Invite</button>
+            </form>
+            <div id="emails">
+                <p>Proposed Editors:</p>
+            </div>
+        </>
     );
 }
