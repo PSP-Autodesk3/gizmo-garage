@@ -136,15 +136,24 @@ function Home({ params }: PageProps) {
   const newFolder = async (e: any) => {
     e.preventDefault();
 
-    await fetch("/api/createFolder", {
+    const alreadyExists = await fetch("/api/getFolderExists", {
       method: "POST",
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ folderName, project, id, type }),
+      body: JSON.stringify({ name: folderName, projectid: project, type, parent_folder_id: id }),
     });
-
-    getData();
+    let resp = await alreadyExists.json();
+    if (resp[0].FolderExists === 1) {
+      console.log("NOT CREATED: ALR EXISTS") // Do something, will fix later
+    } else {
+      await fetch("/api/createFolder", {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ folderName, project, id, type }),
+      });
+      getData();
+    }
     setConfirmModule(false);
-	setFolderName("");
+	  setFolderName("");
   }
 
   const newItem = async (e: any) => {
