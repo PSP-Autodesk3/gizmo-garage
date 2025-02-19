@@ -3,6 +3,8 @@ import { useRouter } from 'next/navigation';
 import Image from "next/image"
 import { Range } from 'react-range';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import Link from 'next/link'
+
 
 interface FiltersProps {
   query?: string;
@@ -30,7 +32,7 @@ export default function Filters({ query, onQueryChange, values, onValuesChange }
     <>
       <div id="side-bar" className='bg-slate-900 p-6 rounded-lg shadow-lg h-screen flex flex-col justify-between'>
         <div>
-          <div className='flex flex-row justify-between pb-4' >
+          <Link href='/' className='flex flex-row justify-between pb-4' >
             <Image
               src="/Gizmo.svg"
               alt="Sample Image"
@@ -38,7 +40,7 @@ export default function Filters({ query, onQueryChange, values, onValuesChange }
               height={75}
             />
             <div className='flex text-3xl items-center'>Gizmo Garage</div>
-          </div>
+          </Link>
           {values && onValuesChange && (
             <div id='Filters'>
               <div className='flex flex-row justify-between pl-5 pr-5 text-xl'>
