@@ -6,9 +6,13 @@ import withAuth from "@/app/lib/withAuth";
 // Other
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState, useCallback  } from 'react';
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
 
 //Filter component
 import Filters from "../../Filter"
+
+
 
 interface PageProps {
   params: Promise<{ slug: string[] }>;
@@ -37,6 +41,9 @@ function Home({ params }: PageProps) {
   const [folderName, setFolderName] = useState('');
   const [id, setID] = useState(0);
   const [type, setType] = useState(0);
+
+  //loading
+  const [loadingFolders, setLoadingFolders] = useState(true);
 
   const getData = useCallback(async () => {
     const resolved = await params;
@@ -71,6 +78,8 @@ function Home({ params }: PageProps) {
 
       response = await query.json();
       setFolders(response);
+
+      setLoadingFolders(false);
 
       // Get files
       query = await fetch("/api/getObjects", {
@@ -175,18 +184,26 @@ function Home({ params }: PageProps) {
           </div>
           <div id="folders">
             <h1>Folders</h1>
-            {Array.isArray(folders) && folders.length > 0 && (
-              folders.map((folder) => (
-                <>
-                  <div key={folder.folder_id}>
-                    <button
-                      onClick={() => { router.push(pathname + `/${folder.name.replace(/ /g, '+')}`); }}
-                    >
-                      {folder.name}
-                    </button>
-                  </div>
-                </>
-              ))
+            {!loadingFolders ? (
+               Array.isArray(folders) && folders.length > 0 && (
+                folders.map((folder) => (
+                  <>
+                    <div key={folder.folder_id}>
+                      <button
+                        onClick={() => { router.push(pathname + `/${folder.name.replace(/ /g, '+')}`); }}
+                      >
+                        {folder.name}
+                      </button>
+                    </div>
+                  </>
+                ))
+              )
+            ):(
+              <>
+                <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
+                  <Skeleton width={400} height={100}/>
+                </SkeletonTheme>
+              </>
             )}
             <button
               onClick={() => setConfirmModule(true)}
