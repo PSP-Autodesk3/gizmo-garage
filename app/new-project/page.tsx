@@ -91,12 +91,12 @@ export default function Home() {
         }
     }
 
-    
+
     const applyTag = (index: number) => {
         const appliedTag = tags[index];
         if (!(appliedTags.includes(appliedTag))) {
             setAppliedTags([...appliedTags, appliedTag]);
-            setAlreadyApplied(0);           
+            setAlreadyApplied(0);
         }
         else {
             setAlreadyApplied(1);
@@ -124,7 +124,7 @@ export default function Home() {
                         {tags.map((tag, index) => (
                             <>
                                 {console.log(tag.name)}
-                                <button className='rounded-full m-2 p-2 bg-blue-600' key={index} onClick={() => applyTag(index)}>{tag.name}</button>
+                                <button className='rounded-full m-2 p-3 bg-blue-600' key={index} onClick={() => applyTag(index)}>{tag.name}</button>
                             </>
                         ))}
                     </div>
@@ -133,7 +133,9 @@ export default function Home() {
                         {
                             appliedTags.map((appliedTag) => (
                                 <>
-                                <button className='rounded-full m-2 p-2 bg-blue-600' key={appliedTag.tag_id} onClick={() => unapplyTag(appliedTag.tag_id)}>{appliedTag.name}</button>
+                                    <button className='flex rounded-full m-2 p-3 bg-blue-600' key={appliedTag.tag_id} onClick={() => unapplyTag(appliedTag.tag_id)}><svg className="w-6 h-6 text-blue-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6" />
+                                    </svg>{appliedTag.name}</button>
                                 </>
                             ))
                         }
@@ -145,7 +147,7 @@ export default function Home() {
                 </form>
                 {alreadyApplied == 1 && (
                     <>
-                    <div className='text-red-500'>Already Applied</div>
+                        <div className='text-red-500'>Already Applied</div>
                     </>
                 )}
             </div>
