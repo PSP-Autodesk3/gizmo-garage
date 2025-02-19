@@ -44,6 +44,7 @@ function Home({ params }: PageProps) {
   const [user] = useAuthState(auth);
   const [itemName, setItemName] = useState('');
   const [moduleType, setModuleType] = useState(0); // 1 = Folder, 2 = Item
+  const [duplicate, setDuplicate] = useState(0); // 0 = off, 1 = folder, 2 = item
 
   const getData = useCallback(async () => {
     const resolved = await params;
@@ -133,9 +134,10 @@ function Home({ params }: PageProps) {
     router.push(route);
   }
 
+  // Create new folder
   const newFolder = async (e: any) => {
     e.preventDefault();
-
+    // Check for duplicates
     const alreadyExists = await fetch("/api/getFolderExists", {
       method: "POST",
       headers: { 'Content-Type': 'application/json' },
@@ -143,8 +145,11 @@ function Home({ params }: PageProps) {
     });
     let resp = await alreadyExists.json();
     if (resp[0].FolderExists === 1) {
-      console.log("NOT CREATED: ALR EXISTS") // Do something, will fix later
-    } else {
+      setDuplicate(1);
+      setTimeout(() => {
+        setDuplicate(0);
+      }, 3000);
+    } else { // If no duplicates -> create folder
       await fetch("/api/createFolder", {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
@@ -158,12 +163,26 @@ function Home({ params }: PageProps) {
 
   const newItem = async (e: any) => {
 	e.preventDefault();
-	if (user) {
-		await fetch("/api/createItem", {
-			method: "POST",
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ itemName, email:user.email, project, id, type }),
-		});
+  // Check dupes 
+  const alreadyExists = await fetch ("/api/getItemExists", {
+    method: "POST",
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: itemName, projectid: project, folderid: id, type }),
+  });
+  let resp = await alreadyExists.json();
+  if (resp[0].ItemExists === 1) {
+    setDuplicate(2);
+    setTimeout(() => {
+      setDuplicate(0);
+    }, 3000);
+  } else {
+	  if (user) {
+      await fetch("/api/createItem", {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ itemName, email:user.email, project, id, type }),
+      });
+    }
 	}
 	getData();
 	setConfirmModule(false);
@@ -208,6 +227,11 @@ function Home({ params }: PageProps) {
 			)}
 		{(!confirmModule) && (
           <div className="bg-slate-800 mx-8 my-4 w-full rounded-lg p-4">
+            {(duplicate === 1) && (
+                <p className="text-red-600">Error: Folder name already exists.</p>
+            ) || (duplicate === 2) && (
+                <p className="text-red-600">Error: Item name already exists.</p>
+            )}
             <div id="folders" className="mx-8 my-4">
               <h1 className="text-3xl my-4">Folders:</h1>
               <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
