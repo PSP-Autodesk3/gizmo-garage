@@ -15,11 +15,19 @@ function Home() {
   const [email, setEmail] = useState('');
   const auth = getAuth();
 
-  // Reset password
+  // Replace with actual user data from Firebase/Auth context
+  const userData = {
+    firstName: "John",
+    lastName: "Doe",
+    username: "johndoe123",
+    email: "johndoe@example.com"
+  };
+
+  // Reset password function
   function resetPassword(email: string) {
-    sendPasswordResetEmail(auth, email) // Ref: https://stackoverflow.com/a/71025861 - Adam
+    sendPasswordResetEmail(auth, email)
       .then(() => {
-        const popupAlert = document.querySelector('.popup')
+        const popupAlert = document.querySelector('.popup');
         popupAlert?.classList.add('show');
         popupAlert?.classList.remove('hidden');
         setTimeout(() => {
@@ -32,52 +40,43 @@ function Home() {
       });
   }
 
-  function changeEmail(email: string) {
-    const user = auth.currentUser;
-    console.log(checkActionCode);
-    const continueUrl = `http://localhost:3000/email-handler?mode=recoverEmail`;
+  return (
+    <>
+      
+      <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 m-4 rounded-lg bg-indigo-500 p-2 text-white text-center text-sm popup hidden">
+        <h1 className="text-xl font-bold">Password Reset</h1>
+        <p className="mx-2">We have sent an email to {email}.</p>
+      </div>
 
-    if (user) {
-      sendEmailVerification(user, {url: continueUrl})
-      .then(() => {
-        console.log("verification email sent");
-      })
-      .catch((error) =>{
-        console.log(error);
-      })
-    }
-  }
+      
+      <div className="p-4 flex justify-between items-center">
+        <Link href="/" className="text-blue-500 hover:underline text-lg">← Home</Link>
+        <Link className="px-6 py-3 text-lg font-medium bg-indigo-600 mx-4 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500 50" href="/signout">
+          Sign Out
+        </Link>
+      </div>
 
-
-
-    return (
-      <>
-        <div className="fixed bottom-0 left-50 right-0 m-4 rounded-lg bg-indigo-500 p-2 text-white text-center text-sm popup hidden">
-          <h1 className="text-xl font-bold">Password Reset</h1>
-          <p className="mx-2">We have sent an email to {email}.</p>
+    
+      <div className="max-w-2xl mx-auto p-6">
+        <h1 className="text-4xl font-bold mb-4">Account Settings</h1>
+        <p className="font-bold text-2xl mb-4">Autodesk</p>
+        <div className="bg-gray-800 p-6 rounded-lg shadow-lg text-white mb-6">
+          <p className="text-lg mb-2"><span className="font-bold">First Name:</span> {userData.firstName}</p>
+          <p className="text-lg mb-2"><span className="font-bold">Last Name:</span> {userData.lastName}</p>
+          <p className="text-lg mb-2"><span className="font-bold">Username:</span> {userData.username}</p>
+          <p className="text-lg"><span className="font-bold">Email:</span> {userData.email}</p>
         </div>
-        <div className="p-4">
-          <Link className=" px-6 py-3 text-lg font-medium bg-indigo-600 mx-4 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500 50" href="/signout">Sign Out</Link>
-          {/*
-        {details ? (
-          <div>
-            <img src={(details.profileImages["sizeX80"])}></img>
-            <p id="name">Name: {details.firstName} {details.lastName}</p>
-            <p id="email">Email: {details.emailId}</p>
-            <p id="username">Username: {details.userName}</p>
-          </div>
-        ) : (
-          <p>Loading user details...</p>
-        )}
-        */}
-        </div>
-        <p>Gizmo Garage</p>
-        <div id="firebase-settings">
-          <form>
-            <div className="py-2 max-w-[20%]">
-              <label htmlFor="email" className="text-xl">Email:</label>
+
+        
+        <p className="font-bold text-2xl mb-4">Gizmo Garage</p>
+
+        
+        <div className="bg-gray-800 p-6 rounded-lg shadow-lg text-white">
+          <form className="flex items-center gap-2">
+            <div className="flex-1">
+              <label className="block text-lg">Email</label>
               <input
-                className="text-white w-full bg-slate-800 p-2 my-2 rounded-lg"
+                className="w-full text-white bg-gray-700 p-2 rounded-lg"
                 type="email"
                 placeholder="Email"
                 name="email"
@@ -87,23 +86,17 @@ function Home() {
               />
             </div>
             <button
-              type="button"
+              type="submit"
               className="px-6 py-3 text-lg font-medium bg-indigo-600 mx-4 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500 50"
-              onClick={() => changeEmail(email)}
-            >
-              Change Email
-            </button>
+            > Save</button>
           </form>
-          <button
-            type="button"
-            className="px-6 py-3 text-lg font-medium bg-indigo-600 mx-4 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500 50"
+          <p className="text-indigo-500 hover:underline cursor-pointer mt-3"
             onClick={() => resetPassword(email)}
-          >
-            Reset Password
-          </button>
+          > Reset Password</p>
         </div>
-      </>
-    )
-  }
+      </div>
+    </>
+  )
+}
 
-  export default withAuth(Home);
+export default withAuth(Home);
