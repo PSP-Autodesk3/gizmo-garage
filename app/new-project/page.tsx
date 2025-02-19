@@ -15,6 +15,7 @@ interface tags {
     name: string;
 }
 
+
 export default function Home() {
     const [user] = useAuthState(auth);
     const router = useRouter();
@@ -23,6 +24,8 @@ export default function Home() {
     const [tags, setTags] = useState<tags[]>([]);
     const [appliedTags, setAppliedTags] = useState<tags[]>([]);
     const [alreadyApplied, setAlreadyApplied] = useState(0);
+    const [query, setQuery] = useState<string>('');
+    const [filteredTags, setFilteredTags] = useState<tags[]>([]);
 
     const newProjectSubmitted = async (e: any) => {
         e.preventDefault()
@@ -88,13 +91,17 @@ export default function Home() {
 
             const tagData = await Data.json();
             setTags(tagData);
+            setFilteredTags(tagData);
         }
     }
 
 
     const applyTag = (index: number) => {
-        const appliedTag = tags[index];
-        if (!(appliedTags.includes(appliedTag))) {
+        console.log("index:",index);
+        const appliedTag = tags.find(tag => tag.tag_id == index);
+        console.log("appliedTag:",appliedTag);
+        console.log("tags:",tags);
+        if (appliedTags && appliedTag && !appliedTags.includes(appliedTag)) {
             setAppliedTags([...appliedTags, appliedTag]);
             setAlreadyApplied(0);
         }
@@ -103,6 +110,18 @@ export default function Home() {
         }
 
     }
+
+    useEffect(() => {
+        if (query.trim() == '') {
+            setFilteredTags(tags);
+            console.log("nothing");
+          }
+          else {
+            console.log("filtered");
+            //display where the search equals the query or matches at least one of the tags
+            setFilteredTags(tags.filter(tags => tags.name.toLowerCase().includes(query.trim())));
+          }
+    },[query]);
 
     const unapplyTag = (index: number) => {
         setAppliedTags(appliedTags.filter(tag => tag.tag_id !== index));
@@ -120,15 +139,24 @@ export default function Home() {
                         onChange={(e) => setName(e.target.value)}
                         className="rounded-lg bg-slate-800 p-2 m-8 text-2xl"
                     />
+                    <div id="search" className='p-4'>
+                        <label htmlFor="search=bar">Search</label>
+                        <input
+                            className='text-white w-full p-2 my-2 rounded-lg bg-slate-800'
+                            type="text"
+                            placeholder="Search"
+                            name="search"
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                        />
+                    </div>
                     <div id='tags'>
-                        {tags.map((tag, index) => (
+                        {filteredTags.map((tag) => (
                             <>
-                                {console.log(tag.name)}
-                                <button className='rounded-full m-2 p-3 bg-blue-600' key={index} onClick={() => applyTag(index)}>{tag.name}</button>
+                                <button className='rounded-full m-2 p-3 bg-blue-600' key={tag.tag_id} onClick={() => applyTag(tag.tag_id)}>{tag.name}</button>
                             </>
                         ))}
                     </div>
-
                     <div id='appliedTags'>
                         {
                             appliedTags.map((appliedTag) => (
