@@ -2,11 +2,12 @@
 
 // Middleware
 import withAuth from "@/app/lib/withAuth";
-import BackBtnBar from '../backBtnBar';
+
 // Other
 import { useState, useEffect } from 'react'
 import { auth } from '@/app/firebase/config';
 import Link from 'next/link';
+import BackBtnBar from '../backBtnBar';
 
 function Home() {
   const [databaseExists, setDatabaseExists] = useState(2);
