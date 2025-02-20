@@ -38,6 +38,11 @@ interface tags {
   name: string;
 }
 
+interface itemTags {
+  object_id: number,
+  name: string
+}
+
 function Home({ params }: PageProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -55,6 +60,8 @@ function Home({ params }: PageProps) {
   const [user] = useAuthState(auth);
   const [itemName, setItemName] = useState('');
   const [moduleType, setModuleType] = useState(0); // 1 = Folder, 2 = Item
+
+  //for tags 
   const [tags, setTags] = useState<tags[]>([]);
   const [FilteredTags, setFilteredTags] = useState<tags[]>([]);
   const [appliedTags, setAppliedTags] = useState<tags[]>([]);
@@ -96,9 +103,9 @@ function Home({ params }: PageProps) {
         body: JSON.stringify({ id, type }),
       });
 
-      response = await query.json();
-      setFolders(response);
-      setFilteredFolders(response);
+      let folderResponse = await query.json();
+      setFolders(folderResponse);
+      setFilteredFolders(folderResponse);
 
       setLoadingFolders(false);
 
@@ -109,19 +116,28 @@ function Home({ params }: PageProps) {
         body: JSON.stringify({ id, type }),
       });
 
-      response = await query.json();
-      setFiles(response);
-      setFilteredFiles(response);
+      let objectResults = await query.json();
+      setFiles(objectResults);
+      setFilteredFiles(objectResults);
 
       query = await fetch("/api/getAllTags", {
         method: "GET",
         headers: { "Content-Type": "application/json" }
       });
 
-      response = await query.json();
-      console.log("Tags:", response);
-      setTags(response);
-      setFilteredTags(response);
+      let tagResult = await query.json();
+      setTags(tagResult);
+      setFilteredTags(tagResult);
+
+      query = await fetch("/api/getObjectTags", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
+      })
+
+      let objectTags = await query.json();
+      objectResults.forEach((file: File) => {
+        file.tags = objectTags.filter((tag: itemTags) => tag.object_id === file.object_id);
+      });
 
       setLoadingFiles(false);
     }
@@ -290,6 +306,8 @@ function Home({ params }: PageProps) {
                             >
                               {folder.name}
                             </button>
+
+
                           </div>
                         </>
                       ))
@@ -328,6 +346,16 @@ function Home({ params }: PageProps) {
                                     {file.name}
                                   </button>
                                 </div>
+                                {console.log("Test 1", file.tags == undefined)}
+                                {console.log("Test 2", file.tags)}
+                                {file?.tags?.length > 0 && (
+                                  file.tags.map((tag) => (
+                                    <span className='rounded-full m-2 p-2 bg-blue-600' key={tag.tag_id}>
+                                      {tag.name}
+                                    </span>
+                                  ))
+                                )}
+
                               </>
                             ))
                           )}
@@ -420,9 +448,9 @@ function Home({ params }: PageProps) {
                         {
                           appliedTags.map((tag) => (
                             <>
-                                <button type='button' className='rounded-full m-2 p-3 bg-blue-600 flex' onClick={() => removeTag(tag.tag_id)} key={tag.tag_id}><svg className="w-6 h-6 text-blue-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24">
-                                  <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18 17.94 6M18 18 6.06 6" />
-                                </svg>{tag.name}</button>
+                              <button type='button' className='rounded-full m-2 p-3 bg-blue-600 flex' onClick={() => removeTag(tag.tag_id)} key={tag.tag_id}><svg className="w-6 h-6 text-blue-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18 17.94 6M18 18 6.06 6" />
+                              </svg>{tag.name}</button>
                             </>
                           ))
                         }
