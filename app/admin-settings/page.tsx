@@ -98,16 +98,32 @@ function Home() {
     }
   }
   
+  // Disabling a user
   const handleDisableUser = async (uid: string) => {
     try {
-      // TODO: Implement user disable functionality
-      console.log('Disabling user:', uid);
+      // Get the current user status
+      const user = users.find(u => u.uid === uid)
+      if (!user) return;
+
+      // Call the api route to update the user status
+      const response = await fetch("/api/manageUserStatus", {
+        method: "POST",
+        headers:{
+          'Content-Type': 'application/json' 
+        },
+        body: JSON.stringify({
+          uid,
+          disabled: !user.disabled
+        })
+      })
+      // Changing what is appearing on the user interface
+      setUsers(users.map(u => u.uid === uid ? // If the user is the one being updated, change the disabled status
+        {...u, disabled: !u.disabled} : u)) // Otherwise, keep the user as is
     } catch (error) {
       console.error('Error disabling user:', error);
     }
   };
 
-  // Disabling a user
 
   return (
     <>
@@ -128,7 +144,7 @@ function Home() {
         <p className="mx-2">We have sent an email to {resetEmail}.</p>
       </div>
       {/* Database Management */}
-      <h2 className="text-xl font-semibold text-slate-200 w-[40%] m-auto mb-2 mt-8">
+      <h2 className="text-xl font-semibold text-slate-200 w-[40%] m-auto mb-2 mt-6">
         Database Management
       </h2>
       <div className="bg-slate-900 p-4 w-[40%] mx-auto rounded-lg shadow-lg mt-4">
@@ -140,9 +156,10 @@ function Home() {
         )}
       </div>
       {/* User Management */}
-      <h2 className="text-xl font-semibold text-slate-200 w-[40%] mx-auto mb-2 mt-16">
+      <h2 className="text-xl font-semibold text-slate-200 w-[40%] mx-auto mb-2 mt-6">
         User Management
       </h2>
+      {/* User Filter */}
       <div className="bg-slate-900 p-4 w-[40%] mx-auto rounded-lg shadow-lg mt-2">
         <div id="search" className='p-1'>
           <input
@@ -155,6 +172,7 @@ function Home() {
           />
         </div>
       </div>
+      {/* User List */}
       <h3 className="text-l font-semibold text-slate-200 w-[40%] m-auto mb-2 mt-4">
         List of Users
       </h3>
@@ -167,22 +185,25 @@ function Home() {
                 <p className="text-slate-400 text-sm">{user.email}</p>
                 <p className="text-slate-500 text-xs">{user.uid}</p>
               </div>
-              <p className="text-indigo-500 hover:underline cursor-pointer mt-3"
-              onClick={() => resetPassword(user.email)}
-              > Reset Password</p>
-              {/* Disabling Accounts */}
-              <label className="inline-flex items-center cursor-pointer">
-                <input 
-                type="checkbox" 
-                className="sr-only peer" 
-                checked={!user.disabled} 
-                onChange={() => handleDisableUser(user.uid)}
-                />
-                <div className="relative w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"></div>
-                <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
-                  {user.disabled ? 'Disabled' : 'Enabled'}
-                </span>
-              </label>
+              <div className="flex justify-between items-center">
+                <p className="text-indigo-500 hover:underline cursor-pointer mt-3"
+                onClick={() => resetPassword(user.email)}
+                > Reset Password</p>
+                {/* Disabling Accounts Toggle*/}
+                {/* Link where I got the button: https://flowbite.com/docs/forms/toggle/ */}
+                <label className="inline-flex items-center cursor-pointer"> 
+                  <input 
+                  type="checkbox" 
+                  className="sr-only peer" 
+                  checked={!user.disabled} 
+                  onChange={() => handleDisableUser(user.uid)}
+                  />
+                  <div className="relative w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-600 dark:peer-checked:bg-green-600"></div>
+                  <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+                    {user.disabled ? 'Disabled' : 'Enabled'}
+                  </span>
+                </label>
+              </div>
             </div>
           ))}
         </div>       
