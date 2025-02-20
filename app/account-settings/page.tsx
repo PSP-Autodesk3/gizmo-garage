@@ -19,14 +19,14 @@ function AccountSettings() {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Get user's email from Firebase Auth
+  //  Get user's email from Firebase Auth
   useEffect(() => {
     if (auth.currentUser?.email) {
       setEmail(auth.currentUser.email);
     }
   }, []);
 
-  // ✅ Fetch user data from API
+  //  Fetch user data from API
   useEffect(() => {
     async function fetchUserData() {
       if (!email) return;
@@ -49,7 +49,7 @@ function AccountSettings() {
     fetchUserData();
   }, [email]);
 
-  // ✅ Reset Password Function
+  // Reset Password Function
   function resetPassword(email: string) {
     if (!email) return alert("Please enter a valid email.");
     sendPasswordResetEmail(auth, email)
@@ -57,7 +57,7 @@ function AccountSettings() {
       .catch((err) => alert(err.message));
   }
 
-  
+
   if (loading) return <p className="text-center text-white">Loading...</p>;
 
   return (
