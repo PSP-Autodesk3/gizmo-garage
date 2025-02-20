@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from "next/image"
 import { Range } from 'react-range';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 interface FiltersProps {
   query?: string;

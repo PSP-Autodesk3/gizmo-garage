@@ -170,7 +170,8 @@ function Home() {
     </div>
     <div id="data" className='flex flex-row '>
     <div id="projects">
-    <div className="flex flex-row justify-between">
+    <div className="w-[50%] py-8 m-auto gap-4 lg:absolute rounded-lg left-1/2 transform -translate-x-1/2">
+    <div className="pr-8 flex flex-row justify-between">
     <h1 className='p-10 text-4xl text-white transition-colors duration-300 hover:text-gray-400 pb-10'>Projects</h1>
     <button
     className="self-center flex justify-end px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
@@ -179,37 +180,38 @@ function Home() {
     Create new Project
     </button>
     </div>
-    {!loadingProjects ? (
-      projects.map((project, index) => (
-        <div className="project" key={index}>
-        <div id="folders">
-        <div className="bg-slate-900 p-4 m-auto rounded-lg shadow-lg mt-16 flex flex-row justify-between">
-        <div className='p-2 pr-10'>
-        <p>Name: {project.name} </p>
-        <p>Version: </p>
-        <p>Date: </p>
+      {!loadingProjects ? (
+        projects.map((project, index) => (
+          <div className="project" key={index}>
+          <div id="folders">
+          <div className="bg-slate-900 p-4 m-auto rounded-lg shadow-lg mx-8 my-4 flex flex-row justify-between">
+          <div className='p-2 pr-10'>
+          <p>Name: {project.name} </p>
+          <p>Version: </p>
+          <p>Date: </p>
+          </div>
+          <div className='content-center'>
+          <button
+          className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+          onClick={() => router.push(`/project/${project.name.replace(/ /g, '+')}`)}
+          >
+          View
+          </button>
+          </div>
+          </div>
+          </div>
+          </div>
+        ))
+      ) : (
+        <>
+        <div>
+        <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
+        <Skeleton width={400} height={100} />
+        </SkeletonTheme>
         </div>
-        <div className='content-center'>
-        <button
-        className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
-        onClick={() => router.push(`/project/${project.name.replace(/ /g, '+')}`)}
-        >
-        View
-        </button>
-        </div>
-        </div>
-        </div>
-        </div>
-      ))
-    ) : (
-      <>
-      <div>
-      <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
-      <Skeleton width={400} height={100} />
-      </SkeletonTheme>
-      </div>
-      </>
-    )}
+        </>
+      )}
+    </div>
     </div>
     </div>
     </div>

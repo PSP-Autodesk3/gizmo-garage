@@ -49,6 +49,15 @@ export async function POST() {
     `);
 
     await connection.execute(`
+      CREATE TABLE IF NOT EXISTS Invite (
+        user_id INT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES Users(user_id),
+        project_id INT NOT NULL, 
+        FOREIGN KEY (project_id) REFERENCES Projects(project_id)
+      );
+    `);
+
+    await connection.execute(`
       CREATE TABLE IF NOT EXISTS Folder (
         folder_id INT PRIMARY KEY AUTO_INCREMENT,
         name VARCHAR(255) NOT NULL,

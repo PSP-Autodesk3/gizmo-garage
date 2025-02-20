@@ -1,5 +1,3 @@
-import { Console } from 'console';
-import { send } from 'process';
 import { useEffect, useState } from 'react';
 
 interface PermissionsProps {
