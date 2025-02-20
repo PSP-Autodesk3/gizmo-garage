@@ -153,7 +153,7 @@ function Home({ params }: PageProps) {
       await fetch("/api/createFolder", {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ folderName, project, id, type }),
+        body: JSON.stringify({ folderName, project: project.replace(/%2B/g, ' '), id, type }),
       });
       getData();
     }
@@ -162,6 +162,7 @@ function Home({ params }: PageProps) {
   }
 
   const newItem = async (e: any) => {
+<<<<<<< Updated upstream
 	e.preventDefault();
   // Check dupes 
   const alreadyExists = await fetch ("/api/getItemExists", {
@@ -182,6 +183,29 @@ function Home({ params }: PageProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ itemName, email:user.email, project, id, type }),
       });
+=======
+    e.preventDefault();
+    // Check dupes 
+    const alreadyExists = await fetch ("/api/getItemExists", {
+      method: "POST",
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: itemName, projectid: project, folder_id: id, type }),
+    });
+    let resp = await alreadyExists.json();
+    if (resp[0].ItemExists === 1) {
+      setDuplicate(2);
+      setTimeout(() => {
+        setDuplicate(0);
+      }, 3000);
+    } else {
+      if (user) {
+        await fetch("/api/createItem", {
+          method: "POST",
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ itemName, email:user.email, project: project.replace(/%2B/g, ' '), id, type }),
+        });
+      }
+>>>>>>> Stashed changes
     }
 	}
 	getData();
