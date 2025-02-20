@@ -1,20 +1,29 @@
 "use client";
 
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import BackBtnBar from '@/app/backBtnBar';
 
 // For Firebase Auth
 import { auth } from '@/app/firebase/config';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import Permissions from '../projectPermissions';
+import Permissions from '../../projectPermissions';
 
-export default function Home() {
+export default function Home(params: number) {
     const [user] = useAuthState(auth);
     const router = useRouter();
     const [name, setName] = useState("");
     const [doesExist, setDoesExist] = useState(0);
+    const [projectID, setProjectID] = useState(0);
+
+    const getProjectID = useCallback(async () => {
+        const resolvedParams = await params;
+        setProjectID(resolvedParams);
+    }, []);
+
+    useEffect(() => {
+        getProjectID();
+    }, []);
 
     const newProjectSubmitted = async (e: any) => {
         e.preventDefault()
@@ -82,9 +91,9 @@ export default function Home() {
                     <button
                         className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
                     >
-                        Create
+                        Save
                     </button>
-                    <Permissions />
+                    <Permissions project={projectID} />
                 </form>
             </div>
             {doesExist == 1 && (

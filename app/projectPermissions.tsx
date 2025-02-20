@@ -1,21 +1,23 @@
 import { useEffect, useState } from 'react';
 
 interface PermissionsProps {
-    project?: string;
+    project?: number;
 }
 
 export default function Permissions({ project }: PermissionsProps) {
     const [emails, updateEmails] = useState<string[]>([]);
+    const [editors, setEditors] = useState<string[]>([]);
 
     useEffect(() => {
         if (project) {
             const getAccounts = async () => {
-                const response = await fetch(`/api/getProjectEditors?project=${project}`, {
+                const response = await fetch(`/api/getProjectEditors?project_id=${project}`, {
                     method: 'GET',
                     headers: { 'Content-Type': 'application/json' }
                 })
 
                 updateEmails(await response.json());
+                setEditors(emails);
             }
             getAccounts();
         }
@@ -47,18 +49,22 @@ export default function Permissions({ project }: PermissionsProps) {
                 ) : (
                     <p>No accounts added</p>
                 )}
-                <EmailSender />
+                <EmailSender editors={editors} setEditors={setEditors} />
             </>
         );
     }
     return (
-        <EmailSender />
+        <EmailSender editors={editors} setEditors={setEditors} />
     );
 }
 
-const EmailSender = () => {
+interface EmailSenderProps {
+    editors: string[];
+    setEditors: React.Dispatch<React.SetStateAction<string[]>>;
+}
+
+const EmailSender = ( { editors, setEditors }: EmailSenderProps ) => {
     const [email, setEmail] = useState("");
-    const [editors, setEditors] = useState<string[]>([]);
 
     const validateEmail = (email: string) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -96,7 +102,7 @@ const EmailSender = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                 />
-                <button type="button" onClick={sendInvite}>Invite</button>
+                <button type="button" onClick={sendInvite}>Add</button>
             </form>
             <div id="emails">
                 <p>Proposed Editors:</p>
