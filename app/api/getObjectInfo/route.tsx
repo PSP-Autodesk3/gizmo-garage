@@ -15,6 +15,7 @@ export async function POST(request: Request) {
         const [rows] = await connection.execute(`
             SELECT *
             FROM Object
+            INNER JOIN Users ON Object.author = Users.user_id
             WHERE object_id = ?;
         `, [id]);
         await connection.end();
