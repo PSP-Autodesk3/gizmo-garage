@@ -12,6 +12,7 @@ import { sendPasswordResetEmail } from 'firebase/auth';
 interface User {
   uid: string;
   email: string;
+  disabled: boolean;
 }
 
 function Home() {
@@ -96,6 +97,15 @@ function Home() {
       }, 3000); // Hide after 3 seconds
     }
   }
+  
+  const handleDisableUser = async (uid: string) => {
+    try {
+      // TODO: Implement user disable functionality
+      console.log('Disabling user:', uid);
+    } catch (error) {
+      console.error('Error disabling user:', error);
+    }
+  };
 
   // Disabling a user
 
@@ -150,6 +160,7 @@ function Home() {
       </h3>
       <div className="bg-slate-900 p-4 w-[40%] m-auto rounded-lg shadow-lg mt-4 mb-5">
         <div id="users" className="space-y-4">
+          {/* Displaying Each User */}
           {filteredUsers.map((user: User) => (
             <div key={user.uid} className="bg-slate-800 p-4 rounded-lg">
               <div className="flex flex-col">
@@ -159,6 +170,19 @@ function Home() {
               <p className="text-indigo-500 hover:underline cursor-pointer mt-3"
               onClick={() => resetPassword(user.email)}
               > Reset Password</p>
+              {/* Disabling Accounts */}
+              <label className="inline-flex items-center cursor-pointer">
+                <input 
+                type="checkbox" 
+                className="sr-only peer" 
+                checked={!user.disabled} 
+                onChange={() => handleDisableUser(user.uid)}
+                />
+                <div className="relative w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"></div>
+                <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+                  {user.disabled ? 'Disabled' : 'Enabled'}
+                </span>
+              </label>
             </div>
           ))}
         </div>       

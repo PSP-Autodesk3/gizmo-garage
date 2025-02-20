@@ -6,6 +6,7 @@ import { getAuth, Auth, UserRecord } from 'firebase-admin/auth';
 interface UserData { 
   uid: string;
   email: string | undefined;
+  disabled: boolean;
 }
 
 // Initialise Firebase Admin SDK, here is the firebase admin docs: https://firebase.google.com/docs/admin/setup
@@ -34,7 +35,8 @@ export async function GET() {
     const listUsersResult = await adminAuth.listUsers(); // Fetch all users
     const users: UserData[] = listUsersResult.users.map((userRecord: UserRecord) => ({ // Map the user data
       uid: userRecord.uid,
-      email: userRecord.email
+      email: userRecord.email,
+      disabled: userRecord.disabled
     }));
     
     return NextResponse.json({ users }); // Return the user data
