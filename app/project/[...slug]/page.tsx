@@ -30,6 +30,12 @@ interface Folder {
 interface File {
   object_id: number;
   name: string;
+  tags: tags[];
+}
+
+interface tags {
+  tag_id: number;
+  name: string;
 }
 
 function Home({ params }: PageProps) {
@@ -40,6 +46,7 @@ function Home({ params }: PageProps) {
   const [folders, setFolders] = useState<Folder[]>([]);
   const [files, setFiles] = useState<File[]>([]);
   const [query, setQuery] = useState<string>('');
+  const [TagQuery, setTagQuery] = useState<string>('');
   const [values, setValues] = useState([20, 80]);
   const [confirmModule, setConfirmModule] = useState(false);
   const [folderName, setFolderName] = useState('');
@@ -48,6 +55,11 @@ function Home({ params }: PageProps) {
   const [user] = useAuthState(auth);
   const [itemName, setItemName] = useState('');
   const [moduleType, setModuleType] = useState(0); // 1 = Folder, 2 = Item
+  const [tags, setTags] = useState<tags[]>([]);
+  const [FilteredTags, setFilteredTags] = useState<tags[]>([]);
+  const [appliedTags, setAppliedTags] = useState<tags[]>([]);
+  const [Filteredfolders, setFilteredFolders] = useState<Folder[]>([]);
+  const [Filteredfiles, setFilteredFiles] = useState<File[]>([]);
 
   //loading
   const [loadingFolders, setLoadingFolders] = useState(true);
@@ -86,6 +98,7 @@ function Home({ params }: PageProps) {
 
       response = await query.json();
       setFolders(response);
+      setFilteredFolders(response);
 
       setLoadingFolders(false);
 
@@ -98,6 +111,18 @@ function Home({ params }: PageProps) {
 
       response = await query.json();
       setFiles(response);
+      setFilteredFiles(response);
+
+      query = await fetch("/api/getAllTags", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
+      });
+
+      response = await query.json();
+      console.log("Tags:", response);
+      setTags(response);
+      setFilteredTags(response);
+
       setLoadingFiles(false);
     }
   }, [params, id, type]);
@@ -164,13 +189,50 @@ function Home({ params }: PageProps) {
       await fetch("/api/createItem", {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ itemName, email: user.email, project, id, type }),
+        body: JSON.stringify({ itemName, email: user.email, project, id, type, appliedTags }),
       });
+
+      //add tag id to linking table
     }
     getData();
     setConfirmModule(false);
     setItemName("");
   }
+
+  useEffect(() => {
+    if (TagQuery != '') {
+      setFilteredTags(tags.filter(tags => tags.name.toLowerCase().includes(TagQuery.trim())));
+    } else {
+      setFilteredTags(tags);
+    }
+  }, [TagQuery]);
+
+  const applyTag = (index: number) => {
+    const appliedTag = tags.find(tag => tag.tag_id == index);
+    if (appliedTags && appliedTag && !appliedTags.includes(appliedTag)) {
+      setAppliedTags([...appliedTags, appliedTag]);
+    }
+    else {
+
+    }
+  }
+
+  const removeTag = (index: number) => {
+    setAppliedTags(appliedTags.filter(tag => tag.tag_id !== index));
+  }
+
+  useEffect(() => {
+    console.log("query:", query);
+    if (query.trim() == '') {
+      setFilteredFolders(folders);
+      setFilteredFiles(files);
+    }
+    else {
+      setFilteredFolders(folders.filter(folder => folder.name.toLowerCase().includes(query.trim())));
+      setFilteredFiles(files.filter(file => file.name.toLowerCase().includes(query.trim()))); //add this part when tags can be added || file.tags.some(tag => tag.name.toLowerCase().includes(query.trim()
+    }
+  }, [query])
+
 
 
 
@@ -219,7 +281,7 @@ function Home({ params }: PageProps) {
                 <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
                   {!loadingFolders ? (
                     Array.isArray(folders) && folders.length > 0 && (
-                      folders.map((folder) => (
+                      Filteredfolders.map((folder) => (
                         <>
                           <div key={folder.folder_id}>
                             <button
@@ -256,7 +318,7 @@ function Home({ params }: PageProps) {
                       <>
                         <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
                           {Array.isArray(files) && files.length > 0 && (
-                            files.map((file) => (
+                            Filteredfiles.map((file) => (
                               <>
                                 <div key={file.object_id}>
                                   <button
@@ -332,6 +394,40 @@ function Home({ params }: PageProps) {
                       className="w-full mt-4 p-2 rounded-lg bg-slate-800"
                       placeholder="Enter Item name"
                     />
+                    <div >
+                      <div id="search" className='p-4'>
+                        <label htmlFor="search=bar">Search</label>
+                        <input
+                          className='text-white w-full p-2 my-2 rounded-lg bg-slate-800'
+                          type="text"
+                          placeholder="Search"
+                          name="search"
+                          value={TagQuery}
+                          onChange={(e) => setTagQuery(e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        {
+                          FilteredTags.map((tag) => (
+                            <>
+                              <button type="button" className='rounded-full m-2 p-3 bg-blue-600' onClick={() => applyTag(tag.tag_id)} key={tag.tag_id}>{tag.name}</button>
+                            </>
+                          ))
+                        }
+                      </div>
+
+                      <div id='appliedTags'>
+                        {
+                          appliedTags.map((tag) => (
+                            <>
+                                <button type='button' className='rounded-full m-2 p-3 bg-blue-600 flex' onClick={() => removeTag(tag.tag_id)} key={tag.tag_id}><svg className="w-6 h-6 text-blue-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24">
+                                  <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18 17.94 6M18 18 6.06 6" />
+                                </svg>{tag.name}</button>
+                            </>
+                          ))
+                        }
+                      </div>
+                    </div>
                     <div className="mt-4">
                       <button
                         className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"

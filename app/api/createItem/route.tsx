@@ -4,7 +4,7 @@ import mysql from "mysql2/promise";
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const {itemName, email, project, type, id} = body;
+        const { itemName, email, project, type, id, appliedTags } = body;
         // Connect to DB
         const connection = await mysql.createConnection({
             host: process.env.DB_HOST,
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
 
         // Insert item into Object table
         const params: (string | number | null)[] = [itemName, email, project];
-        if (type !== 1) {params.push(id);} else {params.push(null);}
+        if (type !== 1) { params.push(id); } else { params.push(null); }
 
         await connection.execute(`
             INSERT INTO Object
@@ -26,9 +26,26 @@ export async function POST(request: Request) {
             (SELECT project_id FROM Projects WHERE name = ?), 
             ?)
         `, params);
+
+        // Get the ID of the item just created
+        const [latestId] = await connection.execute(`SELECT object_id
+            FROM Object
+            ORDER BY object_id DESC
+            LIMIT 1
+            WHERE Projects.owner = Users.user_id OR Editor.user_id IS NOT NULL;
+`);
+
+        await connection.execute(`
+            INSERT INTO object_tag
+            (object_id, tag_id)
+            VALUES (, 
+            ,
+            (SELECT project_id FROM Projects WHERE name = ?), 
+            ?)
+        `, params);
         await connection.end();
         return NextResponse.json({ message: "Item created successfully" });
-    } catch(err) {
+    } catch (err) {
         console.error("Database error:", err);
         return NextResponse.json({ error: "Failed to create item" }, { status: 500 });
     }
