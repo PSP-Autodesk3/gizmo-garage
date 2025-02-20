@@ -26,6 +26,7 @@ function Home({ params }: PageProps) {
      const router = useRouter();
      const [item, setItem] = useState<Item | null>(null);
      const [itemId, setItemId] = useState<number | null>(null);
+     const [itemName, setItemName] = useState<string | null>(null);
 
      useEffect(() => {
         const resolveParams = async () => {
@@ -34,9 +35,25 @@ function Home({ params }: PageProps) {
         }
         resolveParams();
      }, [])
+     useEffect(() => {
+        const fetchInfo = async () => {
+            const response = await fetch ("/api/getObjectInfo", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ id: itemId }),
+            });
+            const itemData = await response.json();
+            console.log(itemData);
+            setItemName(itemData[0]?.name);
+        }
+        fetchInfo();
+    }, [itemId]);
      return (
         <>
-        <p>ID: {itemId}</p>
+            <p>ID: {itemId}</p>
+            <p>Name: {itemName}</p>
         </>
      )
 }
