@@ -162,7 +162,6 @@ function Home({ params }: PageProps) {
   }
 
   const newItem = async (e: any) => {
-<<<<<<< Updated upstream
 	e.preventDefault();
   // Check dupes 
   const alreadyExists = await fetch ("/api/getItemExists", {
@@ -183,7 +182,6 @@ function Home({ params }: PageProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ itemName, email:user.email, project, id, type }),
       });
-=======
     e.preventDefault();
     // Check dupes 
     const alreadyExists = await fetch ("/api/getItemExists", {
@@ -205,12 +203,10 @@ function Home({ params }: PageProps) {
           body: JSON.stringify({ itemName, email:user.email, project: project.replace(/%2B/g, ' '), id, type }),
         });
       }
->>>>>>> Stashed changes
     }
-	}
-	getData();
-	setConfirmModule(false);
-	setItemName("");
+    getData();
+    setConfirmModule(false);
+    setItemName("");
   }
 
   return (
