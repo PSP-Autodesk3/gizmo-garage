@@ -135,10 +135,14 @@ function Home({ params }: PageProps) {
       })
 
       let objectTags = await query.json();
+      console.log("objectTags:", objectTags);
       objectResults.forEach((file: File) => {
         file.tags = objectTags.filter((tag: itemTags) => tag.object_id === file.object_id);
       });
+      console.log("objectResults:", objectResults);
 
+      setFiles(objectResults);
+      setFilteredFiles(objectResults);
       setLoadingFiles(false);
     }
   }, [params, id, type]);
@@ -208,7 +212,6 @@ function Home({ params }: PageProps) {
         body: JSON.stringify({ itemName, email: user.email, project, id, type, appliedTags }),
       });
 
-      //add tag id to linking table
     }
     getData();
     setConfirmModule(false);
@@ -338,24 +341,21 @@ function Home({ params }: PageProps) {
                           {Array.isArray(files) && files.length > 0 && (
                             Filteredfiles.map((file) => (
                               <>
-                                <div key={file.object_id}>
+                                <div key={file.object_id} className='flex flex-col bg-slate-900 rounded-lg'>
                                   <button
-                                    className="bg-slate-900 rounded-lg text-xl my-4 px-4 py-2"
+                                    className=" text-xl my-4 px-4 py-2"
                                     onClick={() => { }}
                                   >
                                     {file.name}
                                   </button>
+                                  {!loadingFiles && Array.isArray(file.tags) && file.tags.length > 0 && (
+                                    file.tags.map((tag) => (
+                                      <span className='rounded-full m-2 p-2 bg-blue-600 self-center' key={tag.tag_id}>
+                                        {tag.name}
+                                      </span>
+                                    ))
+                                  )}
                                 </div>
-                                {console.log("Test 1", file.tags == undefined)}
-                                {console.log("Test 2", file.tags)}
-                                {file?.tags?.length > 0 && (
-                                  file.tags.map((tag) => (
-                                    <span className='rounded-full m-2 p-2 bg-blue-600' key={tag.tag_id}>
-                                      {tag.name}
-                                    </span>
-                                  ))
-                                )}
-
                               </>
                             ))
                           )}
