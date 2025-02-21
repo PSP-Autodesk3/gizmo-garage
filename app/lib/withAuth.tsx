@@ -27,7 +27,7 @@ export default function withAuth<T extends object>(
 
     useEffect(() => {
       // List of routes that are exempt from this middleware
-      const protectedRoutes = ["/", "/login", "/register", "/redirect"];
+      const protectedRoutes = ["/", "/login", "/register", "/redirect", "/admin-settings"]; // To fix: make admin-settings not a protected route. Only for devel.
 
       const checkRedirect = async () => {
         // If nothing is loading
