@@ -27,7 +27,7 @@ export async function POST() {
 
     // Just for development, delete for final version
     await connection.execute(`
-      INSERT INTO Users (user_id, email, fname, lname) VALUES (1,'test@test.test','First','Last');
+      INSERT INTO Users (user_id, email, fname, lname) VALUES (1,'John.Doe@outlook.com','John','Doe');
     `);
 
     await connection.execute(`
