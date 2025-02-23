@@ -15,6 +15,7 @@ export default function Home() {
     const router = useRouter();
     const [name, setName] = useState("");
     const [doesExist, setDoesExist] = useState(0);
+    const [editors, setEditors] = useState<string[]>([]);
 
     const newProjectSubmitted = async (e: any) => {
         e.preventDefault()
@@ -24,7 +25,7 @@ export default function Home() {
                 headers: { 'Content-Type': 'application/json' }
             });
             let response = await exists.json();
-            console.log("Response", response);
+
             if (response[0]?.ProjectExists == 1) {
                 setDoesExist(1);
                 setTimeout(() => {
@@ -37,7 +38,6 @@ export default function Home() {
                     headers: { 'Content-Type': 'application/json' },
                 })
                 response = await getUser.json();
-                console.log("Response", response);
 
                 if (response[0].user_id) {
                     const id = response[0].user_id;
@@ -47,8 +47,21 @@ export default function Home() {
                         body: JSON.stringify({ name, id }),
                     })
                     response = await createProject.json();
+
                     if (response.error == null) {
-                        router.push("/");
+                        console.log("Emails:", editors);
+                        editors.forEach(async (editor) => {
+                            console.log("Processing Email:", editor);
+                            const inviteUser = await fetch(`/api/inviteUser`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ email: editor, project: name }),
+                            })
+
+                            console.log("Email:", await inviteUser.json());
+                        })
+
+                        /*router.push("/");*/
                     } else {
                         console.log("Error:", response.error);
                     }
@@ -84,7 +97,7 @@ export default function Home() {
                     >
                         Create
                     </button>
-                    <Permissions />
+                    <Permissions editors={editors} setEditors={setEditors} />
                 </form>
             </div>
             {doesExist == 1 && (

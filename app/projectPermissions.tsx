@@ -1,12 +1,13 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface PermissionsProps {
     project?: number;
+    editors: string[];
+    setEditors: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-export default function Permissions({ project }: PermissionsProps) {
+export default function Permissions({ project, editors, setEditors }: PermissionsProps) {
     const [emails, updateEmails] = useState<string[]>([]);
-    const [editors, setEditors] = useState<string[]>([]);
 
     useEffect(() => {
         if (project) {
@@ -63,7 +64,7 @@ interface EmailSenderProps {
     setEditors: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-const EmailSender = ( { editors, setEditors }: EmailSenderProps ) => {
+const EmailSender = ({ editors, setEditors }: EmailSenderProps) => {
     const [email, setEmail] = useState("");
 
     const validateEmail = (email: string) => {
@@ -81,8 +82,7 @@ const EmailSender = ( { editors, setEditors }: EmailSenderProps ) => {
                 p.innerHTML = email;
                 div?.appendChild(p);
                 setEditors([...editors, email]);
-
-
+                setEmail("");
             } else {
                 console.log("Invalid email");
             }

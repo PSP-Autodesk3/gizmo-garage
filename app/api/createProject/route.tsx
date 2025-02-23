@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import mysql from "mysql2/promise";
+import mysql, { ResultSetHeader } from "mysql2/promise";
 
 export async function POST(request: Request) {
   try {
@@ -14,11 +14,11 @@ export async function POST(request: Request) {
       database: process.env.DB_DATABASE,
     });
 
-    await connection.execute("INSERT INTO Projects (name, owner) VALUES (?, ?)", [name, id]);
+    const [rows] = await connection.execute<ResultSetHeader>("INSERT INTO Projects (name, owner) VALUES (?, ?)", [name, id]);
     
     await connection.end();
 
-    return NextResponse.json({ message: "Project created successfully" });
+    return NextResponse.json({ message: "Project created successfully", project_id: rows.insertId });
   } catch (error) {
     console.error("Database error:", error);
     return NextResponse.json({ error: "Failed to create project" }, { status: 500 });
