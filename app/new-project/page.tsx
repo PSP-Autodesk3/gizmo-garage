@@ -61,7 +61,7 @@ export default function Home() {
                             console.log("Email:", await inviteUser.json());
                         })
 
-                        /*router.push("/");*/
+                        router.push("/");
                     } else {
                         console.log("Error:", response.error);
                     }
