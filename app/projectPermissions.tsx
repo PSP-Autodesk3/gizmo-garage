@@ -16,11 +16,10 @@ interface Emails {
 
 export default function Permissions({ project, editors, setEditors }: PermissionsProps) {
     const [emails, updateEmails] = useState<Emails[]>([]);
-    const [user] = useAuthState(auth);
+    const [invites, updateInvites] = useState<Emails[]>([]);
 
     useEffect(() => {
         if (project && project > 0) {
-            console.log("ID:", project)
             const getAccounts = async () => {
                 const response = await fetch(`/api/getProjectEditors?project_id=${project}`, {
                     method: 'GET',
@@ -30,9 +29,19 @@ export default function Permissions({ project, editors, setEditors }: Permission
                 const emailResponse = await response.json()
                 updateEmails(emailResponse);
                 setEditors(emailResponse[0].email.toLowerCase());
-                console.log(emailResponse[0]);
             }
             getAccounts();
+
+            const getInvited = async () => {
+                const response = await fetch(`/api/getProjectInvited?project_id=${project}`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                })
+
+                const emailResponse = await response.json();
+                updateInvites(emailResponse);
+            }
+            getInvited();
         }
     }, [project])
 
@@ -61,6 +70,29 @@ export default function Permissions({ project, editors, setEditors }: Permission
                     </>
                 ) : (
                     <p>No accounts added</p>
+                )}
+                <h1>Pending Invites</h1>
+                {invites.length > 0 ? (
+                    <>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Email</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {invites.map((invite, index) => (
+                                    <tr key={index}>
+                                        <td>{invite.email}</td>
+                                        <button>Delete</button>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </>
+                ) : (
+                    <p>No pending invites</p>
                 )}
                 <EmailSender editors={editors} setEditors={setEditors} />
             </>
