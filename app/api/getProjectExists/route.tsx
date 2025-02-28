@@ -5,6 +5,7 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const name = searchParams.get("name");
+    const email = searchParams.get("email");
 
     if (!name || name.trim() === "") {
       return NextResponse.json({ error: "Missing 'name' parameter" }, { status: 400 });
@@ -21,8 +22,8 @@ export async function GET(request: Request) {
     const [rows] = await connection.execute(`
       SELECT COUNT(*) AS ProjectExists
       FROM Projects
-      WHERE name = ?
-    `, [name]);
+      WHERE name = ? AND owner = (SELECT user_id FROM Users WHERE email = ?)
+    `, [name, email]);
     await connection.end();
 
     return NextResponse.json(rows, { status: 200});

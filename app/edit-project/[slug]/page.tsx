@@ -23,57 +23,26 @@ export default function Home({ params }: PageProps) {
 
     const getProjectID = useCallback(async () => {
         const resolvedParams = await params;
-        setProjectID(Number.parseInt(resolvedParams.slug));
-    }, []);
+        if (resolvedParams) {
+            setProjectID(Number.parseInt(resolvedParams.slug));
+    
+            const details = await fetch(`/api/getProjectDetails?id=${resolvedParams.slug}`, {
+                method: "GET",
+                headers: { 'Content-Type': 'application/json' }
+            })
+            const response = await details.json();
+    
+            if (response[0].name) {
+                setName(response[0].name);
+            }
+        }
+    }, [params]);
 
     useEffect(() => {
         getProjectID();
-    }, []);
+    }, [getProjectID]);
 
-    const newProjectSubmitted = async (e: any) => {
-        e.preventDefault()
-        if (name != null && name.trim() != "") {
-            const exists = await fetch(`/api/getProjectExists?name=${encodeURIComponent(name)}`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
-            });
-            let response = await exists.json();
-            console.log("Response", response);
-            if (response[0]?.ProjectExists == 1) {
-                setDoesExist(1);
-                setTimeout(() => {
-                    setDoesExist(0);
-                }, 3000);
-            }
-            if (response[0]?.ProjectExists == 0 && user?.email) {
-                const getUser = await fetch(`/api/getUserDetails?email=${encodeURIComponent(user?.email)}`, {
-                    method: 'GET',
-                    headers: { 'Content-Type': 'application/json' },
-                })
-                response = await getUser.json();
-                console.log("Response", response);
-
-                if (response[0].user_id) {
-                    const id = response[0].user_id;
-                    const createProject = await fetch(`/api/createProject`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ name, id }),
-                    })
-                    response = await createProject.json();
-                    if (response.error == null) {
-                        router.push("/");
-                    } else {
-                        console.log("Error:", response.error);
-                    }
-                }
-            } else {
-                console.log("Failed to find user in database.")
-            }
-        } else {
-            console.log("Error: Already exists.")
-        }
-    }
+    
 
     useEffect(() => {
         if (!user || !sessionStorage.getItem('token')) {
@@ -81,11 +50,30 @@ export default function Home({ params }: PageProps) {
         }
     }, [user])
 
+    const saveProject = async (e: any) => {
+        e.preventDefault()
+
+        if (name && name.trim() != "" && user?.email) {
+            const exists = await fetch(`/api/getProjectExists?name=${encodeURIComponent(name)}&email=${encodeURIComponent(user?.email)}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            let response = await exists.json();
+
+            if (response[0]?.ProjectExists == 0) {
+                const exists = await fetch(`/api/changeProjectName?name=${encodeURIComponent(name)}&id=${projectID}`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+            }
+        }
+    }
+
     return (
         <div>
             <BackBtnBar />
             <div className="bg-slate-900 py-4 px-8 rounded-lg flex flex-row w-[50%] m-auto my-16 justify-center items-center">
-                <form onSubmit={(e) => newProjectSubmitted(e)}>
+                <form onSubmit={(e) => saveProject(e)}>
                     <label htmlFor="name" className="text-2xl my-8">Project Name:</label>
                     <input
                         type="text"
