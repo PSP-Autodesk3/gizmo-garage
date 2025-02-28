@@ -17,7 +17,7 @@ export async function POST(request: Request) {
         console.log(email);
 
         const [rows] = await connection.execute(`
-            SELECT Projects.name AS project, CONCAT(Author.fname, ' ', Author.lname) AS author
+            SELECT Projects.name AS project, Projects.project_id, CONCAT(Author.fname, ' ', Author.lname) AS author, Author.user_id
             FROM Invite
             INNER JOIN Users ON Invite.user_id = Users.user_id
             INNER JOIN Projects ON Invite.project_id = Projects.project_id

@@ -77,10 +77,23 @@ const EmailSender = ({ editors, setEditors }: EmailSenderProps) => {
 
         if (!editors.includes(email)) {
             if (validateEmail(email)) {
-                const div = document.getElementById("emails");
+                const parentDiv = document.getElementById("emails");
+
+                const childDiv = document.createElement("div");
+                parentDiv?.appendChild(childDiv);
+
                 const p = document.createElement("p");
                 p.innerHTML = email;
-                div?.appendChild(p);
+                childDiv.appendChild(p);
+
+                const button = document.createElement("button");
+                button.innerHTML = "Remove";
+                button.onclick = () => {
+                    parentDiv?.removeChild(childDiv);
+                    setEditors(editors.filter((e) => e !== email));
+                };
+                childDiv.appendChild(button);
+
                 setEditors([...editors, email]);
                 setEmail("");
             } else {
@@ -93,7 +106,12 @@ const EmailSender = ({ editors, setEditors }: EmailSenderProps) => {
 
     return (
         <>
-            <form>
+            <form
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    sendInvite;
+                }}
+            >
                 <p>Invite to project</p>
                 <input
                     type="email"
@@ -102,7 +120,7 @@ const EmailSender = ({ editors, setEditors }: EmailSenderProps) => {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                 />
-                <button type="button" onClick={sendInvite}>Add</button>
+                <button onClick={sendInvite}>Add</button>
             </form>
             <div id="emails">
                 <p>Proposed Editors:</p>

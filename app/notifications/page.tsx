@@ -13,7 +13,9 @@ import BackBtnBar from '../backBtnBar';
 
 interface Invite {
     project: string;
+    project_id: number;
     author: string;
+    user_id: number;
 }
 
 function Home() {
@@ -36,6 +38,27 @@ function Home() {
         }
     }, [loadingAuth]);
 
+    const acceptInvite = async (invite: Invite) => {
+        declineInvite(invite);
+
+        await fetch("/api/addEditor", {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: user?.email, project: invite.project_id })
+        })
+    }
+
+    const declineInvite = async (invite: Invite) => {
+        console.log("Invite:", invite);
+        await fetch("/api/deleteInvite", {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ owner: invite.user_id, project: invite.project, email: user?.email }),
+        });
+
+        fetchInvites();
+    }
+
     return (
         <>
             <BackBtnBar />
@@ -47,15 +70,19 @@ function Home() {
                     <div key={invite.project + invite.author}>
                         <p>{invite.project}</p>
                         <p>{invite.author}</p>
-                        <button>
+                        <button
+                            onClick={() => acceptInvite(invite)}
+                        >
                             Accept
                         </button>
-                        <button>
+                        <button
+                            onClick={() => declineInvite(invite)}
+                        >
                             Decline
                         </button>
                     </div>
                 ))) : (
-                <p>No invites</p>
+                <p>No pending invites...</p>
             )}
         </>
     )
