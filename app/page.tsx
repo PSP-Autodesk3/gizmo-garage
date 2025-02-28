@@ -199,7 +199,7 @@ function Home() {
                           </button>
                           <button
                             className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
-                            onClick={() => router.push(`/project/${project.name.replace(/ /g, '+')}`)}
+                            onClick={() => router.push(`/edit-project/${project.project_id}`)}
                           >
                             Edit
                           </button>

@@ -1,24 +1,36 @@
 import React, { useEffect, useState } from 'react';
 
+// For Firebase Auth
+import { auth } from '@/app/firebase/config';
+import { useAuthState } from 'react-firebase-hooks/auth';
+
 interface PermissionsProps {
     project?: number;
     editors: string[];
     setEditors: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
+interface Emails {
+    email: string;
+}
+
 export default function Permissions({ project, editors, setEditors }: PermissionsProps) {
-    const [emails, updateEmails] = useState<string[]>([]);
+    const [emails, updateEmails] = useState<Emails[]>([]);
+    const [user] = useAuthState(auth);
 
     useEffect(() => {
-        if (project) {
+        if (project && project > 0) {
+            console.log("ID:", project)
             const getAccounts = async () => {
                 const response = await fetch(`/api/getProjectEditors?project_id=${project}`, {
                     method: 'GET',
                     headers: { 'Content-Type': 'application/json' }
                 })
-
-                updateEmails(await response.json());
-                setEditors(emails);
+                
+                const emailResponse = await response.json()
+                updateEmails(emailResponse);
+                setEditors(emailResponse[0].email.toLowerCase());
+                console.log(emailResponse[0]);
             }
             getAccounts();
         }
@@ -38,9 +50,9 @@ export default function Permissions({ project, editors, setEditors }: Permission
                                 </tr>
                             </thead>
                             <tbody>
-                                {emails.map((email) => (
-                                    <tr key={email}>
-                                        <td>{email}</td>
+                                {emails.map((email, index) => (
+                                    <tr key={index}>
+                                        <td>{email.email}</td>
                                         <button>Delete</button>
                                     </tr>
                                 ))}
@@ -65,6 +77,7 @@ interface EmailSenderProps {
 }
 
 const EmailSender = ({ editors, setEditors }: EmailSenderProps) => {
+    const [user] = useAuthState(auth);
     const [email, setEmail] = useState("");
 
     const validateEmail = (email: string) => {
@@ -75,7 +88,8 @@ const EmailSender = ({ editors, setEditors }: EmailSenderProps) => {
     const sendInvite = async (e: any) => {
         e.preventDefault();
 
-        if (!editors.includes(email)) {
+        if (!editors.includes(email.toLowerCase()) && user?.email !== email.toLowerCase()) {
+            console.log(editors);
             if (validateEmail(email)) {
                 const parentDiv = document.getElementById("emails");
 
@@ -94,7 +108,7 @@ const EmailSender = ({ editors, setEditors }: EmailSenderProps) => {
                 };
                 childDiv.appendChild(button);
 
-                setEditors([...editors, email]);
+                setEditors([...editors, email.toLowerCase()]);
                 setEmail("");
             } else {
                 console.log("Invalid email");

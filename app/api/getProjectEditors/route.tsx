@@ -20,8 +20,10 @@ export async function GET(request: Request) {
 
     const [rows] = await connection.execute(`
       SELECT email
-      FROM editors
-      WHERE project_id = ?
+      FROM Users
+      INNER JOIN Editor ON  Users.user_id = Editor.user_id
+      INNER JOIN Projects ON Editor.project_id = Projects.project_id
+      WHERE Projects.project_id = ?
     `, [project_id]);
     await connection.end();
 

@@ -9,16 +9,21 @@ import { auth } from '@/app/firebase/config';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import Permissions from '../../projectPermissions';
 
-export default function Home(params: number) {
+interface PageProps {
+    params: Promise<{ slug: string }>;
+  }
+
+export default function Home({ params }: PageProps) {
     const [user] = useAuthState(auth);
     const router = useRouter();
     const [name, setName] = useState("");
     const [doesExist, setDoesExist] = useState(0);
     const [projectID, setProjectID] = useState(0);
+    const [editors, setEditors] = useState<string[]>([]);
 
     const getProjectID = useCallback(async () => {
         const resolvedParams = await params;
-        setProjectID(resolvedParams);
+        setProjectID(Number.parseInt(resolvedParams.slug));
     }, []);
 
     useEffect(() => {
@@ -93,8 +98,8 @@ export default function Home(params: number) {
                     >
                         Save
                     </button>
-                    <Permissions project={projectID} />
                 </form>
+                <Permissions project={projectID} editors={editors} setEditors={setEditors} />
             </div>
             {doesExist == 1 && (
                 <div id="error-message">
