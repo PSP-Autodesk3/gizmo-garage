@@ -52,7 +52,6 @@ export default function Home({ params }: PageProps) {
 
     const saveProject = async (e: any) => {
         e.preventDefault()
-
         if (name && name.trim() != "" && user?.email) {
             const exists = await fetch(`/api/getProjectExists?name=${encodeURIComponent(name)}&email=${encodeURIComponent(user?.email)}`, {
                 method: 'GET',
@@ -66,6 +65,19 @@ export default function Home({ params }: PageProps) {
                     headers: { 'Content-Type': 'application/json' }
                 });
             }
+
+            editors.forEach(async (editor) => {
+                console.log("Processing Email:", editor);
+                const inviteUser = await fetch(`/api/inviteUser`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: editor, project: name }),
+                })
+
+                console.log("Email:", await inviteUser.json());
+            })
+
+            router.push("/");
         }
     }
 
