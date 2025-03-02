@@ -2,10 +2,9 @@
 
 // Middleware
 import withAuth from "@/app/lib/withAuth";
-import BackBtnBar from '../backBtnBar';
+
 // Other
 import { useState, useEffect } from 'react'
-import Link from 'next/link';
 import BackBtnBar from '../backBtnBar';
 
 //Firebase
