@@ -81,6 +81,8 @@ function Home({ params }: PageProps) {
       setProject(resolved.slug[0]);
       setRoutes(resolved.slug.slice(1));
 
+      //current project id
+
       // Get current folder or project ID
       let query = await fetch("/api/getCurrentFileID", {
         method: "POST",
@@ -89,6 +91,8 @@ function Home({ params }: PageProps) {
       });
 
       let response = await query.json();
+
+      console.log("response:", response);
 
       setID(0);
       setType(0);
@@ -241,7 +245,7 @@ function Home({ params }: PageProps) {
         await fetch("/api/createItem", {
           method: "POST",
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ itemName, email:user.email, project: project.replace(/%2B/g, ' '), id, type, appliedTags }),
+          body: JSON.stringify({ itemName, email:user.email, project: project.replace(/%2B/g, ' '), id, type, appliedTags, projectid: project}),
         });
       }
     }

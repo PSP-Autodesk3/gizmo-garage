@@ -15,15 +15,16 @@ export async function GET(request: Request) {
     });
 
     const [rows] = await connection.execute(`
-       SELECT project_id, tag.name
-        FROM Project_Tag
-        INNER JOIN tag ON Project_Tag.tag_id = tag.tag_id
-        WHERE Project_id IN (SELECT Projects.project_id
-        FROM Projects
-        INNER JOIN Users ON Users.email = ?
-        LEFT JOIN Editor ON Editor.project_id = Projects.project_id AND Editor.user_id = Users.user_id
-        WHERE Projects.owner = Users.user_id OR Editor.user_id IS NOT NULL);
-    `, [email]);
+      SELECT project_id, tag.name
+       FROM Object_Tag
+       INNER JOIN tag ON Object_Tag.tag_id = tag.tag_id
+       WHERE Project_id IN (SELECT Projects.project_id
+       FROM Projects
+       INNER JOIN Users ON Users.email = ?
+       LEFT JOIN Editor ON Editor.project_id = Projects.project_id AND Editor.user_id = Users.user_id
+       WHERE Projects.owner = Users.user_id OR Editor.user_id IS NOT NULL);
+   `, [email]);
+
     await connection.end();
     return NextResponse.json(rows);
   } catch (error) {

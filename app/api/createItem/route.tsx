@@ -5,7 +5,7 @@ export async function POST(request: Request) {
 
     try {
         const body = await request.json();
-        const { itemName, email, project, type, id, appliedTags} = body;
+        const { itemName, email, project, type, id, appliedTags, project_id} = body;
         // Connect to DB
         const connection = await mysql.createConnection({
             host: process.env.DB_HOST,
@@ -39,9 +39,9 @@ export async function POST(request: Request) {
             console.log("latest:",latestId.id);
             await connection.execute(`
                 INSERT INTO object_tag
-                (object_id, tag_id)
-                VALUES (?, ?)   
-            `, [latestId.id, tag.tag_id]);
+                (object_id, project_id, tag_id)
+                VALUES (?, ?, ?)   
+            `, [latestId.id, project_id, tag.tag_id]);
         }
 
         await connection.end();

@@ -94,14 +94,7 @@ export async function POST() {
       CREATE TABLE IF NOT EXISTS Object_Tag (
         object_id INT NOT NULL,
         FOREIGN KEY (object_id) REFERENCES Object(object_id),
-        tag_id INT NOT NULL,
-        FOREIGN KEY (tag_id) REFERENCES Tag(tag_id)
-      );
-    `);
-
-    await connection.execute(`
-      CREATE TABLE IF NOT EXISTS Project_Tag (
-        project_id INT NOT NULL,
+        project_id INT,
         FOREIGN KEY (project_id) REFERENCES Projects(project_id),
         tag_id INT NOT NULL,
         FOREIGN KEY (tag_id) REFERENCES Tag(tag_id)
