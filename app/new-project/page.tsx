@@ -25,7 +25,6 @@ export default function Home() {
                 headers: { 'Content-Type': 'application/json' }
             });
             let response = await exists.json();
-
             if (response[0]?.ProjectExists == 1) {
                 setDoesExist(1);
                 setTimeout(() => {

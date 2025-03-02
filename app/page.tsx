@@ -180,6 +180,7 @@ function Home() {
                   Create new Project
                 </button>
               </div>
+              
               {!loadingProjects ? (
                 projects.map((project, index) => (
                   <div className="project" key={index}>
