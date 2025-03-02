@@ -13,8 +13,7 @@ export async function POST(request: Request) {
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
     });
-
-    let sql = `
+      let sql = `
         SELECT Projects.project_id
         FROM Projects
         WHERE Projects.name = ?

@@ -63,6 +63,8 @@ function Home({ params }: PageProps) {
   const [moduleType, setModuleType] = useState(0); // 1 = Folder, 2 = Item
   const [duplicate, setDuplicate] = useState(0); // 0 = off, 1 = folder, 2 = item
 
+  const [ProjectID, setProjectID] = useState(null);
+
   //for tags 
   const [tags, setTags] = useState<tags[]>([]);
   const [FilteredTags, setFilteredTags] = useState<tags[]>([]);
@@ -81,8 +83,17 @@ function Home({ params }: PageProps) {
       setProject(resolved.slug[0]);
       setRoutes(resolved.slug.slice(1));
 
-      //current project id
+      console.log("resolved:", resolved.slug[0]);
+      let projectID = await fetch("/api/getProjectID", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ project: resolved.slug[0] }),
+      });
 
+      let projectIDresponse = await projectID.json();
+      setProjectID(projectIDresponse);
+
+      console.log("projectIDresponse:", projectIDresponse);
       // Get current folder or project ID
       let query = await fetch("/api/getCurrentFileID", {
         method: "POST",
@@ -245,7 +256,7 @@ function Home({ params }: PageProps) {
         await fetch("/api/createItem", {
           method: "POST",
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ itemName, email:user.email, project: project.replace(/%2B/g, ' '), id, type, appliedTags, projectid: project}),
+          body: JSON.stringify({ itemName, email:user.email, project: project.replace(/%2B/g, ' '), id, type, appliedTags, projectid: ProjectID}),
         });
       }
     }

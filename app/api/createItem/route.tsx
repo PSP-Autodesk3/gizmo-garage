@@ -5,7 +5,7 @@ export async function POST(request: Request) {
 
     try {
         const body = await request.json();
-        const { itemName, email, project, type, id, appliedTags, project_id} = body;
+        const { itemName, email, project, type, id, appliedTags, projectid} = body;
         // Connect to DB
         const connection = await mysql.createConnection({
             host: process.env.DB_HOST,
@@ -33,6 +33,8 @@ export async function POST(request: Request) {
         const [result] = await connection.execute(`SELECT LAST_INSERT_ID() AS id`); //found LAST_INSERT_ID() from the solution by Jaylen, Jul 12th 2015: https://stackoverflow.com/questions/31371079/retrieve-last-inserted-id-with-mysql - Jacob
         const latestId = (result as any)[0];
 
+        console.log("project id:",projectid.project_id);
+
         // Insert tags into object_tag table
         for (const tag of appliedTags) {
             console.log("tagId:",tag.tag_id);
@@ -41,7 +43,7 @@ export async function POST(request: Request) {
                 INSERT INTO object_tag
                 (object_id, project_id, tag_id)
                 VALUES (?, ?, ?)   
-            `, [latestId.id, project_id, tag.tag_id]);
+            `, [latestId.id, projectid, tag.tag_id]);
         }
 
         await connection.end();
