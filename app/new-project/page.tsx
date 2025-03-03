@@ -19,8 +19,8 @@ export default function Home() {
 
     const newProjectSubmitted = async (e: any) => {
         e.preventDefault()
-        if (name != null && name.trim() != "") {
-            const exists = await fetch(`/api/getProjectExists?name=${encodeURIComponent(name)}`, {
+        if (name != null && name.trim() != "" && user?.email) {
+            const exists = await fetch(`/api/getProjectExists?name=${encodeURIComponent(name)}&email=${encodeURIComponent(user?.email)}`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }
             });
