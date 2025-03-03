@@ -3,10 +3,10 @@
 // Middleware
 import withAuth from "@/app/lib/withAuth";
  
-
 // Other
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState, useCallback  } from 'react';
+
 // Auth
 import { auth } from "@/app/firebase/config"
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -32,6 +32,7 @@ function Home({ params }: PageProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [project, setProject] = useState('');
+  const [projectID, setProjectID] = useState(0);
   const [routes, setRoutes] = useState<string[]>([]);
   const [folders, setFolders] = useState<Folder[]>([]);
   const [files, setFiles] = useState<File[]>([]);
@@ -49,14 +50,15 @@ function Home({ params }: PageProps) {
   const getData = useCallback(async () => {
     const resolved = await params;
     if (resolved) {
-      setProject(resolved.slug[0]);
+      setProject(resolved.slug[0].split('%2B').slice(1).join('2B'));
+      setProjectID(Number.parseInt(resolved.slug[0].split('%2B')[0]));
       setRoutes(resolved.slug.slice(1));
 
       // Get current folder or project ID
       let query = await fetch("/api/getCurrentFileID", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ project: resolved.slug[0], routes: resolved.slug.slice(1) }),
+        body: JSON.stringify({ project: resolved.slug[0].split('%2B').slice(1).join('2B'), routes: resolved.slug.slice(1) }),
       });
 
       let response = await query.json();
@@ -130,7 +132,7 @@ function Home({ params }: PageProps) {
 
   const goneBack = async (num: number) => {
     const selectedFolders = routes.slice(0, (num + 1)).join('/');
-    const route = `/project/${project.replace(/%2B/g, '+')}/${selectedFolders.replace(/%2B/g, '+')}`;
+    const route = `/project/${projectID}+${project.replace(/%2B/g, '+')}/${selectedFolders.replace(/%2B/g, '+')}`;
     router.push(route);
   }
 
@@ -141,7 +143,7 @@ function Home({ params }: PageProps) {
     const alreadyExists = await fetch("/api/getFolderExists", {
       method: "POST",
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: folderName, projectid: project, type, parent_folder_id: id }),
+      body: JSON.stringify({ name: folderName, projectid: projectID, type, parent_folder_id: id }),
     });
     let resp = await alreadyExists.json();
     if (resp[0].FolderExists === 1) {
@@ -150,10 +152,10 @@ function Home({ params }: PageProps) {
         setDuplicate(0);
       }, 3000);
     } else { // If no duplicates -> create folder
-      await fetch("/api/createFolder", {
+      const response = await fetch("/api/createFolder", {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ folderName, project, id, type }),
+        body: JSON.stringify({ name: folderName, projectid: projectID, folder_id: id, type }),
       });
       getData();
     }
@@ -167,7 +169,7 @@ function Home({ params }: PageProps) {
     const alreadyExists = await fetch ("/api/getItemExists", {
       method: "POST",
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: itemName, projectid: project, folder_id: id, type }),
+      body: JSON.stringify({ name: itemName, projectid: projectID, folder_id: id, type }),
     });
     let resp = await alreadyExists.json();
     if (resp[0].ItemExists === 1) {
@@ -180,7 +182,7 @@ function Home({ params }: PageProps) {
         await fetch("/api/createItem", {
           method: "POST",
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ itemName, email:user.email, project, id, type }),
+          body: JSON.stringify({ itemName, email: user.email, project: projectID, id, type }),
         });
       }
     }
@@ -206,7 +208,7 @@ function Home({ params }: PageProps) {
 				</button>
 				<h1>&nbsp;&nbsp;&gt;&nbsp;&nbsp;</h1>
 				<button
-				  onClick={() => { router.push(`/project/${project.replace(/%2B/g, '+')}`); }}
+				  onClick={() => { router.push(`/project/${projectID}+${project.replace(/%2B/g, '+')}`); }}
 				>
 				  {project.replace(/%2B/g, ' ')}
 				</button>
