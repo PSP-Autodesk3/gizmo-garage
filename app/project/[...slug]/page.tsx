@@ -153,7 +153,7 @@ function Home({ params }: PageProps) {
       await fetch("/api/createFolder", {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ folderName, project:project.replace(/%2B/g, ' '), id, type }),
+        body: JSON.stringify({ folderName, project, id, type }),
       });
       getData();
     }
@@ -180,7 +180,7 @@ function Home({ params }: PageProps) {
         await fetch("/api/createItem", {
           method: "POST",
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ itemName, email:user.email, project:project.replace(/%2B/g, ' '), id, type }),
+          body: JSON.stringify({ itemName, email:user.email, project, id, type }),
         });
       }
     }

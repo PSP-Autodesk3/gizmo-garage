@@ -2,9 +2,11 @@
 
 // Middleware
 import withAuth from "@/app/lib/withAuth";
-import BackBtnBar from '../backBtnBar';
+
 // Other
 import { useState, useEffect } from 'react'
+import BackBtnBar from '../backBtnBar';
+
 //Firebase
 import { auth } from '@/app/firebase/config';
 import { sendPasswordResetEmail } from 'firebase/auth';
@@ -206,7 +208,7 @@ function Home() {
               </div>
             </div>
           ))}
-        </div>       
+        </div>
       </div>
       {/* Pop up message for db reset*/}
       {(confirmModule) && (

@@ -27,7 +27,7 @@ export async function POST() {
 
     // Just for development, delete for final version
     await connection.execute(`
-      INSERT INTO Users (user_id, email, fname, lname) VALUES (1,'John.Doe@outlook.com','John','Doe');
+      INSERT INTO Users (user_id, email, fname, lname) VALUES (1,'John.Doe@outlook.com','John','Doe'), (2,'User@email.com','New','User');
     `);
 
     await connection.execute(`
@@ -41,6 +41,15 @@ export async function POST() {
 
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS Editor (
+        user_id INT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES Users(user_id),
+        project_id INT NOT NULL, 
+        FOREIGN KEY (project_id) REFERENCES Projects(project_id)
+      );
+    `);
+
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS Invite (
         user_id INT NOT NULL,
         FOREIGN KEY (user_id) REFERENCES Users(user_id),
         project_id INT NOT NULL, 
