@@ -17,7 +17,7 @@ export default function Home() {
     const [doesExist, setDoesExist] = useState(0);
     const [editors, setEditors] = useState<string[]>([]);
 
-    const newProjectSubmitted = async (e: any) => {
+    const newProjectSubmitted = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         if (name != null && name.trim() != "" && user?.email) {
             const exists = await fetch(`/api/getProjectExists?name=${encodeURIComponent(name)}&email=${encodeURIComponent(user?.email)}`, {
@@ -48,7 +48,6 @@ export default function Home() {
                     response = await createProject.json();
 
                     if (response.error == null) {
-                        console.log("Emails:", editors);
                         editors.forEach(async (editor) => {
                             console.log("Processing Email:", editor);
                             const inviteUser = await fetch(`/api/inviteUser`, {
@@ -96,8 +95,8 @@ export default function Home() {
                     >
                         Create
                     </button>
-                    <Permissions editors={editors} setEditors={setEditors} />
                 </form>
+                <Permissions editors={editors} setEditors={setEditors} />
             </div>
             {doesExist == 1 && (
                 <div id="error-message">

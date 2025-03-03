@@ -17,7 +17,6 @@ export default function Home({ params }: PageProps) {
     const [user] = useAuthState(auth);
     const router = useRouter();
     const [name, setName] = useState("");
-    const [doesExist, setDoesExist] = useState(0);
     const [projectID, setProjectID] = useState(0);
     const [editors, setEditors] = useState<string[]>([]);
 
@@ -50,17 +49,17 @@ export default function Home({ params }: PageProps) {
         }
     }, [user])
 
-    const saveProject = async (e: any) => {
+    const saveProject = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         if (name && name.trim() != "" && user?.email) {
             const exists = await fetch(`/api/getProjectExists?name=${encodeURIComponent(name)}&email=${encodeURIComponent(user?.email)}`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }
             });
-            let response = await exists.json();
+            const response = await exists.json();
 
             if (response[0]?.ProjectExists == 0) {
-                const exists = await fetch(`/api/changeProjectName?name=${encodeURIComponent(name)}&id=${projectID}`, {
+                await fetch(`/api/changeProjectName?name=${encodeURIComponent(name)}&id=${projectID}`, {
                     method: 'GET',
                     headers: { 'Content-Type': 'application/json' }
                 });
@@ -101,11 +100,6 @@ export default function Home({ params }: PageProps) {
                 </form>
                 <Permissions project={projectID} editors={editors} setEditors={setEditors} />
             </div>
-            {doesExist == 1 && (
-                <div id="error-message">
-                    <p className="text-red-600 text-xl text-center">Project already exists.</p>
-                </div>
-            )}
         </div>
     )
 }

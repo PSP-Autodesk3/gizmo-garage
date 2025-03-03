@@ -69,6 +69,7 @@ export default function Filters({ query, onQueryChange, values, onValuesChange }
                   renderThumb={({ props }) => (
                     <div
                       {...props}
+                      key={props.key}
                       style={{
                         ...props.style,
                         height: '22px',

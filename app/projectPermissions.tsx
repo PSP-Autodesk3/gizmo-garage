@@ -117,8 +117,10 @@ const EmailSender = ({ editors, setEditors }: EmailSenderProps) => {
         return emailRegex.test(email);
     };
 
-    const sendInvite = async (e: any) => {
+    const sendInvite = async (e: React.FormEvent<HTMLFormElement>) => {
+        console.log("Prevented 1");
         e.preventDefault();
+        console.log("Prevented");
 
         if (!editors.includes(email.toLowerCase()) && user?.email !== email.toLowerCase()) {
             console.log(editors);
@@ -153,10 +155,7 @@ const EmailSender = ({ editors, setEditors }: EmailSenderProps) => {
     return (
         <>
             <form
-                onSubmit={(e) => {
-                    e.preventDefault();
-                    sendInvite;
-                }}
+                onSubmit={sendInvite}
             >
                 <p>Invite to project</p>
                 <input
@@ -166,7 +165,7 @@ const EmailSender = ({ editors, setEditors }: EmailSenderProps) => {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                 />
-                <button onClick={sendInvite}>Add</button>
+                <button type="submit">Add</button>
             </form>
             <div id="emails">
                 <p>Proposed Editors:</p>

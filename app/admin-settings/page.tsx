@@ -108,7 +108,7 @@ function Home() {
       if (!user) return;
 
       // Call the api route to update the user status
-      const response = await fetch("/api/manageUserStatus", {
+      await fetch("/api/manageUserStatus", {
         method: "POST",
         headers:{
           'Content-Type': 'application/json' 

@@ -2,10 +2,10 @@
 
 // Middleware
 import withAuth from "@/app/lib/withAuth";
- 
+
 // Other
 import { useRouter, usePathname } from 'next/navigation';
-import { useEffect, useState, useCallback  } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 // Auth
 import { auth } from "@/app/firebase/config"
@@ -50,7 +50,7 @@ function Home({ params }: PageProps) {
   const getData = useCallback(async () => {
     const resolved = await params;
     if (resolved) {
-      setProject(resolved.slug[0].split('%2B').slice(1).join('2B'));
+      setProject(resolved.slug[0].split('%2B').slice(1).join('%2B'));
       setProjectID(Number.parseInt(resolved.slug[0].split('%2B')[0]));
       setRoutes(resolved.slug.slice(1));
 
@@ -58,7 +58,7 @@ function Home({ params }: PageProps) {
       let query = await fetch("/api/getCurrentFileID", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ project: resolved.slug[0].split('%2B').slice(1).join('2B'), routes: resolved.slug.slice(1) }),
+        body: JSON.stringify({ project: resolved.slug[0].split('%2B').slice(1).join('%2B'), routes: resolved.slug.slice(1) }),
       });
 
       let response = await query.json();
@@ -137,7 +137,7 @@ function Home({ params }: PageProps) {
   }
 
   // Create new folder
-  const newFolder = async (e: any) => {
+  const newFolder = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Check for duplicates
     const alreadyExists = await fetch("/api/getFolderExists", {
@@ -145,14 +145,14 @@ function Home({ params }: PageProps) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: folderName, projectid: projectID, type, parent_folder_id: id }),
     });
-    let resp = await alreadyExists.json();
+    const resp = await alreadyExists.json();
     if (resp[0].FolderExists === 1) {
       setDuplicate(1);
       setTimeout(() => {
         setDuplicate(0);
       }, 3000);
     } else { // If no duplicates -> create folder
-      const response = await fetch("/api/createFolder", {
+      await fetch("/api/createFolder", {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: folderName, projectid: projectID, folder_id: id, type }),
@@ -160,18 +160,18 @@ function Home({ params }: PageProps) {
       getData();
     }
     setConfirmModule(false);
-	  setFolderName("");
+    setFolderName("");
   }
 
-  const newItem = async (e: any) => {
+  const newItem = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Check dupes 
-    const alreadyExists = await fetch ("/api/getItemExists", {
+    const alreadyExists = await fetch("/api/getItemExists", {
       method: "POST",
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: itemName, projectid: projectID, folder_id: id, type }),
     });
-    let resp = await alreadyExists.json();
+    const resp = await alreadyExists.json();
     if (resp[0].ItemExists === 1) {
       setDuplicate(2);
       setTimeout(() => {
@@ -193,161 +193,157 @@ function Home({ params }: PageProps) {
 
   return (
     <>
-	
       <div className='flex m-auto'>
         <div id='Filter'>
           <Filters query={query} onQueryChange={setQuery} values={values} onValuesChange={setValues} />
         </div>
         <div id="data">
-            {(!confirmModule) && (
-				<div id="breadcrumbs" className="flex flex-row text-2xl p-4 rounded-lg mx-8 my-4">
-				<button
-				  onClick={() => { router.push(`/`); }}
-				>
-				  Home
-				</button>
-				<h1>&nbsp;&nbsp;&gt;&nbsp;&nbsp;</h1>
-				<button
-				  onClick={() => { router.push(`/project/${projectID}+${project.replace(/%2B/g, '+')}`); }}
-				>
-				  {project.replace(/%2B/g, ' ')}
-				</button>
-				{Array.isArray(routes) && routes.length > 0 && (
-				  routes.map((route, index) => (
-					<>
-					  <h1>&nbsp;&nbsp;&gt;&nbsp;&nbsp;</h1>
-					  <button
-						key={route}
-						onClick={() => goneBack(index)}
-					  >
-						{route.replace(/%2B/g, ' ')}
-					  </button>
-					</>
-				  ))
-				)}
-				</div>
-			)}
-		{(!confirmModule) && (
-          <div className="bg-slate-800 mx-8 my-4 w-full rounded-lg p-4">
-            {(duplicate === 1) && (
-                <p className="text-red-600">Error: Folder name already exists.</p>
-            ) || (duplicate === 2) && (
-                <p className="text-red-600">Error: Item name already exists.</p>
-            )}
-            <div id="folders" className="mx-8 my-4">
-              <h1 className="text-3xl my-4">Folders:</h1>
-              <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
-              {Array.isArray(folders) && folders.length > 0 && (
-                folders.map((folder) => (
-                  <>
-                    <div key={folder.folder_id}>
-                      <button
-                        className="bg-slate-900 rounded-lg text-xl my-4 px-4 py-2"
-                        onClick={() => { router.push(pathname + `/${folder.name.replace(/ /g, '+')}`); }}
-                      >
-                        {folder.name}
-                      </button>
-                    </div>
-                  </>
-                ))
-              )}
-              
-            </div>
-			<button
-                onClick={() => {setModuleType(1), setConfirmModule(true)}}
-				className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 flex justify-center"
+          {(!confirmModule) && (
+            <div id="breadcrumbs" className="flex flex-row text-2xl p-4 rounded-lg mx-8 my-4">
+              <button
+                onClick={() => { router.push(`/`); }}
               >
-                Create New Folder
+                Home
               </button>
-            <div id="files" className=" my-4">
-              <h1 className="my-4 text-3xl">Files</h1>
-              <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
-              {Array.isArray(files) && files.length > 0 && (
-                files.map((file) => (
-                  <>
-                    <div key={file.object_id}>
-                      <button
-                        className="bg-slate-900 rounded-lg text-xl my-4 px-4 py-2"
-                        onClick={() => { }}
-                      >
-                        {file.name}
-                      </button>
-                    </div>
-                  </>
+              <h1>&nbsp;&nbsp;&gt;&nbsp;&nbsp;</h1>
+              <button
+                onClick={() => { router.push(`/project/${projectID}+${project.replace(/%2B/g, '+')}`); }}
+              >
+                {project.replace(/%2B/g, ' ')}
+              </button>
+              {Array.isArray(routes) && routes.length > 0 && (
+                routes.map((route, index) => (
+                  <div key={index} className="flex flex-row">
+                    <h1>&nbsp;&nbsp;&gt;&nbsp;&nbsp;</h1>
+                    <button
+                      onClick={() => goneBack(index)}
+                    >
+                      {route.replace(/%2B/g, ' ')}
+                    </button>
+                  </div>
                 ))
               )}
-              </div>
-              <button 
-			  className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 flex justify-center"
-			  onClick={() => {setModuleType(2), setConfirmModule(true)}}
-			  >
-                Create New Item
-              </button>
             </div>
-          </div>
-          </div>
-		)}
+          )}
+          {(!confirmModule) && (
+            <div className="bg-slate-800 mx-8 my-4 w-full rounded-lg p-4">
+              {(duplicate === 1) && (
+                <p className="text-red-600">Error: Folder name already exists.</p>
+              ) || (duplicate === 2) && (
+                <p className="text-red-600">Error: Item name already exists.</p>
+              )}
+              <div id="folders" className="mx-8 my-4">
+                <h1 className="text-3xl my-4">Folders:</h1>
+                <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
+                  {Array.isArray(folders) && folders.length > 0 && (
+                    folders.map((folder) => (
+                      <div key={folder.folder_id}>
+                        <button
+                          className="bg-slate-900 rounded-lg text-xl my-4 px-4 py-2"
+                          onClick={() => { router.push(pathname + `/${folder.name.replace(/ /g, '+')}`); }}
+                        >
+                          {folder.name}
+                        </button>
+                      </div>
+                    ))
+                  )}
 
-        {(confirmModule) && (
-          <>
-            <div className="fixed inset-0 flex border-indigo-600 border-2 items-center justify-center bg-slate-900 p-4 w-[40%] h-[40%] m-auto rounded-lg shadow-lg mt-16">
-              {(moduleType === 1) && (
-				<form className="text-center" onSubmit={(e) => newFolder(e)}>
-                <h1 className='text-3xl'>Folder name</h1>
-                <input
-                  name="folder-name"
-                  type="text"
-                  value={folderName}
-                  onChange={(e) => setFolderName(e.target.value)}
-                  className="w-full mt-4 p-2 rounded-lg bg-slate-800"
-                  placeholder="Enter folder name"
-				  id="dir-name-input"
-                />
-                <div className="mt-4">
+                </div>
+                <button
+                  onClick={() => { setModuleType(1); setConfirmModule(true); }}
+                  className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 flex justify-center"
+                >
+                  Create New Folder
+                </button>
+                <div id="files" className=" my-4">
+                  <h1 className="my-4 text-3xl">Files</h1>
+                  <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
+                    {Array.isArray(files) && files.length > 0 && (
+                      files.map((file) => (
+                        <>
+                          <div key={file.object_id}>
+                            <button
+                              className="bg-slate-900 rounded-lg text-xl my-4 px-4 py-2"
+                              onClick={() => { }}
+                            >
+                              {file.name}
+                            </button>
+                          </div>
+                        </>
+                      ))
+                    )}
+                  </div>
                   <button
-                    className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                    className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 flex justify-center"
+                    onClick={() => { setModuleType(2); setConfirmModule(true); }}
                   >
-                    Create
-                  </button>
-                  <button
-                    className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
-                    onClick={() => setConfirmModule(false)}
-                  >
-                    Cancel
+                    Create New Item
                   </button>
                 </div>
-              </form>
-			  )}
-			  {(moduleType === 2) && (
-				<form className="text-center" onSubmit={(e) => newItem(e)}>
-                <h1 className='text-3xl'>Item name</h1>
-                <input
-                  name="item-name"
-                  type="text"
-                  value={itemName}
-                  onChange={(e) => setItemName(e.target.value)}
-                  className="w-full mt-4 p-2 rounded-lg bg-slate-800"
-                  placeholder="Enter Item name"
-                />
-                <div className="mt-4">
-                  <button
-                    className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
-                  >
-                    Create
-                  </button>
-                  <button
-                    className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
-                    onClick={() => setConfirmModule(false)}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              	</form>
-			  )}
+              </div>
             </div>
-          </>
-        )}
-      </div>
+          )}
+
+          {(confirmModule) && (
+            <>
+              <div className="fixed inset-0 flex border-indigo-600 border-2 items-center justify-center bg-slate-900 p-4 w-[40%] h-[40%] m-auto rounded-lg shadow-lg mt-16">
+                {(moduleType === 1) && (
+                  <form className="text-center" onSubmit={(e) => newFolder(e)}>
+                    <h1 className='text-3xl'>Folder name</h1>
+                    <input
+                      name="folder-name"
+                      type="text"
+                      value={folderName}
+                      onChange={(e) => setFolderName(e.target.value)}
+                      className="w-full mt-4 p-2 rounded-lg bg-slate-800"
+                      placeholder="Enter folder name"
+                      id="dir-name-input"
+                    />
+                    <div className="mt-4">
+                      <button
+                        className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                      >
+                        Create
+                      </button>
+                      <button
+                        className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                        onClick={() => setConfirmModule(false)}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                )}
+                {(moduleType === 2) && (
+                  <form className="text-center" onSubmit={(e) => newItem(e)}>
+                    <h1 className='text-3xl'>Item name</h1>
+                    <input
+                      name="item-name"
+                      type="text"
+                      value={itemName}
+                      onChange={(e) => setItemName(e.target.value)}
+                      className="w-full mt-4 p-2 rounded-lg bg-slate-800"
+                      placeholder="Enter Item name"
+                    />
+                    <div className="mt-4">
+                      <button
+                        className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                      >
+                        Create
+                      </button>
+                      <button
+                        className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                        onClick={() => setConfirmModule(false)}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </>
   )
