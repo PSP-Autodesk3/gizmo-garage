@@ -266,7 +266,7 @@ function Home({ params }: PageProps) {
                     <div key={file.object_id}>
                       <button
                         className="bg-slate-900 rounded-lg text-xl my-4 px-4 py-2"
-                        onClick={() => { }}
+                        onClick={() => {router.push(`/item/${file.object_id}`);}}
                       >
                         {file.name}
                       </button>
