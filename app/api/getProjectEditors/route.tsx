@@ -4,11 +4,10 @@ import mysql from "mysql2/promise";
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const name = searchParams.get("name");
-    const email = searchParams.get("email");
+    const project_id = searchParams.get("project_id");
 
-    if (!name || name.trim() === "") {
-      return NextResponse.json({ error: "Missing 'name' parameter" }, { status: 400 });
+    if (!project_id || project_id.trim() === "") {
+      return NextResponse.json({ error: "Missing 'project' parameter" }, { status: 400 });
     }
 
     const connection = await mysql.createConnection({
@@ -20,15 +19,17 @@ export async function GET(request: Request) {
     });
 
     const [rows] = await connection.execute(`
-      SELECT COUNT(*) AS ProjectExists
-      FROM Projects
-      WHERE name = ? AND owner = (SELECT user_id FROM Users WHERE email = ?)
-    `, [name, email]);
+      SELECT email
+      FROM Users
+      INNER JOIN Editor ON  Users.user_id = Editor.user_id
+      INNER JOIN Projects ON Editor.project_id = Projects.project_id
+      WHERE Projects.project_id = ?
+    `, [project_id]);
     await connection.end();
 
-    return NextResponse.json(rows, { status: 200});
+    return NextResponse.json(rows);
   } catch (error) {
     console.error("Database error:", error);
-    return NextResponse.json({ error: "Failed to check database status" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to get editors" }, { status: 500 });
   }
 }

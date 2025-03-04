@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from "next/image"
 import { Range } from 'react-range';
-import { useAuthState } from 'react-firebase-hooks/auth';
 
 interface FiltersProps {
   query?: string;
@@ -70,6 +69,7 @@ export default function Filters({ query, onQueryChange, values, onValuesChange }
                   renderThumb={({ props }) => (
                     <div
                       {...props}
+                      key={props.key}
                       style={{
                         ...props.style,
                         height: '22px',
@@ -99,6 +99,12 @@ export default function Filters({ query, onQueryChange, values, onValuesChange }
         </div>
         <div className='flex flex-col justify-between'>
           <div id="options" className='flex flex-col p-6 mt-auto'>
+            <button
+              className='p-1 text-white transition-colors duration-300 hover:text-gray-400'
+              onClick={() => router.push("/notifications")}
+            >
+              Notifications
+            </button>
             {admin && (
               <>
                 <button
