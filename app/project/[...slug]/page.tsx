@@ -93,6 +93,8 @@ function Home({ params }: PageProps) {
       response = await query.json();
       setFiles(response);
 
+      // GET AND DISPLAY THE TREE STRUCTURE
+
       // Get folders in the project
       query = await fetch(`/api/getProjectsFolders?projectID=${encodeURIComponent(Number.parseInt(resolved.slug[0].split('%2B')[0]))}`, {
         method: "GET",
@@ -100,7 +102,7 @@ function Home({ params }: PageProps) {
       })
 
       const folders = await query.json();
-      
+
       // Base information to be passed to outputFolder
       const baseFolders = folders.filter((folder: Folder) => folder.parent_folder_id === null);
       const tree = document.getElementById("trees");
@@ -110,7 +112,7 @@ function Home({ params }: PageProps) {
         }
       }
 
-      const outputFolder = (parentFolders: Folder[], parentDetails: HTMLElement, history: string[], depth: number, valid: boolean ) => {
+      const outputFolder = (parentFolders: Folder[], parentDetails: HTMLElement, history: string[], depth: number, valid: boolean) => {
 
         // Iterates foreach child in the folder
         parentFolders.forEach((folder: Folder) => {
@@ -126,11 +128,14 @@ function Home({ params }: PageProps) {
           // Creates a details tag, which by default is collapsible
           const details = document.createElement("details");
           details.className = "pl-6";
+          if (newValid)
           details.open = true;
 
           // Creates a summary tag, which is the preview text
           const summary = document.createElement("summary");
-          summary.innerHTML = folder.name || "Unnamed Folder";
+          const button = document.createElement("button");
+          button.innerHTML = folder.name;
+          summary.appendChild(button);
 
           // Styling for open folders
           if (newValid) summary.innerHTML = "<strong>" + summary.innerHTML + "</strong>";
@@ -139,6 +144,7 @@ function Home({ params }: PageProps) {
           const newHistory = [...history, `/${folder.name.replace(/ /g, "+")}`];
           const newDepth = depth + 1;
 
+          // Double clicking routes to the folder
           summary.ondblclick = () => {
             const route = `/project/${Number.parseInt(resolved.slug[0].split('%2B')[0])}+${resolved.slug[0].split('%2B').slice(1).join(' ')}${newHistory.join('/')}`;
             console.log(route);
@@ -158,11 +164,12 @@ function Home({ params }: PageProps) {
           }
         })
       }
-      
+
       if (baseFolders && tree) {
         await outputFolder(baseFolders, tree, [], 0, true);
       }
     }
+
   }, [params, id, type]);
 
   useEffect(() => {
@@ -268,7 +275,13 @@ function Home({ params }: PageProps) {
         <div id='Filter'>
           <Filters query={query} onQueryChange={setQuery} values={values} onValuesChange={setValues} />
         </div>
-        <div id="trees">
+        <div>
+          <button
+            onClick={() => { router.push(`/project/${projectID}+${project.replace(/%2B/g, '+')}`); }}
+          >
+            {project}
+          </button>
+          <div id="trees"></div>
         </div>
         <div id="data">
           {(!confirmModule) && (
