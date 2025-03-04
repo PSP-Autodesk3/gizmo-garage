@@ -21,6 +21,7 @@ interface PageProps {
 interface Folder {
   folder_id: number;
   name: string;
+  parent_folder_id: number | null;
 }
 
 interface File {
@@ -91,6 +92,58 @@ function Home({ params }: PageProps) {
 
       response = await query.json();
       setFiles(response);
+
+      // Get folders in the project
+      query = await fetch(`/api/getProjectsFolders?projectID=${encodeURIComponent(Number.parseInt(resolved.slug[0].split('%2B')[0]))}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      })
+
+      const folders = await query.json();
+      
+      // Base information to be passed to outputFolder
+      const baseFolders = folders.filter((folder: Folder) => folder.parent_folder_id === null);
+      const tree = document.getElementById("trees");
+
+      const outputFolder = (parentFolders: Folder[], parentDetails: HTMLElement, history: string[] ) => {
+
+        // Iterates foreach child in the folder
+        parentFolders.forEach((folder: Folder) => {
+          // Creates a details tag, which by default is collapsible
+          const details = document.createElement("details");
+          details.className = "pl-6";
+
+          // Creates a summary tag, which is the preview text
+          const summary = document.createElement("summary");
+          summary.innerHTML = folder.name || "Unnamed Folder";
+
+          // Assigns the route function
+          const newHistory = [...history, `/${folder.name.replace(/ /g, "+")}`];
+
+          summary.ondblclick = () => {
+            const route = `/project/${Number.parseInt(resolved.slug[0].split('%2B')[0])}+${resolved.slug[0].split('%2B').slice(1).join(' ')}${newHistory.join('/')}`;
+            console.log(route);
+            router.push(route);
+          }
+
+          // Adds the new elements to each other and the DOM
+          details.appendChild(summary);
+          parentDetails.appendChild(details);
+
+          // Gets folders that are a child of the current folder
+          const childFolders = folders.filter((childFolder: Folder) => childFolder.parent_folder_id === folder.folder_id);
+
+          // Does this again for each child folder iteratively
+          if (childFolders.length > 0) {
+            outputFolder(childFolders, details, newHistory);
+          }
+        })
+      }
+      
+      if (baseFolders && tree) {
+        console.log("Outputting");
+        await outputFolder(baseFolders, tree, []);
+      }
     }
   }, [params, id, type]);
 
@@ -196,6 +249,8 @@ function Home({ params }: PageProps) {
       <div className='flex m-auto'>
         <div id='Filter'>
           <Filters query={query} onQueryChange={setQuery} values={values} onValuesChange={setValues} />
+        </div>
+        <div id="trees">
         </div>
         <div id="data">
           {(!confirmModule) && (
