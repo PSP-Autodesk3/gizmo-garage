@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import mysql, { ResultSetHeader } from "mysql2/promise";
+import mysql from "mysql2/promise";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, id } = body;
+    const { email, project } = body;
     
     const connection = await mysql.createConnection({
       host: process.env.DB_HOST,
@@ -14,13 +14,16 @@ export async function POST(request: Request) {
       database: process.env.DB_DATABASE,
     });
 
-    const [rows] = await connection.execute<ResultSetHeader>("INSERT INTO Projects (name, owner) VALUES (?, ?)", [name, id]);
+    await connection.execute(`
+        INSERT INTO Editor (user_id, project_id)
+        VALUES ((SELECT user_id FROM Users WHERE email = ?), ?)
+        `, [email, project]);
     
     await connection.end();
 
-    return NextResponse.json({ message: "Project created successfully", project_id: rows.insertId });
+    return NextResponse.json({ message: "Successfully deleted invite" }, { status: 200 });
   } catch (error) {
     console.error("Database error:", error);
-    return NextResponse.json({ error: "Failed to create project" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to delete invite" }, { status: 500 });
   }
 }

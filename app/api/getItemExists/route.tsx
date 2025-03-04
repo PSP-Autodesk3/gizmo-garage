@@ -20,7 +20,7 @@ export async function POST(req: Request) {
             SELECT COUNT(*) AS ItemExists
             FROM Object
             WHERE name = ?
-            AND project_id = (SELECT project_id FROM Projects WHERE name = ?)
+            AND project_id = ?
             AND folder_id ${type === 1 ? `IS NULL` : `= ?`};
         `, params);
         await connection.end();

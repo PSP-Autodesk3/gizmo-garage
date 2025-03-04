@@ -3,7 +3,6 @@
 // Middleware
 import withAuth from "@/app/lib/withAuth";
 
-
 // Other
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState, useCallback } from 'react';
@@ -48,6 +47,7 @@ function Home({ params }: PageProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [project, setProject] = useState('');
+  const [projectID, setProjectID] = useState(0);
   const [routes, setRoutes] = useState<string[]>([]);
   const [folders, setFolders] = useState<Folder[]>([]);
   const [files, setFiles] = useState<File[]>([]);
@@ -62,8 +62,6 @@ function Home({ params }: PageProps) {
   const [itemName, setItemName] = useState('');
   const [moduleType, setModuleType] = useState(0); // 1 = Folder, 2 = Item
   const [duplicate, setDuplicate] = useState(0); // 0 = off, 1 = folder, 2 = item
-
-  const [ProjectID, setProjectID] = useState(null);
 
   //for tags 
   const [tags, setTags] = useState<tags[]>([]);
@@ -80,7 +78,8 @@ function Home({ params }: PageProps) {
   const getData = useCallback(async () => {
     const resolved = await params;
     if (resolved) {
-      setProject(resolved.slug[0]);
+      setProject(resolved.slug[0].split('%2B').slice(1).join('%2B'));
+      setProjectID(Number.parseInt(resolved.slug[0].split('%2B')[0]));
       setRoutes(resolved.slug.slice(1));
 
       console.log("resolved:", resolved.slug[0]);
@@ -98,7 +97,7 @@ function Home({ params }: PageProps) {
       let query = await fetch("/api/getCurrentFileID", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ project: resolved.slug[0], routes: resolved.slug.slice(1) }),
+        body: JSON.stringify({ project: resolved.slug[0].split('%2B').slice(1).join('%2B'), routes: resolved.slug.slice(1) }),
       });
 
       let response = await query.json();
@@ -203,20 +202,20 @@ function Home({ params }: PageProps) {
 
   const goneBack = async (num: number) => {
     const selectedFolders = routes.slice(0, (num + 1)).join('/');
-    const route = `/project/${project.replace(/%2B/g, '+')}/${selectedFolders.replace(/%2B/g, '+')}`;
+    const route = `/project/${projectID}+${project.replace(/%2B/g, '+')}/${selectedFolders.replace(/%2B/g, '+')}`;
     router.push(route);
   }
 
   // Create new folder
-  const newFolder = async (e: any) => {
+  const newFolder = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Check for duplicates
     const alreadyExists = await fetch("/api/getFolderExists", {
       method: "POST",
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: folderName, projectid: project, type, parent_folder_id: id }),
+      body: JSON.stringify({ name: folderName.trim(), projectid: projectID, type, parent_folder_id: id }),
     });
-    let resp = await alreadyExists.json();
+    const resp = await alreadyExists.json();
     if (resp[0].FolderExists === 1) {
       setDuplicate(1);
       setTimeout(() => {
@@ -226,26 +225,27 @@ function Home({ params }: PageProps) {
       await fetch("/api/createFolder", {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ folderName, project: project.replace(/%2B/g, ' '), id, type }),
+        body: JSON.stringify({ name: folderName.trim(), projectid: projectID, folder_id: id, type }),
       });
       getData();
     }
     setConfirmModule(false);
-	  setFolderName("");
+    setFolderName("");
   }
 
-  const newItem = async (e: any) => {
+  const newItem = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     //reset selected tags
     setAppliedTags([]);
-    // Check dupes
-    const alreadyExists = await fetch ("/api/getItemExists", {
+
+    // Check dupes 
+    const alreadyExists = await fetch("/api/getItemExists", {
       method: "POST",
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: itemName, projectid: project, folder_id: id, type }),
+      body: JSON.stringify({ name: itemName.trim(), projectid: projectID, folder_id: id, type }),
     });
-    let resp = await alreadyExists.json();
+    const resp = await alreadyExists.json();
     if (resp[0].ItemExists === 1) {
       setDuplicate(2);
       setTimeout(() => {
@@ -256,7 +256,7 @@ function Home({ params }: PageProps) {
         await fetch("/api/createItem", {
           method: "POST",
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ itemName, email:user.email, project: project.replace(/%2B/g, ' '), id, type, appliedTags, projectid: ProjectID}),
+          body: JSON.stringify({ itemName: itemName.trim(), email: user.email, project: projectID, id, type, appliedTags}),
         });
       }
     }
@@ -282,8 +282,8 @@ function Home({ params }: PageProps) {
       setAlreadyApplied(1);
       setTimeout(() => {
         setAlreadyApplied(0);
-      }, 1000); 
-  }
+      }, 1000);
+    }
   }
 
   const removeTag = (index: number) => {
@@ -307,243 +307,240 @@ function Home({ params }: PageProps) {
 
   return (
     <>
-
       <div className='flex m-auto'>
         <div id='Filter'>
           <Filters query={query} onQueryChange={setQuery} values={values} onValuesChange={setValues} />
         </div>
         <div id="data">
-  {
-    (!confirmModule) && (
-      <div id="breadcrumbs" className="flex flex-row text-2xl p-4 rounded-lg mx-8 my-4">
-        <button
-          className="transition-colors duration-300 hover:text-gray-400"
-          onClick={() => { router.push(`/`); }}
-        >
-          Home
-        </button>
-        <h1>&nbsp;&nbsp;&gt;&nbsp;&nbsp;</h1>
-        <button
-          className="transition-colors duration-300 hover:text-gray-400"
-          onClick={() => { router.push(`/project/${project.replace(/%2B/g, '+')}`); }}
-        >
-          {project.replace(/%2B/g, ' ')}
-        </button>
-        {Array.isArray(routes) && routes.length > 0 && (
-          routes.map((route, index) => (
-            <>
+          {(!confirmModule) && (
+            <div id="breadcrumbs" className="flex flex-row text-2xl p-4 rounded-lg mx-8 my-4">
+              <button
+                className="transition-colors duration-300 hover:text-gray-400"
+                onClick={() => { router.push(`/`); }}
+              >
+                Home
+              </button>
               <h1>&nbsp;&nbsp;&gt;&nbsp;&nbsp;</h1>
               <button
-                key={route}
-                onClick={() => goneBack(index)}
+                className="transition-colors duration-300 hover:text-gray-400"
+                onClick={() => { router.push(`/project/${projectID}+${project.replace(/%2B/g, '+')}`); }}
               >
-                {route.replace(/%2B/g, ' ')}
+                {project.replace(/%2B/g, ' ')}
               </button>
-            </>
-          ))
-        )}
-      </div>
-    )
-  }
-  {
-    (!confirmModule) && (
-      <div className="bg-slate-800 mx-8 my-4 w-full rounded-lg p-4">
-        {(duplicate === 1) && (
-          <p className="text-red-600">Error: Folder name already exists.</p>
-        ) || (duplicate === 2) && (
-          <p className="text-red-600">Error: Item name already exists.</p>
-        )}
-        <div id="folders" className="mx-8 my-4">
-          <h1 className="text-3xl my-4">Folders:</h1>
-          <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
-            {!loadingFolders ? (
-              Array.isArray(folders) && folders.length > 0 && (
-                Filteredfolders.map((folder) => (
-                  <>
-                    <div key={folder.folder_id}>
-                      <button
-                        className="bg-slate-900 rounded-lg text-xl my-4 px-4 py-2"
-                        onClick={() => { router.push(pathname + `/${folder.name.replace(/ /g, '+')}`); }}
-                      >
-                        {folder.name}
-                      </button>
-
-
-                    </div>
-                  </>
+              {Array.isArray(routes) && routes.length > 0 && (
+                routes.map((route, index) => (
+                  <div key={index} className="flex flex-row">
+                    <h1>&nbsp;&nbsp;&gt;&nbsp;&nbsp;</h1>
+                    <button
+                      onClick={() => goneBack(index)}
+                    >
+                      {route.replace(/%2B/g, ' ')}
+                    </button>
+                  </div>
                 ))
-              )
-            ) : (
-              <>
-                <div className='p-2 flex'>
-                  <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
-                    <Skeleton width={300} height={100} />
-                  </SkeletonTheme>
-                </div>
-              </>
-            )
-            }
-          </div>
-          <button
-            onClick={() => { setModuleType(1), setConfirmModule(true) }}
-            className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 flex justify-center"
-          >
-            Create New Folder
-          </button>
-          <div id="files" className=" my-4">
-            <h1 className="my-4 text-3xl">Files</h1>
-            {
-              !loadingFiles ? (
-                <>
-                  <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
-                    {Array.isArray(files) && files.length > 0 && (
-                      Filteredfiles.map((file) => (
+              )}
+            </div>
+          )}
+          {(!confirmModule) && (
+            <div className="bg-slate-800 mx-8 my-4 w-full rounded-lg p-4">
+              {(duplicate === 1) && (
+                <p className="text-red-600">Error: Folder name already exists.</p>
+              ) || (duplicate === 2) && (
+                <p className="text-red-600">Error: Item name already exists.</p>
+              )}
+              <div id="folders" className="mx-8 my-4">
+                <h1 className="text-3xl my-4">Folders:</h1>
+                <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
+                  {!loadingFolders ? (
+                    Array.isArray(folders) && folders.length > 0 && (
+                      Filteredfolders.map((folder) => (
                         <>
-                          <div key={file.object_id} className='flex flex-col bg-slate-900 rounded-lg'>
+                          <div key={folder.folder_id}>
                             <button
-                              className=" text-xl my-4 px-4 py-2"
-                              onClick={() => { }}
+                              className="bg-slate-900 rounded-lg text-xl my-4 px-4 py-2"
+                              onClick={() => { router.push(pathname + `/${folder.name.replace(/ /g, '+')}`); }}
                             >
-                              {file.name}
+                              {folder.name}
                             </button>
-                            {!loadingFiles && Array.isArray(file.tags) && file.tags.length > 0 && (
-                              file.tags.map((tag) => (
-                                <span className='rounded-full m-2 p-2 bg-blue-600 self-center' key={tag.tag_id}>
-                                  {tag.name}
-                                </span>
+
+
+                          </div>
+                        </>
+                      ))
+                    )
+                  ) : (
+                    <>
+                      <div className='p-2 flex'>
+                        <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
+                          <Skeleton width={300} height={100} />
+                        </SkeletonTheme>
+                      </div>
+                    </>
+                  )
+                  }
+                </div>
+                <button
+                  onClick={() => { setModuleType(1); setConfirmModule(true); }}
+                  className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 flex justify-center"
+                >
+                  Create New Folder
+                </button>
+                <div id="files" className=" my-4">
+                  <h1 className="my-4 text-3xl">Files</h1>
+                  <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
+                    {
+                      !loadingFiles ? (
+                        <>
+                          <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
+                            {Array.isArray(files) && files.length > 0 && (
+                              Filteredfiles.map((file) => (
+                                <>
+                                  <div key={file.object_id} className='flex flex-col bg-slate-900 rounded-lg'>
+                                    <button
+                                      className=" text-xl my-4 px-4 py-2"
+                                      onClick={() => { }}
+                                    >
+                                      {file.name}
+                                    </button>
+                                    {!loadingFiles && Array.isArray(file.tags) && file.tags.length > 0 && (
+                                      file.tags.map((tag) => (
+                                        <span className='rounded-full m-2 p-2 bg-blue-600 self-center' key={tag.tag_id}>
+                                          {tag.name}
+                                        </span>
+                                      ))
+                                    )}
+                                  </div>
+                                </>
                               ))
                             )}
                           </div>
                         </>
-                      ))
-                    )}
+                      ) : (
+                        <>
+                          <div className='p-2 flex'>
+                            <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
+                              <Skeleton width={300} height={100} />
+                            </SkeletonTheme>
+                          </div>
+                        </>
+                      )
+                    }
                   </div>
-                </>
-              ) : (
-                <>
-                  <div className='p-2 flex'>
-                    <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
-                      <Skeleton width={300} height={100} />
-                    </SkeletonTheme>
-                  </div>
-                </>
-              )
-            }
-            <button
-              className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 flex justify-center"
-              onClick={() => { setModuleType(2), setConfirmModule(true) }}
-            >
-              Create New Item
-            </button>
-          </div>
-        </div>
-      </div>)
-  }
-
-  {
-    (confirmModule) && (
-      <>
-        <div className="fixed inset-0 flex border-indigo-600 border-2 items-center justify-center bg-slate-900 p-4 w-[40%] h-[40%] m-auto rounded-lg shadow-lg mt-16">
-          {(moduleType === 1) && (
-            <form className="text-center" onSubmit={(e) => newFolder(e)}>
-              <h1 className='text-3xl'>Folder name</h1>
-              <input
-                name="folder-name"
-                type="text"
-                value={folderName}
-                onChange={(e) => setFolderName(e.target.value)}
-                className="w-full mt-4 p-2 rounded-lg bg-slate-800"
-                placeholder="Enter folder name"
-                id="dir-name-input"
-              />
-              <div className="mt-4">
-                <button
-                  className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
-                >
-                  Create
-                </button>
-                <button
-                  className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
-                  onClick={() => setConfirmModule(false)}
-                >
-                  Cancel
-                </button>
+                  <button
+                    className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 flex justify-center"
+                    onClick={() => { setModuleType(2); setConfirmModule(true); }}
+                  >
+                    Create New Item
+                  </button>
+                </div>
               </div>
-            </form>
+            </div>
           )}
-          {(moduleType === 2) && (
-            <form className="text-center" onSubmit={(e) => newItem(e)}>
-              <h1 className='text-3xl'>Item name</h1>
-              <input
-                name="item-name"
-                type="text"
-                value={itemName}
-                onChange={(e) => setItemName(e.target.value)}
-                className="w-full mt-4 p-2 rounded-lg bg-slate-800"
-                placeholder="Enter Item name"
-              />
-              <div >
-                <div id="search" className='p-4'>
-                  <label htmlFor="search=bar">Search</label>
-                  <input
-                    className='text-white w-full p-2 my-2 rounded-lg bg-slate-800'
-                    type="text"
-                    placeholder="Search"
-                    name="search"
-                    value={TagQuery}
-                    onChange={(e) => setTagQuery(e.target.value)}
-                  />
-                </div>
-                <div>
-                  {
-                    FilteredTags.map((tag) => (
-                      <>
-                      
-                        <button type="button" className='rounded-full m-2 p-3 bg-blue-600' onClick={() => applyTag(tag.tag_id)} key={tag.tag_id}>{tag.name}</button>
-                      </>
-                    ))
-                  }
-                </div>
 
-                <div id='appliedTags'>
-                  {
-                    appliedTags.map((tag) => (
-                      <>
-                        <button type='button' className='rounded-full m-2 p-3 bg-blue-600 flex' onClick={() => removeTag(tag.tag_id)} key={tag.tag_id}><svg className="w-6 h-6 text-blue-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24">
-                          <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18 17.94 6M18 18 6.06 6" />
-                        </svg>{tag.name}</button>
-                      </>
-                    ))
-                  }
+          {(confirmModule) && (
+            <>
+              <div className="fixed inset-0 flex border-indigo-600 border-2 items-center justify-center bg-slate-900 p-4 w-[40%] h-[40%] m-auto rounded-lg shadow-lg mt-16">
+                {(moduleType === 1) && (
+                  <form className="text-center" onSubmit={(e) => newFolder(e)}>
+                    <h1 className='text-3xl'>Folder name</h1>
+                    <input
+                      name="folder-name"
+                      type="text"
+                      value={folderName}
+                      onChange={(e) => setFolderName(e.target.value)}
+                      className="w-full mt-4 p-2 rounded-lg bg-slate-800"
+                      placeholder="Enter folder name"
+                      id="dir-name-input"
+                    />
+                    <div className="mt-4">
+                      <button
+                        className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                      >
+                        Create
+                      </button>
+                      <button
+                        className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                        onClick={() => setConfirmModule(false)}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                )}
+                {(moduleType === 2) && (
+                  <form className="text-center" onSubmit={(e) => newItem(e)}>
+                    <h1 className='text-3xl'>Item name</h1>
+                    <input
+                      name="item-name"
+                      type="text"
+                      value={itemName}
+                      onChange={(e) => setItemName(e.target.value)}
+                      className="w-full mt-4 p-2 rounded-lg bg-slate-800"
+                      placeholder="Enter Item name"
+                    />
 
-                  <div>
-                  {alreadyApplied === 1 && (
-                      <span className='text-red-500'>Already Applied</span>
-                    )}
-                  </div>
-                </div>
+                    <div >
+                      <div id="search" className='p-4'>
+                        <label htmlFor="search=bar">Search</label>
+                        <input
+                          className='text-white w-full p-2 my-2 rounded-lg bg-slate-800'
+                          type="text"
+                          placeholder="Search"
+                          name="search"
+                          value={TagQuery}
+                          onChange={(e) => setTagQuery(e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        {
+                          FilteredTags.map((tag) => (
+                            <>
+
+                              <button type="button" className='rounded-full m-2 p-3 bg-blue-600' onClick={() => applyTag(tag.tag_id)} key={tag.tag_id}>{tag.name}</button>
+                            </>
+                          ))
+                        }
+                      </div>
+
+                      <div id='appliedTags'>
+                        {
+                          appliedTags.map((tag) => (
+                            <>
+                              <button type='button' className='rounded-full m-2 p-3 bg-blue-600 flex' onClick={() => removeTag(tag.tag_id)} key={tag.tag_id}><svg className="w-6 h-6 text-blue-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18 17.94 6M18 18 6.06 6" />
+                              </svg>{tag.name}</button>
+                            </>
+                          ))
+                        }
+
+                        <div>
+                          {alreadyApplied === 1 && (
+                            <span className='text-red-500'>Already Applied</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-4">
+                      <button
+                        className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                      >
+                        Create
+                      </button>
+                      <button
+                        className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                        onClick={() => setConfirmModule(false)}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                )}
               </div>
-              <div className="mt-4">
-                <button
-                  className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
-                >
-                  Create
-                </button>
-                <button
-                  className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
-                  onClick={() => setConfirmModule(false)}
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
+            </>
           )}
         </div>
-      </>
-    )
-  }
-        </div >
-      </div >
+      </div>
     </>
   )
 }

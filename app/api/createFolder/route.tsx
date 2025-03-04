@@ -4,7 +4,7 @@ import mysql from "mysql2/promise";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { folderName, project, id, type } = body;
+    const { name, projectid, folder_id, type } = body;
     
     const connection = await mysql.createConnection({
       host: process.env.DB_HOST,
@@ -14,24 +14,24 @@ export async function POST(request: Request) {
       database: process.env.DB_DATABASE,
     });
 
-    const params: (string | number)[] = [folderName, project];
-    if (type !== 1) params.push(id);
-    params.push(project);
+    console.log(name, ",", projectid, ",", folder_id, ",", type);
 
-    params.push(folderName, project);
-    if (type !== 1) params.push(id);
+    const params: (string | number)[] = [name, projectid];
+    if (type !== 1) params.push(folder_id);
+    params.push(projectid);
 
-    console.log(params);
+    params.push(name, projectid);
+    if (type !== 1) params.push(folder_id);
 
     await connection.execute(`
       INSERT INTO Folder (name, project_id, parent_folder_id)
-      SELECT ?, (SELECT project_id FROM Projects WHERE name = ?), ${type === 1 ? `NULL` : `?`}
+      SELECT ?, ?, ${type === 1 ? `NULL` : `?`}
       FROM Projects
-      WHERE name = ?
+      WHERE name = (SELECT name FROM Projects WHERE Projects.project_id = ?)
       AND NOT EXISTS (
         SELECT 1 FROM Folder 
         WHERE name = ? 
-        AND project_id = (SELECT project_id FROM Projects WHERE name = ?) 
+        AND project_id = ?
         AND parent_folder_id ${type === 1 ? `IS NULL` : `= ?`}
       );
       `, params
