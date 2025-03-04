@@ -104,6 +104,11 @@ function Home({ params }: PageProps) {
       // Base information to be passed to outputFolder
       const baseFolders = folders.filter((folder: Folder) => folder.parent_folder_id === null);
       const tree = document.getElementById("trees");
+      if (tree) {
+        while (tree.firstChild) {
+          tree.removeChild(tree.firstChild);
+        }
+      }
 
       const outputFolder = (parentFolders: Folder[], parentDetails: HTMLElement, history: string[] ) => {
 
@@ -141,7 +146,6 @@ function Home({ params }: PageProps) {
       }
       
       if (baseFolders && tree) {
-        console.log("Outputting");
         await outputFolder(baseFolders, tree, []);
       }
     }
