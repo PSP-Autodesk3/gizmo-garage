@@ -25,7 +25,7 @@ function Home() {
   const [searchTerm, setSearchTerm] = useState('');
   const [password, setPassword] = useState('');
   const [resetEmail, setResetEmail] = useState<string>(''); // Tracking which email is going to be reset
-
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (databaseExists === 2) {
@@ -42,12 +42,15 @@ function Home() {
     // Fetch users
     const fetchUsers = async () => {
       try {
+        setIsLoading(true);
         const response = await fetch('/api/getAllUsers');
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`); // Was for debugging a silly error i was getting.
         const data = await response.json();
         setUsers(data.users || []); 
       } catch (error) {
         console.error('Error fetching users:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchUsers();
@@ -151,8 +154,9 @@ function Home() {
 
   return (
     <>
-      <div className={`transition-all duration-0 ${confirmModule ? 'blur-xl bg-opacity-40 bg-black' : ''}`}>
+      <div className={`min-h-screen bg-slate-950 ${confirmModule ? 'blur-xl bg-opacity-40' : ''}`}>
         <BackBtnBar/>
+        {/* Header */}
         <h1 className="text-4xl font-semibold text-slate-200 w-[40%] m-auto mb-2 mt-16">
           Admin Settings
         </h1>
@@ -181,7 +185,6 @@ function Home() {
         <h2 className="text-2xl font-semibold text-slate-200 w-[40%] mx-auto mb-2 mt-8">
           User Management
         </h2>
-        {/* User List */}
         <h3 className="text-l font-semibold text-slate-200 w-[40%] m-auto mb-2 mt-4">
           User Filter
         </h3>
@@ -205,34 +208,59 @@ function Home() {
         </h3>
         <div className="bg-slate-900 p-4 w-[40%] m-auto rounded-lg shadow-lg mt-4 mb-5">
           <div id="users" className="space-y-4">
-            {/* Displaying Each User */}
-            {filteredUsers.map((user: User) => (
-              <div key={user.uid} className="bg-slate-800 p-4 rounded-lg">
-                <div className="flex flex-col">
-                  <p className="text-slate-400 text-sm">{user.email}</p>
-                  <p className="text-slate-500 text-xs">{user.uid}</p>
+            {isLoading ? (
+              // Skeleton loading while data is fetching
+              [...Array(3)].map((_, index) => (
+                <div key={index} className="bg-slate-800 p-4 rounded-lg animate-pulse">
+                  <div className="flex flex-col">
+                    <div className="h-4 bg-slate-700 rounded-lg w-3/4 mb-2"></div>
+                    <div className="h-3 bg-slate-700 rounded-lg w-1/2"></div>
+                  </div>
+                  <div className="flex justify-between items-center mt-3">
+                    <div className="h-4 bg-slate-700 rounded-lg w-24"></div>
+                    <div className="flex items-center space-x-3">
+                      <div className="w-11 h-6 bg-slate-700 rounded-full"></div>
+                      <div className="h-4 bg-slate-700 rounded-lg w-16"></div>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center">
-                  <p className="text-indigo-500 hover:underline cursor-pointer mt-3"
-                  onClick={() => resetPassword(user.email)}
-                  > Reset Password</p>
-                  {/* Disabling Accounts Toggle*/}
-                  {/* Link where I got the button: https://flowbite.com/docs/forms/toggle/ */}
-                  <label className="inline-flex items-center cursor-pointer"> 
-                    <input 
-                    type="checkbox" 
-                    className="sr-only peer" 
-                    checked={!user.disabled} 
-                    onChange={() => handleDisableUser(user.uid)}
-                    />
-                    <div className="relative w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-600 dark:peer-checked:bg-green-600"></div>
-                    <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
-                      {user.disabled ? 'Disabled' : 'Enabled'}
-                    </span>
-                  </label>
+              ))
+            ) : filteredUsers.length > 0 ? (
+              // Display users when data is loaded
+              filteredUsers.map((user: User) => (
+                <div key={user.uid} className="bg-slate-800 p-4 rounded-lg">
+                  <div className="flex flex-col">
+                    <p className="text-slate-400 text-sm">{user.email}</p>
+                    <p className="text-slate-500 text-xs">{user.uid}</p>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <p 
+                      className="text-indigo-500 hover:underline cursor-pointer mt-3"
+                      onClick={() => resetPassword(user.email)}
+                    >
+                      Reset Password
+                    </p>
+                    <label className="inline-flex items-center cursor-pointer"> 
+                      <input 
+                        type="checkbox" 
+                        className="sr-only peer" 
+                        checked={!user.disabled} 
+                        onChange={() => handleDisableUser(user.uid)}
+                      />
+                      <div className="relative w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-600 dark:peer-checked:bg-green-600"></div>
+                      <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+                        {user.disabled ? 'Disabled' : 'Enabled'}
+                      </span>
+                    </label>
+                  </div>
                 </div>
+              ))
+            ) : (
+              // No users found message
+              <div className="text-center text-slate-400 py-4">
+                No users found
               </div>
-            ))}
+            )}
           </div>
         </div>
       </div>
