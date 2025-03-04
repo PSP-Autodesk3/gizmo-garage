@@ -6,7 +6,7 @@ import { auth } from '@/app/firebase/config';
 
 export default function SigningIn() {
 
-  const [user, loading] = useAuthState(auth);
+  const [user] = useAuthState(auth);
 
   if (!user) {
     return (

@@ -23,8 +23,7 @@ export async function POST(request: Request) {
             (name, author, project_id, folder_id)
             VALUES (?, 
             (SELECT user_id FROM Users WHERE email = ?),
-            (SELECT project_id FROM Projects WHERE name = ?), 
-            ?)
+            ?, ?)
         `, params);
         await connection.end();
         return NextResponse.json({ message: "Item created successfully" });
