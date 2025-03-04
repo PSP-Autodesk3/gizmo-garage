@@ -110,20 +110,34 @@ function Home({ params }: PageProps) {
         }
       }
 
-      const outputFolder = (parentFolders: Folder[], parentDetails: HTMLElement, history: string[] ) => {
+      const outputFolder = (parentFolders: Folder[], parentDetails: HTMLElement, history: string[], depth: number, valid: boolean ) => {
 
         // Iterates foreach child in the folder
         parentFolders.forEach((folder: Folder) => {
+
+          // Tests if the folder is opened
+          let newValid = false;
+          if (valid) {
+            if (routes[depth] === folder.name) {
+              newValid = true;
+            }
+          }
+
           // Creates a details tag, which by default is collapsible
           const details = document.createElement("details");
           details.className = "pl-6";
+          details.open = true;
 
           // Creates a summary tag, which is the preview text
           const summary = document.createElement("summary");
           summary.innerHTML = folder.name || "Unnamed Folder";
 
+          // Styling for open folders
+          if (newValid) summary.innerHTML = "<strong>" + summary.innerHTML + "</strong>";
+
           // Assigns the route function
           const newHistory = [...history, `/${folder.name.replace(/ /g, "+")}`];
+          const newDepth = depth + 1;
 
           summary.ondblclick = () => {
             const route = `/project/${Number.parseInt(resolved.slug[0].split('%2B')[0])}+${resolved.slug[0].split('%2B').slice(1).join(' ')}${newHistory.join('/')}`;
@@ -140,13 +154,13 @@ function Home({ params }: PageProps) {
 
           // Does this again for each child folder iteratively
           if (childFolders.length > 0) {
-            outputFolder(childFolders, details, newHistory);
+            outputFolder(childFolders, details, newHistory, newDepth, newValid);
           }
         })
       }
       
       if (baseFolders && tree) {
-        await outputFolder(baseFolders, tree, []);
+        await outputFolder(baseFolders, tree, [], 0, true);
       }
     }
   }, [params, id, type]);
