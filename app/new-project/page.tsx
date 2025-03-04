@@ -20,7 +20,7 @@ export default function Home() {
     const newProjectSubmitted = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         if (name != null && name.trim() != "" && user?.email) {
-            const exists = await fetch(`/api/getProjectExists?name=${encodeURIComponent(name)}&email=${encodeURIComponent(user?.email)}`, {
+            const exists = await fetch(`/api/getProjectExists?name=${encodeURIComponent(name.trim())}&email=${encodeURIComponent(user?.email)}`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }
             });
@@ -43,7 +43,7 @@ export default function Home() {
                     const createProject = await fetch(`/api/createProject`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ name, id }),
+                        body: JSON.stringify({ name: name.trim(), id }),
                     })
                     response = await createProject.json();
 
@@ -53,7 +53,7 @@ export default function Home() {
                             const inviteUser = await fetch(`/api/inviteUser`, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ email: editor, project: name }),
+                                body: JSON.stringify({ email: editor, project: name.trim() }),
                             })
 
                             console.log("Email:", await inviteUser.json());

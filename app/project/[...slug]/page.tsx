@@ -143,7 +143,7 @@ function Home({ params }: PageProps) {
     const alreadyExists = await fetch("/api/getFolderExists", {
       method: "POST",
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: folderName, projectid: projectID, type, parent_folder_id: id }),
+      body: JSON.stringify({ name: folderName.trim(), projectid: projectID, type, parent_folder_id: id }),
     });
     const resp = await alreadyExists.json();
     if (resp[0].FolderExists === 1) {
@@ -155,7 +155,7 @@ function Home({ params }: PageProps) {
       await fetch("/api/createFolder", {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: folderName, projectid: projectID, folder_id: id, type }),
+        body: JSON.stringify({ name: folderName.trim(), projectid: projectID, folder_id: id, type }),
       });
       getData();
     }
@@ -169,7 +169,7 @@ function Home({ params }: PageProps) {
     const alreadyExists = await fetch("/api/getItemExists", {
       method: "POST",
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: itemName, projectid: projectID, folder_id: id, type }),
+      body: JSON.stringify({ name: itemName.trim(), projectid: projectID, folder_id: id, type }),
     });
     const resp = await alreadyExists.json();
     if (resp[0].ItemExists === 1) {
@@ -182,7 +182,7 @@ function Home({ params }: PageProps) {
         await fetch("/api/createItem", {
           method: "POST",
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ itemName, email: user.email, project: projectID, id, type }),
+          body: JSON.stringify({ itemName: itemName.trim(), email: user.email, project: projectID, id, type }),
         });
       }
     }
@@ -260,16 +260,14 @@ function Home({ params }: PageProps) {
                   <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
                     {Array.isArray(files) && files.length > 0 && (
                       files.map((file) => (
-                        <>
-                          <div key={file.object_id}>
-                            <button
-                              className="bg-slate-900 rounded-lg text-xl my-4 px-4 py-2"
-                              onClick={() => { }}
-                            >
-                              {file.name}
-                            </button>
-                          </div>
-                        </>
+                        <div key={file.object_id}>
+                          <button
+                            className="bg-slate-900 rounded-lg text-xl my-4 px-4 py-2"
+                            onClick={() => { }}
+                          >
+                            {file.name}
+                          </button>
+                        </div>
                       ))
                     )}
                   </div>
