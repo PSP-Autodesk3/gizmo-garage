@@ -37,111 +37,120 @@ function Home({ params }: ParamProps) {
   const getData = useCallback(async () => {
     const resolved = await params;
     if (resolved) {
-      // Resolves params
       setProject(resolved.slug[0].split('%2B').slice(1).join('%2B'));
       setProjectID(Number.parseInt(resolved.slug[0].split('%2B')[0]));
       setRoutes(resolved.slug.slice(1));
 
-      // Get and display tree structure
-
-      // Tracks current file
       let currentFolder: Folder | null = null as Folder | null;
 
-      // Get folders in the project
-      let query = await fetch(`/api/getProjectsFolders?projectID=${projectID}`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      })
+    // GET AND DISPLAY THE TREE STRUCTURE
 
-      const folders = await query.json();
+    // Get folders in the project
+    let query = await fetch(`/api/getProjectsFolders?projectID=${projectID}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    })
 
-      // Base information to be passed to outputFolder
-      const baseFolders = folders.filter((folder: Folder) => folder.parent_folder_id === null);
-      const tree = document.getElementById("trees");
-      if (tree) {
-        while (tree.firstChild) {
-          tree.removeChild(tree.firstChild);
+    const folders = await query.json();
+
+    // Base information to be passed to outputFolder
+    const baseFolders = folders.filter((folder: Folder) => folder.parent_folder_id === null);
+    const tree = document.getElementById("trees");
+    if (tree) {
+      while (tree.firstChild) {
+        tree.removeChild(tree.firstChild);
+      }
+    }
+
+    const outputFolder = (parentFolders: Folder[], parentDetails: HTMLElement, history: string[], depth: number, valid: boolean) => {
+
+      // Iterates foreach child in the folder
+      parentFolders.forEach((folder: Folder) => {
+
+        // Tests if the folder is opened
+        let newValid = false;
+        if (valid) {
+          if (routes[depth] === folder.name) {
+            newValid = true;
+            currentFolder = folder;
+          }
         }
-      }
 
-      const outputFolder = (parentFolders: Folder[], parentDetails: HTMLElement, history: string[], depth: number, valid: boolean) => {
+        // Creates a details tag, which by default is collapsible
+        const details = document.createElement("details");
+        details.className = "pl-6";
+        if (newValid)
+          details.open = true;
 
-        // Iterates foreach child in the folder
-        parentFolders.forEach((folder: Folder) => {
+        // Creates a summary tag, which is the preview text
+        const summary = document.createElement("summary");
+        const button = document.createElement("button");
+        button.innerHTML = folder.name;
+        summary.appendChild(button);
 
-          // Tests if the folder is opened
-          let newValid = false;
-          if (valid) {
-            if (routes[depth] === folder.name) {
-              newValid = true;
-              currentFolder = folder;
-            }
-          }
+        // Styling for open folders
+        if (newValid) summary.innerHTML = "<strong>" + summary.innerHTML + "</strong>";
 
-          // Creates a details tag, which by default is collapsible
-          const details = document.createElement("details");
-          details.className = "pl-6";
-          if (newValid)
-            details.open = true;
+        // Assigns the route function
+        const newHistory = [...history, `/${folder.name.replace(/ /g, "+")}`];
+        const newDepth = depth + 1;
 
-          // Creates a summary tag, which is the preview text
-          const summary = document.createElement("summary");
-          const button = document.createElement("button");
-          button.innerHTML = folder.name;
-          summary.appendChild(button);
+        // Double clicking routes to the folder
+        summary.ondblclick = () => {
+          const route = `/project/${projectID}+${project}${newHistory.join('/')}`;
+          console.log(route);
+          router.push(route);
+        }
 
-          // Styling for open folders
-          if (newValid) summary.innerHTML = "<strong>" + summary.innerHTML + "</strong>";
+        // Adds the new elements to each other and the DOM
+        details.appendChild(summary);
+        parentDetails.appendChild(details);
 
-          // Assigns the route function
-          const newHistory = [...history, `/${folder.name.replace(/ /g, "+")}`];
-          const newDepth = depth + 1;
+        // Gets folders that are a child of the current folder
+        const childFolders = folders.filter((childFolder: Folder) => childFolder.parent_folder_id === folder.folder_id);
 
-          // Double clicking routes to the folder
-          summary.ondblclick = () => {
-            const route = `/project/${projectID}+${project}${newHistory.join('/')}`;
-            router.push(route);
-          }
+        // Does this again for each child folder iteratively
+        if (childFolders.length > 0) {
+          outputFolder(childFolders, details, newHistory, newDepth, newValid);
+        }
+      })
+    }
 
-          // Adds the new elements to each other and the DOM
-          details.appendChild(summary);
-          parentDetails.appendChild(details);
+    if (baseFolders && tree) {
+      await outputFolder(baseFolders, tree, [], 0, true);
+    }
 
-          // Gets folders that are a child of the current folder
-          const childFolders = folders.filter((childFolder: Folder) => childFolder.parent_folder_id === folder.folder_id);
+    // GET OTHER INFO
 
-          // Does this again for each child folder iteratively
-          if (childFolders.length > 0) {
-            outputFolder(childFolders, details, newHistory, newDepth, newValid);
-          }
-        })
-      }
+    setID(0);
+    setType(0);
 
-      if (baseFolders && tree) {
-        await outputFolder(baseFolders, tree, [], 0, true);
-      }
+    if (currentFolder) {
+      setID(currentFolder.folder_id);
+    } else {
+      setID(projectID);
+      setType(1);
+    }
 
-      // Get Folders
+    // Get folders
+    query = await fetch("/api/getFolders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, type }),
+    });
 
-      setID(currentFolder ? (currentFolder.folder_id) : (projectID));
-      setType(currentFolder ? (0) : (1));
+    let response = await query.json();
+    setFolders(response);
 
-      if (currentFolder) {
-        setFolders(folders.filter((folder: Folder) => folder.parent_folder_id === currentFolder?.folder_id));
-      } else {
-        setFolders(folders.filter((folder: Folder) => folder.parent_folder_id === null));
-      }
+    // Get files
+    query = await fetch("/api/getObjects", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, type }),
+    });
 
-      // Get Files
-
-      query = await fetch("/api/getObjects", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, type }),
-      });
-
-      let response = await query.json();
-      setFiles(response);
+    response = await query.json();
+    setFiles(response);
     }
 
   }, [params, id, type]);
