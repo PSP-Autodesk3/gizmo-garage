@@ -7,17 +7,14 @@ import withAuth from "@/app/lib/withAuth";
 import { useState, useEffect } from 'react'
 
 // Components
-import BackBtnBar from '@/app/components/backBtnBar';;
+import BackBtnBar from '@/app/shared/components/backBtnBar';;
 
 // Firebase
 import { auth } from '@/app/firebase/config';
 import { sendPasswordResetEmail } from 'firebase/auth';
 
-interface User {
-  uid: string;
-  email: string;
-  disabled: boolean;
-}
+// Interfaces
+import { User } from '@/app/shared/interfaces/user';
 
 function Home() {
   const [databaseExists, setDatabaseExists] = useState(2);

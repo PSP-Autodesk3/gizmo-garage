@@ -8,7 +8,7 @@ import { sendPasswordResetEmail } from 'firebase/auth';
 import withAuth from "@/app/lib/withAuth";
 
 // Components
-import BackBtnBar from '@/app/components/backBtnBar';;
+import BackBtnBar from '@/app/shared/components/backBtnBar';;
 
 // Other
 import { useState } from 'react';

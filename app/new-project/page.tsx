@@ -5,8 +5,8 @@ import { auth } from '@/app/firebase/config';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 // Components
-import Permissions from '@/app/components/projectPermissions';
-import BackBtnBar from '@/app/components/backBtnBar';
+import Permissions from '@/app/shared/components/projectPermissions';
+import BackBtnBar from '@/app/shared/components/backBtnBar';
 
 // Other
 import { useRouter } from 'next/navigation';

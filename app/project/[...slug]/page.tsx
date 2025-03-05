@@ -12,24 +12,14 @@ import { auth } from "@/app/firebase/config"
 import { useAuthState } from "react-firebase-hooks/auth";
 
 // Components
-import Filters from "@/app/components/Filter"
+import Filters from "@/app/shared/components/Filter"
 
-interface PageProps {
-  params: Promise<{ slug: string[] }>;
-}
+// Interfaces
+import { ParamProps } from "@/app/shared/interfaces/paramProps";
+import { Folder } from "@/app/shared/interfaces/folder";
+import { File } from "@/app/shared/interfaces/file";
 
-interface Folder {
-  folder_id: number;
-  name: string;
-  parent_folder_id: number | null;
-}
-
-interface File {
-  object_id: number;
-  name: string;
-}
-
-function Home({ params }: PageProps) {
+function Home({ params }: ParamProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [project, setProject] = useState('');

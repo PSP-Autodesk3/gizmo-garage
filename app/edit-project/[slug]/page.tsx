@@ -8,18 +8,17 @@ import { auth } from '@/app/firebase/config';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 // Components
-import Permissions from '@/app/components/projectPermissions';
-import BackBtnBar from '@/app/components/backBtnBar';
+import Permissions from '@/app/shared/components/projectPermissions';
+import BackBtnBar from '@/app/shared/components/backBtnBar';
 
 // Other
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, useCallback } from 'react';
 
-interface PageProps {
-    params: Promise<{ slug: string }>;
-}
+// Interfaces
+import { ParamProps } from "@/app/shared/interfaces/paramProps";
 
-function Home({ params }: PageProps) {
+function Home({ params }: ParamProps) {
     const [user] = useAuthState(auth);
     const router = useRouter();
     const [name, setName] = useState("");
@@ -29,7 +28,7 @@ function Home({ params }: PageProps) {
     const getProjectID = useCallback(async () => {
         const resolvedParams = await params;
         if (resolvedParams) {
-            setProjectID(Number.parseInt(resolvedParams.slug));
+            setProjectID(Number.parseInt(resolvedParams.slug[0]));
 
             const details = await fetch(`/api/getProjectDetails?id=${resolvedParams.slug}`, {
                 method: "GET",
