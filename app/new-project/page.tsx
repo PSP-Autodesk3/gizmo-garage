@@ -1,14 +1,16 @@
 "use client";
 
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { useEffect } from 'react';
-import BackBtnBar from '@/app/backBtnBar';
-
-// For Firebase Auth
+// Firebase
 import { auth } from '@/app/firebase/config';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import Permissions from '../projectPermissions';
+
+// Components
+import Permissions from '@/app/components/projectPermissions';
+import BackBtnBar from '@/app/components/backBtnBar';
+
+// Other
+import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
 export default function Home() {
     const [user] = useAuthState(auth);

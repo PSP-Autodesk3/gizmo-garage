@@ -9,7 +9,9 @@ import withAuth from "@/app/lib/withAuth";
 
 // Other
 import { useState, useEffect } from 'react'
-import BackBtnBar from '../backBtnBar';
+
+// Components
+import BackBtnBar from '@/app/components/backBtnBar';
 
 interface Invite {
     project: string;

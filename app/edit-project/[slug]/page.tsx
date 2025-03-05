@@ -1,19 +1,25 @@
 "use client";
 
-import { useRouter } from 'next/navigation';
-import { useState, useEffect, useCallback } from 'react';
-import BackBtnBar from '@/app/backBtnBar';
+// Middleware
+import withAuth from "@/app/lib/withAuth";
 
-// For Firebase Auth
+// Firebase
 import { auth } from '@/app/firebase/config';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import Permissions from '../../projectPermissions';
+
+// Components
+import Permissions from '@/app/components/projectPermissions';
+import BackBtnBar from '@/app/components/backBtnBar';
+
+// Other
+import { useRouter } from 'next/navigation';
+import { useState, useEffect, useCallback } from 'react';
 
 interface PageProps {
     params: Promise<{ slug: string }>;
-  }
+}
 
-export default function Home({ params }: PageProps) {
+function Home({ params }: PageProps) {
     const [user] = useAuthState(auth);
     const router = useRouter();
     const [name, setName] = useState("");
@@ -24,13 +30,13 @@ export default function Home({ params }: PageProps) {
         const resolvedParams = await params;
         if (resolvedParams) {
             setProjectID(Number.parseInt(resolvedParams.slug));
-    
+
             const details = await fetch(`/api/getProjectDetails?id=${resolvedParams.slug}`, {
                 method: "GET",
                 headers: { 'Content-Type': 'application/json' }
             })
             const response = await details.json();
-    
+
             if (response[0].name) {
                 setName(response[0].name);
             }
@@ -41,7 +47,7 @@ export default function Home({ params }: PageProps) {
         getProjectID();
     }, [getProjectID]);
 
-    
+
 
     useEffect(() => {
         if (!user || !sessionStorage.getItem('token')) {
@@ -103,3 +109,5 @@ export default function Home({ params }: PageProps) {
         </div>
     )
 }
+
+export default withAuth(Home);

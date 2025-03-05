@@ -12,14 +12,13 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
+// Skeleton Loading
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 
-//components
-import Filters from './Filter';
-// import NavItem from './Filter';
-import SigningIn from './signingIn';
-// import Image from 'next/image';
+// Components
+import Filters from '@/app/components/Filter';
+import SigningIn from '@/app/components/signingIn';
 
 // Format returned by api call to getProjects
 interface Project {

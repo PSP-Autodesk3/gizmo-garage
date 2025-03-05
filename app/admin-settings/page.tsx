@@ -5,9 +5,11 @@ import withAuth from "@/app/lib/withAuth";
 
 // Other
 import { useState, useEffect } from 'react'
-import BackBtnBar from '../backBtnBar';
 
-//Firebase
+// Components
+import BackBtnBar from '@/app/components/backBtnBar';;
+
+// Firebase
 import { auth } from '@/app/firebase/config';
 import { sendPasswordResetEmail } from 'firebase/auth';
 

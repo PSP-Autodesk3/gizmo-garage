@@ -7,12 +7,12 @@ import withAuth from "@/app/lib/withAuth";
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState, useCallback } from 'react';
 
-// Auth
+// Firebase
 import { auth } from "@/app/firebase/config"
 import { useAuthState } from "react-firebase-hooks/auth";
 
-//Filter component
-import Filters from "../../Filter"
+// Components
+import Filters from "@/app/components/Filter"
 
 interface PageProps {
   params: Promise<{ slug: string[] }>;

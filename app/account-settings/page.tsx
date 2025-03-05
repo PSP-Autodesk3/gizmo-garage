@@ -7,8 +7,10 @@ import { sendPasswordResetEmail } from 'firebase/auth';
 // Middleware
 import withAuth from "@/app/lib/withAuth";
 
+// Components
+import BackBtnBar from '@/app/components/backBtnBar';;
+
 // Other
-import Link from 'next/link';
 import { useState } from 'react';
 
 function Home() {
@@ -41,21 +43,7 @@ function Home() {
 
   return (
     <>
-      
-      <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 m-4 rounded-lg bg-indigo-500 p-2 text-white text-center text-sm popup hidden">
-        <h1 className="text-xl font-bold">Password Reset</h1>
-        <p className="mx-2">We have sent an email to {email}.</p>
-      </div>
-
-      
-      <div className="p-4 flex justify-between items-center">
-        <Link href="/" className="text-blue-500 hover:underline text-lg">← Home</Link>
-        <Link className="px-6 py-3 text-lg font-medium bg-indigo-600 mx-4 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500 50" href="/signout">
-          Sign Out
-        </Link>
-      </div>
-
-    
+      <BackBtnBar />
       <div className="max-w-2xl mx-auto p-6">
         <h1 className="text-4xl font-bold mb-4">Account Settings</h1>
         <p className="font-bold text-2xl mb-4">Autodesk</p>
@@ -66,10 +54,10 @@ function Home() {
           <p className="text-lg"><span className="font-bold">Email:</span> {userData.email}</p>
         </div>
 
-        
+
         <p className="font-bold text-2xl mb-4">Gizmo Garage</p>
 
-        
+
         <div className="bg-gray-800 p-6 rounded-lg shadow-lg text-white">
           <form className="flex items-center gap-2">
             <div className="flex-1">
