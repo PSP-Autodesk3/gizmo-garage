@@ -251,9 +251,9 @@ function Home() {
                 ))
               ) : (
                 <>
-                  <div>
+                  <div className='flex justify-center'>
                     <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
-                      <Skeleton width={400} height={100} />
+                      <Skeleton width={600} height={125} count={4} style={{marginBottom: '16px'}} />
                     </SkeletonTheme>
                   </div>
                 </>

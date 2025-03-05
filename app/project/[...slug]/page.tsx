@@ -11,8 +11,12 @@ import { useEffect, useState, useCallback } from 'react';
 import { auth } from "@/app/firebase/config"
 import { useAuthState } from "react-firebase-hooks/auth";
 
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
+
 //Filter component
 import Filters from "../../Filter"
+import { Direction } from "react-range";
 
 interface PageProps {
   params: Promise<{ slug: string[] }>;
@@ -128,7 +132,7 @@ function Home({ params }: PageProps) {
       })
 
       let objectTags = await query.json();
-      console.log("objecttags",objectTags)
+      console.log("objecttags", objectTags)
       objectResults.forEach((file: File) => {
         file.tags = objectTags.filter((tag: itemTags) => tag.object_id === file.object_id);
       });
@@ -288,12 +292,14 @@ function Home({ params }: PageProps) {
             <div id="breadcrumbs" className="flex flex-row text-2xl p-4 rounded-lg mx-8 my-4">
               <button
                 onClick={() => { router.push(`/`); }}
+                className='text-white transition-colors duration-300 hover:text-gray-400'
               >
                 Home
               </button>
               <h1>&nbsp;&nbsp;&gt;&nbsp;&nbsp;</h1>
               <button
                 onClick={() => { router.push(`/project/${projectID}+${project.replace(/%2B/g, '+')}`); }}
+                className='text-white transition-colors duration-300 hover:text-gray-400'
               >
                 {project.replace(/%2B/g, ' ')}
               </button>
@@ -321,17 +327,23 @@ function Home({ params }: PageProps) {
               <div id="folders" className="mx-8 my-4">
                 <h1 className="text-3xl my-4">Folders:</h1>
                 <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
-                  {Array.isArray(folders) && folders.length > 0 && (
-                    Filteredfolders.map((folder) => (
-                      <div key={folder.folder_id}>
-                        <button
-                          className="bg-slate-900 rounded-lg text-xl my-4 px-4 py-2"
-                          onClick={() => { router.push(pathname + `/${folder.name.replace(/ /g, '+')}`); }}
-                        >
-                          {folder.name}
-                        </button>
-                      </div>
-                    ))
+                  {!Filteredfolders ? (
+                    <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
+                      <Skeleton width={600} height={125} count={4} style={{ marginBottom: '16px' }} />
+                    </SkeletonTheme>
+                  ) : (
+                    Array.isArray(Filteredfolders) && Filteredfolders.length > 0 && (
+                      Filteredfolders.map((folder) => (
+                        <div key={folder.folder_id}>
+                          <button
+                            className="bg-slate-900 rounded-lg text-xl my-4 px-4 py-2"
+                            onClick={() => { router.push(pathname + `/${folder.name.replace(/ /g, '+')}`); }}
+                          >
+                            {folder.name}
+                          </button>
+                        </div>
+                      ))
+                    )
                   )}
 
                 </div>
@@ -344,24 +356,36 @@ function Home({ params }: PageProps) {
                 <div id="files" className=" my-4">
                   <h1 className="my-4 text-3xl">Files</h1>
                   <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
-                    {Array.isArray(files) && files.length > 0 && (
-                      Filteredfiles.map((file) => (
-                        <div key={file.object_id}>
-                          <button
-                            className="bg-slate-900 rounded-lg text-xl my-4 px-4 py-2"
-                            onClick={() => { }}
-                          >
-                            {file.name}
-                          </button>
-                          {Array.isArray(file.tags) && file.tags.length > 0 && (
-                            file.tags.map((tag) => (
-                              <span className='rounded-full m-2 p-2 bg-blue-600 self-center' key={tag.tag_id}>
-                                {tag.name}
-                              </span>
-                            ))
-                          )}
-                        </div>
-                      ))
+                    {!Filteredfolders ? (
+                      <>
+                      <div>
+                      <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
+                          <Skeleton width={100} height={100} style={{ margin: '5px'}} />
+                        </SkeletonTheme>
+                      </div>
+                      </>
+                    ) : (
+                      <>
+                        {Array.isArray(files) && files.length > 0 && (
+                          Filteredfiles.map((file) => (
+                            <div key={file.object_id}>
+                              <button
+                                className="bg-slate-900 rounded-lg text-xl my-4 px-4 py-2"
+                                onClick={() => { }}
+                              >
+                                {file.name}
+                              </button>
+                              {Array.isArray(file.tags) && file.tags.length > 0 && (
+                                file.tags.map((tag) => (
+                                  <span className='rounded-full m-2 p-2 bg-blue-600 self-center' key={tag.tag_id}>
+                                    {tag.name}
+                                  </span>
+                                ))
+                              )}
+                            </div>
+                          ))
+                        )}
+                      </>
                     )}
                   </div>
                   <button
