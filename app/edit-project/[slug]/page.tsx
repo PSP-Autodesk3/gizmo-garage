@@ -1,19 +1,24 @@
 "use client";
 
-import { useRouter } from 'next/navigation';
-import { useState, useEffect, useCallback } from 'react';
-import BackBtnBar from '@/app/backBtnBar';
+// Middleware
+import withAuth from "@/app/lib/withAuth";
 
-// For Firebase Auth
+// Firebase
 import { auth } from '@/app/firebase/config';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import Permissions from '../../projectPermissions';
 
-interface PageProps {
-    params: Promise<{ slug: string }>;
-  }
+// Components
+import Permissions from '@/app/shared/components/projectPermissions';
+import BackBtnBar from '@/app/shared/components/backBtnBar';
 
-export default function Home({ params }: PageProps) {
+// Other
+import { useRouter } from 'next/navigation';
+import { useState, useEffect, useCallback } from 'react';
+
+// Interfaces
+import { ParamProps } from "@/app/shared/interfaces/paramProps";
+
+function Home({ params }: ParamProps) {
     const [user] = useAuthState(auth);
     const router = useRouter();
     const [name, setName] = useState("");
@@ -23,14 +28,14 @@ export default function Home({ params }: PageProps) {
     const getProjectID = useCallback(async () => {
         const resolvedParams = await params;
         if (resolvedParams) {
-            setProjectID(Number.parseInt(resolvedParams.slug));
-    
+            setProjectID(Number.parseInt(resolvedParams.slug[0]));
+
             const details = await fetch(`/api/getProjectDetails?id=${resolvedParams.slug}`, {
                 method: "GET",
                 headers: { 'Content-Type': 'application/json' }
             })
             const response = await details.json();
-    
+
             if (response[0].name) {
                 setName(response[0].name);
             }
@@ -41,7 +46,7 @@ export default function Home({ params }: PageProps) {
         getProjectID();
     }, [getProjectID]);
 
-    
+
 
     useEffect(() => {
         if (!user || !sessionStorage.getItem('token')) {
@@ -103,3 +108,5 @@ export default function Home({ params }: PageProps) {
         </div>
     )
 }
+
+export default withAuth(Home);

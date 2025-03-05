@@ -9,14 +9,12 @@ import withAuth from "@/app/lib/withAuth";
 
 // Other
 import { useState, useEffect } from 'react'
-import BackBtnBar from '../backBtnBar';
 
-interface Invite {
-    project: string;
-    project_id: number;
-    author: string;
-    user_id: number;
-}
+// Components
+import BackBtnBar from '@/app/shared/components/backBtnBar';
+
+// Interfaces
+import { Invite } from '@/app/shared/interfaces/invite';
 
 function Home() {
     const [user, loadingAuth] = useAuthState(auth);
