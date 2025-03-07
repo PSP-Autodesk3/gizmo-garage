@@ -73,7 +73,7 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                 setDuplicate(0);
             }, 3000);
         } else if (user) { // If no duplicates -> create file
-            await fetch("/api/createItem", {
+            await fetch("http://localhost:3001/createItem", {
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ itemName: itemName.trim(), email: user.email, project: projectID, id, type }),

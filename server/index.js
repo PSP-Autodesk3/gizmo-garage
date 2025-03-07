@@ -6,7 +6,7 @@ import cors from "cors";
 dotenv.config();
 const app = express();
 app.use(express.json());
-app.use(cors({ origin: "http://localhost:3000" })); 
+app.use(cors({ origin: "http://localhost:3000" }));
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
@@ -60,9 +60,35 @@ app.post("/createFolder", async (req, res) => {
     );
     res.json({ message: "Folder created successfully", affectedRows: result.affectedRows });
   }
-  catch(error) {
-    console.error("DB Err: ", error);
-    res.status(500),json({error: "Failed to create folder"});
+  catch (error) {
+    console.error("Database error: ", error);
+    res.status(500), json({ error: "Failed to create folder" });
+  }
+});
+
+app.post("/createItem", async (req, res) => {
+  try {
+    const { itemName, email, project, type, id } = req.body;
+
+    const params = [itemName, email, project];
+    if (type !== 1) {
+      params.push(id);
+    } else {
+      params.push(null);
+    }
+
+    const [result] = await pool.execute(`
+      INSERT INTO Object
+        (name, author, project_id, folder_id)
+        VALUES (?, 
+        (SELECT user_id FROM Users WHERE email = ?),
+        ?, ?)
+    `, params);
+    res.json({ message: "Object created successfully", affectedRows: result.affectedRows });
+  }
+  catch (error) {
+    console.error("Database error: ", error);
+    res.status(500), json({ error: "Failed to create item" });
   }
 });
 
