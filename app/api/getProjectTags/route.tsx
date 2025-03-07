@@ -15,7 +15,7 @@ export async function GET(request: Request) {
     });
 
     const [rows] = await connection.execute(`
-      SELECT project_id, tag.name
+      SELECT DISTINCT project_id, tag.name
        FROM Object_Tag
        INNER JOIN tag ON Object_Tag.tag_id = tag.tag_id
        WHERE Project_id IN (SELECT Projects.project_id

@@ -102,30 +102,6 @@ function Home({ params }: PageProps) {
         setType(1);
       }
 
-      // Get folders
-      let folderQuery = await fetch("/api/getFolders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, type }),
-      });
-
-      let folderResponse = await folderQuery.json();
-      setFolders(folderResponse);
-      setFilteredFolders(folderResponse);
-
-
-      // Get files
-      let objectQuery = await fetch("/api/getObjects", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, type }),
-      });
-
-      let objectResults = await objectQuery.json();
-      setFiles(objectResults);
-      setFilteredFiles(objectResults);
-
-
       // Get Tags
       let tagQuery = await fetch("/api/getAllTags", {
         method: "GET",
@@ -144,12 +120,41 @@ function Home({ params }: PageProps) {
       let objectTags = await query.json();
       console.log("objecttags", objectTags)
 
+      // Get folders
+      let folderQuery = await fetch("/api/getFolders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, type }),
+      });
+
+      let folderResponse = await folderQuery.json();
+      setFolders(folderResponse);
+      setFilteredFolders(folderResponse);
+
+      //adds tags to folders
       query = await fetch(`/api/getFolderTags?fileID=${encodeURIComponent(Number.parseInt(resolved.slug[0].split('%2B')[0]))}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       })
 
       let folderTags = await query.json();
+
+      //adds tags to folders
+      folderResponse.forEach((folder: Folder) => {
+        folder.tags = folderTags.filter((tag: folderTags) => tag.folder_id === folder.folder_id);
+      });
+
+
+      // Get files
+      let objectQuery = await fetch("/api/getObjects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, type }),
+      });
+
+      let objectResults = await objectQuery.json();
+      setFiles(objectResults);
+      setFilteredFiles(objectResults);
 
       //adds tags to files
       objectResults.forEach((file: File) => {
@@ -159,10 +164,7 @@ function Home({ params }: PageProps) {
 
       console.log("please:", folderResponse);
       console.log("folders", Filteredfolders)
-      //adds tags to folders
-      folderResponse.forEach((folder: Folder) => {
-        folder.tags = folderTags.filter((tag: folderTags) => tag.folder_id === folder.folder_id);
-      });
+      console.log("foldertags:", folderTags);
 
       console.log("Come on:", folders);
     }
@@ -203,6 +205,7 @@ function Home({ params }: PageProps) {
   useEffect(() => {
     getData();
   }, [getData]);
+
 
   const goneBack = async (num: number) => {
     const selectedFolders = routes.slice(0, (num + 1)).join('/');
@@ -309,6 +312,49 @@ function Home({ params }: PageProps) {
   useEffect(() => {
     console.log("test:", Filteredfiles);
   }, [files])
+
+  {
+    Array.isArray(Filteredfolders) && Filteredfolders.length > 0 && (
+      Filteredfolders.map((folder) => {
+        console.log('Folder:', folder); // Log the entire folder object
+        console.log('Tags for folder:', folder.tags); // Log the tags array for each folder
+
+        return (
+          <div key={folder.folder_id}>
+            <button
+              className="bg-slate-900 rounded-lg text-xl my-4 px-4 py-2"
+              onClick={() => { router.push(pathname + `/${folder.name.replace(/ /g, '+')}`); }}
+            >
+              {folder.name}
+            </button>
+            {Array.isArray(folder.tags) && folder.tags.length > 0 && (
+              folder.tags.map((tag) => (
+                <span className='rounded-full m-2 p-2 bg-blue-600 self-center' key={tag.tag_id}>
+                  {tag.name}
+                </span>
+              ))
+            )}
+          </div>
+        );
+      })
+    )
+  }
+
+
+  useEffect(() => {
+    console.log("testsdasd:", Filteredfolders);
+  }, [folders])
+
+  console.log("foldejnjnjrs:", folders);
+
+  folders.map((folder, index) => {
+    if (folder.tags) {
+      console.log(`Tags in Folder ${index}:`, folder.tags);
+    } else {
+      console.log(`No tags in Folder ${index}`);
+    }
+  });
+
   return (
     <>
       <div className='flex m-auto'>
