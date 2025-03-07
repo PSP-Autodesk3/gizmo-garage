@@ -4,7 +4,7 @@ import mysql from "mysql2/promise";
 export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
-        const email = searchParams.get("email");
+        const projectid = searchParams.get("fileID");
 
         const connection = await mysql.createConnection({
             host: process.env.DB_HOST,
@@ -14,13 +14,18 @@ export async function GET(request: Request) {
             database: process.env.DB_DATABASE,
         });
 
+        console.log(projectid);
         const [rows] = await connection.execute(`
-            SELECT object_id, tag.name
+            SELECT *
             FROM object_Tag
+            INNER JOIN object ON object_Tag.object_id = object.object_id
+            INNER JOIN folder ON object.folder_id = folder.folder_id
             INNER JOIN tag ON object_Tag.tag_id = tag.tag_id
-            WHERE object_id IN ( SELECT object_id
-            FROM object)
-    `) //may have to modify this in future so it fetches less tags for efficiency
+            WHERE object_Tag.project_id = ?
+        `, [projectid]);
+        
+    
+        console.log("test",rows);
         await connection.end();
         return NextResponse.json(rows);
     } catch (error) {

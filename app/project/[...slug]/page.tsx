@@ -25,6 +25,7 @@ interface PageProps {
 interface Folder {
   folder_id: number;
   name: string;
+  tags: tags[];
 }
 
 interface File {
@@ -35,6 +36,11 @@ interface File {
 
 interface itemTags {
   object_id: number,
+  name: string
+}
+
+interface folderTags {
+  folder_id: number,
   name: string
 }
 
@@ -85,47 +91,51 @@ function Home({ params }: PageProps) {
         body: JSON.stringify({ project: resolved.slug[0].split('%2B').slice(1).join('%2B'), routes: resolved.slug.slice(1) }),
       });
 
-      let response = await query.json();
+      let getCurrentFileID = await query.json();
 
       setID(0);
       setType(0);
-      if (response[0].folder_id) {
-        setID(response[0].folder_id);
+      if (getCurrentFileID[0].folder_id) {
+        setID(getCurrentFileID[0].folder_id);
       } else {
-        setID(response[0].project_id);
+        setID(getCurrentFileID[0].project_id);
         setType(1);
       }
 
       // Get folders
-      query = await fetch("/api/getFolders", {
+      let folderQuery = await fetch("/api/getFolders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, type }),
       });
 
-      response = await query.json();
-      setFolders(response);
-      setFilteredFolders(response);
+      let folderResponse = await folderQuery.json();
+      setFolders(folderResponse);
+      setFilteredFolders(folderResponse);
+
 
       // Get files
-      query = await fetch("/api/getObjects", {
+      let objectQuery = await fetch("/api/getObjects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, type }),
       });
 
-      let objectResults = await query.json();
+      let objectResults = await objectQuery.json();
       setFiles(objectResults);
       setFilteredFiles(objectResults);
 
+
       // Get Tags
-      query = await fetch("/api/getAllTags", {
+      let tagQuery = await fetch("/api/getAllTags", {
         method: "GET",
         headers: { "Content-Type": "application/json" }
       });
-      response = await query.json();
-      setTags(response);
-      setFilteredTags(response);
+      let tagResponse = await tagQuery.json();
+      setTags(tagResponse);
+      setFilteredTags(tagResponse);
+
+      //get object tags
       query = await fetch("/api/getObjectTags", {
         method: "GET",
         headers: { "Content-Type": "application/json" }
@@ -133,12 +143,28 @@ function Home({ params }: PageProps) {
 
       let objectTags = await query.json();
       console.log("objecttags", objectTags)
+
+      query = await fetch(`/api/getFolderTags?fileID=${encodeURIComponent(Number.parseInt(resolved.slug[0].split('%2B')[0]))}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      })
+
+      let folderTags = await query.json();
+
+      //adds tags to files
       objectResults.forEach((file: File) => {
         file.tags = objectTags.filter((tag: itemTags) => tag.object_id === file.object_id);
       });
 
-      console.log("objectResults:", objectResults);
 
+      console.log("please:", folderResponse);
+      console.log("folders", Filteredfolders)
+      //adds tags to folders
+      folderResponse.forEach((folder: Folder) => {
+        folder.tags = folderTags.filter((tag: folderTags) => tag.folder_id === folder.folder_id);
+      });
+
+      console.log("Come on:", folders);
     }
   }, [params, id, type]);
 
@@ -280,7 +306,9 @@ function Home({ params }: PageProps) {
     }
   }, [query])
 
-  console.log(Filteredfiles);
+  useEffect(() => {
+    console.log("test:", Filteredfiles);
+  }, [files])
   return (
     <>
       <div className='flex m-auto'>
@@ -341,6 +369,13 @@ function Home({ params }: PageProps) {
                           >
                             {folder.name}
                           </button>
+                          {Array.isArray(folder.tags) && folder.tags.length > 0 && (
+                            folder.tags.map((tag) => (
+                              <span className='rounded-full m-2 p-2 bg-blue-600 self-center' key={tag.tag_id}>
+                                {tag.name}
+                              </span>
+                            ))
+                          )}
                         </div>
                       ))
                     )
@@ -354,15 +389,15 @@ function Home({ params }: PageProps) {
                   Create New Folder
                 </button>
                 <div id="files" className=" my-4">
-                  <h1 className="my-4 text-3xl">Files</h1>
+                  <h1 className="my-4 text-3xl">Files:</h1>
                   <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
                     {!Filteredfolders ? (
                       <>
-                      <div>
-                      <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
-                          <Skeleton width={100} height={100} style={{ margin: '5px'}} />
-                        </SkeletonTheme>
-                      </div>
+                        <div>
+                          <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
+                            <Skeleton width={100} height={100} style={{ margin: '5px' }} />
+                          </SkeletonTheme>
+                        </div>
                       </>
                     ) : (
                       <>
