@@ -41,7 +41,7 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                 setDuplicate(0);
             }, 3000);
         } else { // If no duplicates -> create folder
-            await fetch("/api/createFolder", {
+            await fetch("http://localhost:3001/createFolder", {
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: folderName.trim(), projectid: projectID, folder_id: id, type }),

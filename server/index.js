@@ -19,7 +19,7 @@ const pool = mysql.createPool({
   queueLimit: 0,
 });
 
-app.post("/projects", async (req, res) => {
+app.post("/createProjects", async (req, res) => {
   try {
     const { name, owner } = req.body;
 
@@ -32,6 +32,37 @@ app.post("/projects", async (req, res) => {
   } catch (error) {
     console.error("Database error:", error);
     res.status(500).json({ error: "Failed to create project" });
+  }
+});
+
+app.post("/createFolder", async (req, res) => {
+  try {
+    const { name, projectid, folder_id, type } = req.body;
+    const params = [name, projectid];
+    if (type !== 1) params.push(folder_id);
+    params.push(projectid);
+    params.push(name, projectid);
+    if (type !== 1) params.push(folder_id);
+
+    const [result] = await pool.execute(
+      `
+      INSERT INTO Folder (name, project_id, parent_folder_id)
+      SELECT ?, ?, ${type === 1 ? `NULL` : `?`}
+      FROM Projects
+      WHERE name = (SELECT name FROM Projects WHERE Projects.project_id = ?)
+      AND NOT EXISTS (
+        SELECT 1 FROM Folder 
+        WHERE name = ? 
+        AND project_id = ?
+        AND parent_folder_id ${type === 1 ? `IS NULL` : `= ?`}
+      );
+      `, params
+    );
+    res.json({ message: "Folder created successfully", affectedRows: result.affectedRows });
+  }
+  catch(error) {
+    console.error("DB Err: ", error);
+    res.status(500),json({error: "Failed to create folder"});
   }
 });
 
