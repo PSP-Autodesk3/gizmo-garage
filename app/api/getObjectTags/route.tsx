@@ -16,8 +16,8 @@ export async function GET(request: Request) {
 
         const [rows] = await connection.execute(`
             SELECT object_id, tag.tag
-            FROM object_Tag
-            INNER JOIN tag ON object_Tag.tag_id = tag.tag_id
+            FROM Object_Tag
+            INNER JOIN tag ON Object_Tag.tag_id = tag.tag_id
             WHERE object_id IN ( SELECT object_id
             FROM object)
     `) //may have to modify this in future so it fetches less tags for efficiency

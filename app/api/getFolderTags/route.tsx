@@ -17,10 +17,10 @@ export async function GET(request: Request) {
         console.log(projectid);
         const [rows] = await connection.execute(`
             SELECT *
-            FROM object_Tag
-            INNER JOIN object ON object_Tag.object_id = object.object_id
+            FROM Object_Tag
+            INNER JOIN object ON Object_Tag.object_id = object.object_id
             INNER JOIN folder ON object.folder_id = folder.folder_id
-            INNER JOIN tag ON object_Tag.tag_id = tag.tag_id
+            INNER JOIN tag ON Object_Tag.tag_id = tag.tag_id
             WHERE object.project_id = ?
         `, [projectid]);
         
