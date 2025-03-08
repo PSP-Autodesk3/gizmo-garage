@@ -28,14 +28,14 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
         e.preventDefault();
 
         // Check for duplicates
-        const alreadyExists = await fetch("/api/getFolderExists", {
+        const alreadyExists = await fetch("http://localhost:3001/folders/exists", {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name: folderName.trim(), projectid: projectID, type, parent_folder_id: id }),
         });
         const resp = await alreadyExists.json();
 
-        if (resp[0].FolderExists === 1) { // If duplicates -> display message
+        if (resp.FolderExists === 1) { // If duplicates -> display message
             setDuplicate(1);
             setTimeout(() => {
                 setDuplicate(0);
