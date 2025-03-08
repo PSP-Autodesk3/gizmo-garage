@@ -11,8 +11,12 @@ import { useEffect, useState, useCallback } from 'react';
 import { auth } from "@/app/firebase/config"
 import { useAuthState } from "react-firebase-hooks/auth";
 
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
+
 //Filter component
 import Filters from "../../Filter"
+import { Direction } from "react-range";
 
 interface PageProps {
   params: Promise<{ slug: string[] }>;
@@ -21,12 +25,29 @@ interface PageProps {
 interface Folder {
   folder_id: number;
   name: string;
+  tags: tags[];
   parent_folder_id: number | null;
 }
 
 interface File {
   object_id: number;
   name: string;
+  tags: tags[];
+}
+
+interface itemTags {
+  object_id: number,
+  name: string
+}
+
+interface folderTags {
+  folder_id: number,
+  name: string
+}
+
+interface tags {
+  tag_id: number;
+  tag: string;
 }
 
 function Home({ params }: PageProps) {
@@ -38,6 +59,7 @@ function Home({ params }: PageProps) {
   const [folders, setFolders] = useState<Folder[]>([]);
   const [files, setFiles] = useState<File[]>([]);
   const [query, setQuery] = useState<string>('');
+  const [TagQuery, setTagQuery] = useState<string>('');
   const [values, setValues] = useState([20, 80]);
   const [confirmModule, setConfirmModule] = useState(false);
   const [folderName, setFolderName] = useState('');
@@ -47,6 +69,14 @@ function Home({ params }: PageProps) {
   const [itemName, setItemName] = useState('');
   const [moduleType, setModuleType] = useState(0); // 1 = Folder, 2 = Item
   const [duplicate, setDuplicate] = useState(0); // 0 = off, 1 = folder, 2 = item
+
+  //for tags
+  const [alltags, setTags] = useState<tags[]>([]);
+  const [FilteredTags, setFilteredTags] = useState<tags[]>([]);
+  const [appliedTags, setAppliedTags] = useState<tags[]>([]);
+  const [Filteredfolders, setFilteredFolders] = useState<Folder[]>([]);
+  const [Filteredfiles, setFilteredFiles] = useState<File[]>([]);
+  const [alreadyApplied, setAlreadyApplied] = useState(0);
 
   const getData = useCallback(async () => {
     const resolved = await params;
@@ -62,36 +92,75 @@ function Home({ params }: PageProps) {
         body: JSON.stringify({ project: resolved.slug[0].split('%2B').slice(1).join('%2B'), routes: resolved.slug.slice(1) }),
       });
 
-      let response = await query.json();
+      let getCurrentFileID = await query.json();
 
       setID(0);
       setType(0);
-      if (response[0].folder_id) {
-        setID(response[0].folder_id);
+      if (getCurrentFileID[0].folder_id) {
+        setID(getCurrentFileID[0].folder_id);
       } else {
-        setID(response[0].project_id);
+        setID(getCurrentFileID[0].project_id);
         setType(1);
       }
 
+      // Get Tags
+      let tagQuery = await fetch("/api/getAllTags", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
+      });
+      let tagResponse = await tagQuery.json();
+      setTags(tagResponse);
+      setFilteredTags(tagResponse);
+
+      //get object tags
+      query = await fetch("/api/getObjectTags", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
+      })
+
+      let objectTags = await query.json();
+      console.log("objecttags", objectTags)
+
       // Get folders
-      query = await fetch("/api/getFolders", {
+      let folderQuery = await fetch("/api/getFolders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, type }),
       });
 
-      response = await query.json();
-      setFolders(response);
+      let folderResponse = await folderQuery.json();
+      setFolders(folderResponse);
+      setFilteredFolders(folderResponse);
+
+      //adds tags to folders
+      query = await fetch(`/api/getFolderTags?fileID=${encodeURIComponent(Number.parseInt(resolved.slug[0].split('%2B')[0]))}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      })
+
+      let folderTags = await query.json();
+
+      //adds tags to folders
+      folderResponse.forEach((folder: Folder) => {
+        folder.tags = folderTags.filter((tag: folderTags) => tag.folder_id === folder.folder_id);
+      });
+
 
       // Get files
-      query = await fetch("/api/getObjects", {
+      let objectQuery = await fetch("/api/getObjects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, type }),
       });
 
-      response = await query.json();
-      setFiles(response);
+      let objectResults = await objectQuery.json();
+      setFiles(objectResults);
+      setFilteredFiles(objectResults);
+
+      //adds tags to files
+      objectResults.forEach((file: File) => {
+        file.tags = objectTags.filter((tag: itemTags) => tag.object_id === file.object_id);
+      });
 
       // GET AND DISPLAY THE TREE STRUCTURE
 
@@ -208,6 +277,7 @@ function Home({ params }: PageProps) {
     getData();
   }, [getData]);
 
+
   const goneBack = async (num: number) => {
     const selectedFolders = routes.slice(0, (num + 1)).join('/');
     const route = `/project/${projectID}+${project.replace(/%2B/g, '+')}/${selectedFolders.replace(/%2B/g, '+')}`;
@@ -243,6 +313,10 @@ function Home({ params }: PageProps) {
 
   const newItem = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    //reset selected tags
+    setAppliedTags([]);
+
     // Check dupes 
     const alreadyExists = await fetch("/api/getItemExists", {
       method: "POST",
@@ -260,7 +334,7 @@ function Home({ params }: PageProps) {
         await fetch("/api/createItem", {
           method: "POST",
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ itemName: itemName.trim(), email: user.email, project: projectID, id, type }),
+          body: JSON.stringify({ itemName: itemName.trim(), email: user.email, project: projectID, id, type, appliedTags, projectID }),
         });
       }
     }
@@ -268,6 +342,89 @@ function Home({ params }: PageProps) {
     setConfirmModule(false);
     setItemName("");
   }
+
+  useEffect(() => {
+    if (TagQuery != '') {
+      setFilteredTags(alltags.filter(tags => tags.tag.toLowerCase().includes(TagQuery.trim())));
+    } else {
+      setFilteredTags(alltags);
+    }
+  }, [TagQuery]);
+
+  const applyTag = (index: number) => {
+    const appliedTag = alltags.find(tag => tag.tag_id == index);
+    if (appliedTags && appliedTag && !appliedTags.includes(appliedTag)) {
+      setAppliedTags([...appliedTags, appliedTag]);
+    }
+    else {
+      setAlreadyApplied(1);
+      setTimeout(() => {
+        setAlreadyApplied(0);
+      }, 1000);
+    }
+  }
+
+  const removeTag = (index: number) => {
+    setAppliedTags(appliedTags.filter(tag => tag.tag_id !== index));
+  }
+
+  useEffect(() => {
+    console.log("query:", query);
+    if (query.trim() == '') {
+      setFilteredFolders(folders);
+      setFilteredFiles(files);
+    }
+    else {
+      setFilteredFolders(folders.filter(folder => folder.name.toLowerCase().includes(query.trim()) || folder.tags.some(tag => tag.tag.toLowerCase().includes(query.trim()))));
+      setFilteredFiles(files.filter(file => file.name.toLowerCase().includes(query.trim()) || file.tags.some(tag => tag.tag.toLowerCase().includes(query.trim()))));
+    }
+  }, [query])
+
+  useEffect(() => {
+    console.log("test:", Filteredfiles);
+  }, [files])
+
+  {
+    Array.isArray(Filteredfolders) && Filteredfolders.length > 0 && (
+      Filteredfolders.map((folder) => {
+        console.log('Folder:', folder); // Log the entire folder object
+        console.log('Tags for folder:', folder.tags); // Log the tags array for each folder
+
+        return (
+          <div key={folder.folder_id}>
+            <button
+              className="bg-slate-900 rounded-lg text-xl my-4 px-4 py-2"
+              onClick={() => { router.push(pathname + `/${folder.name.replace(/ /g, '+')}`); }}
+            >
+              {folder.name}
+            </button>
+            {Array.isArray(folder.tags) && folder.tags.length > 0 && (
+              folder.tags.map((tag) => (
+                <span className='rounded-full m-2 p-2 bg-blue-600 self-center' key={tag.tag_id}>
+                  {tag.tag}
+                </span>
+              ))
+            )}
+          </div>
+        );
+      })
+    )
+  }
+
+
+  useEffect(() => {
+    console.log("testsdasd:", Filteredfolders);
+  }, [folders])
+
+  console.log("foldejnjnjrs:", folders);
+
+  folders.map((folder, index) => {
+    if (folder.tags) {
+      console.log(`Tags in Folder ${index}:`, folder.tags);
+    } else {
+      console.log(`No tags in Folder ${index}`);
+    }
+  });
 
   return (
     <>
@@ -288,12 +445,14 @@ function Home({ params }: PageProps) {
             <div id="breadcrumbs" className="flex flex-row text-2xl p-4 rounded-lg mx-8 my-4">
               <button
                 onClick={() => { router.push(`/`); }}
+                className='text-white transition-colors duration-300 hover:text-gray-400'
               >
                 Home
               </button>
               <h1>&nbsp;&nbsp;&gt;&nbsp;&nbsp;</h1>
               <button
                 onClick={() => { router.push(`/project/${projectID}+${project.replace(/%2B/g, '+')}`); }}
+                className='text-white transition-colors duration-300 hover:text-gray-400'
               >
                 {project.replace(/%2B/g, ' ')}
               </button>
@@ -321,17 +480,30 @@ function Home({ params }: PageProps) {
               <div id="folders" className="mx-8 my-4">
                 <h1 className="text-3xl my-4">Folders:</h1>
                 <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
-                  {Array.isArray(folders) && folders.length > 0 && (
-                    folders.map((folder) => (
-                      <div key={folder.folder_id}>
-                        <button
-                          className="bg-slate-900 rounded-lg text-xl my-4 px-4 py-2"
-                          onClick={() => { router.push(pathname + `/${folder.name.replace(/ /g, '+')}`); }}
-                        >
-                          {folder.name}
-                        </button>
-                      </div>
-                    ))
+                  {!Filteredfolders ? (
+                    <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
+                      <Skeleton width={600} height={125} count={4} style={{ marginBottom: '16px' }} />
+                    </SkeletonTheme>
+                  ) : (
+                    Array.isArray(Filteredfolders) && Filteredfolders.length > 0 && (
+                      Filteredfolders.map((folder) => (
+                        <div key={folder.folder_id}>
+                          <button
+                            className="bg-slate-900 rounded-lg text-xl my-4 px-4 py-2"
+                            onClick={() => { router.push(pathname + `/${folder.name.replace(/ /g, '+')}`); }}
+                          >
+                            {folder.name}
+                          </button>
+                          {Array.isArray(folder.tags) && folder.tags.length > 0 && (
+                            folder.tags.map((tag) => (
+                              <span className='rounded-full m-2 p-2 bg-blue-600 self-center' key={tag.tag_id}>
+                                {tag.tag}
+                              </span>
+                            ))
+                          )}
+                        </div>
+                      ))
+                    )
                   )}
 
                 </div>
@@ -342,19 +514,38 @@ function Home({ params }: PageProps) {
                   Create New Folder
                 </button>
                 <div id="files" className=" my-4">
-                  <h1 className="my-4 text-3xl">Files</h1>
+                  <h1 className="my-4 text-3xl">Files:</h1>
                   <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
-                    {Array.isArray(files) && files.length > 0 && (
-                      files.map((file) => (
-                        <div key={file.object_id}>
-                          <button
-                            className="bg-slate-900 rounded-lg text-xl my-4 px-4 py-2"
-                            onClick={() => { }}
-                          >
-                            {file.name}
-                          </button>
+                    {!Filteredfolders ? (
+                      <>
+                        <div>
+                          <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
+                            <Skeleton width={100} height={100} style={{ margin: '5px' }} />
+                          </SkeletonTheme>
                         </div>
-                      ))
+                      </>
+                    ) : (
+                      <>
+                        {Array.isArray(files) && files.length > 0 && (
+                          Filteredfiles.map((file) => (
+                            <div key={file.object_id}>
+                              <button
+                                className="bg-slate-900 rounded-lg text-xl my-4 px-4 py-2"
+                                onClick={() => { }}
+                              >
+                                {file.name}
+                              </button>
+                              {Array.isArray(file.tags) && file.tags.length > 0 && (
+                                file.tags.map((tag) => (
+                                  <span className='rounded-full m-2 p-2 bg-blue-600 self-center' key={tag.tag_id}>
+                                    {tag.tag}
+                                  </span>
+                                ))
+                              )}
+                            </div>
+                          ))
+                        )}
+                      </>
                     )}
                   </div>
                   <button
@@ -409,6 +600,48 @@ function Home({ params }: PageProps) {
                       className="w-full mt-4 p-2 rounded-lg bg-slate-800"
                       placeholder="Enter Item name"
                     />
+
+                    <div >
+                      <div id="search" className='p-4'>
+                        <label htmlFor="search=bar">Search</label>
+                        <input
+                          className='text-white w-full p-2 my-2 rounded-lg bg-slate-800'
+                          type="text"
+                          placeholder="Search"
+                          name="search"
+                          value={TagQuery}
+                          onChange={(e) => setTagQuery(e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        {
+                          FilteredTags.map((tag) => (
+                            <>
+                              <button type="button" className='rounded-full m-2 p-3 bg-blue-600' onClick={() => applyTag(tag.tag_id)} key={tag.tag_id}>{tag.tag}</button>
+                            </>
+                          ))
+                        }
+                      </div>
+
+                      <div id='appliedTags'>
+                        {
+                          appliedTags.map((tag) => (
+                            <>
+                              <button type='button' className='rounded-full m-2 p-3 bg-blue-600 flex' onClick={() => removeTag(tag.tag_id)} key={tag.tag_id}><svg className="w-6 h-6 text-blue-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18 17.94 6M18 18 6.06 6" />
+                              </svg>{tag.tag}</button>
+                            </>
+                          ))
+                        }
+
+                        <div>
+                          {alreadyApplied === 1 && (
+                            <span className='text-red-500'>Already Applied</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="mt-4">
                       <button
                         className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"

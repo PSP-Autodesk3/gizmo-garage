@@ -26,7 +26,14 @@ interface Project {
   project_id: number,
   name: string,
   ownsProject: number,
-  error: string
+  error: string,
+  tags: projectTags[]
+}
+
+
+interface projectTags {
+  project_id: number,
+  tag: string
 }
 
 function Home() {
@@ -38,8 +45,20 @@ function Home() {
   const [projects, setProjects] = useState<Project[]>([] as Project[]);
   const [loading, setLoading] = useState(true);
   const [loadingProjects, setLoadingProjects] = useState(true);
+  const [filteredProjects, setFilteredProjects] = useState<Project[]>([] as Project[]);
+  const [projectTags, setProjectTags] = useState<projectTags[]>([] as projectTags[])
   const [query, setQuery] = useState<string>('');
 
+
+  useEffect(() => {
+    if (query.trim() == '') {
+      setFilteredProjects(projects);
+    }
+    else {
+      //display where the search equals the query or matches at least one of the tags
+      setFilteredProjects(projects.filter(project => project.name.toLowerCase().includes(query.trim()) || project.tags.some(tag => tag.tag.toLowerCase().includes(query.trim()))));
+    }
+  }, [query]);
   useEffect(() => {
     // Only runs if the user has logged in
     if (user) {
@@ -60,7 +79,23 @@ function Home() {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }
               })
-              setProjects(await data.json());
+              const tagData = await fetch(`/api/getProjectTags?email=${encodeURIComponent(user?.email)}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+              })          
+              
+              const result = await data.json();
+              const tagResult = await tagData.json();
+
+              setProjects(result);
+              setFilteredProjects(result);
+              setProjectTags(tagResult);
+
+              //assigns tags to projects
+              result.forEach((project: Project) => {
+                project.tags = tagResult.filter((tag: projectTags) => tag.project_id === project.project_id);
+              });
+
               if (!data.ok) {
                 setDatabaseErrorMessage("Database not found, contact your system administrator");
               }
@@ -182,7 +217,7 @@ function Home() {
               </div>
               
               {!loadingProjects ? (
-                projects.map((project, index) => (
+                filteredProjects.map((project, index) => (
                   <div className="project" key={index}>
                     <div id="folders">
                       <div className="bg-slate-900 p-4 m-auto rounded-lg shadow-lg mx-8 my-4 flex flex-row justify-between">
@@ -190,6 +225,11 @@ function Home() {
                           <p>Name: {project.name} </p>
                           <p>Version: </p>
                           <p>Date: </p>
+                          {project.tags.length > 0 && (
+                            <p>Tags: {project.tags.map((tag, index) => (
+                              <span className='rounded-full m-2 p-2 bg-blue-600' key={index}>{tag.tag}</span>
+                            ))}</p>
+                          )}
                         </div>
                         <div className='content-center'>
                           <button
@@ -211,9 +251,9 @@ function Home() {
                 ))
               ) : (
                 <>
-                  <div>
+                  <div className='flex justify-center'>
                     <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
-                      <Skeleton width={400} height={100} />
+                      <Skeleton width={600} height={125} count={4} style={{marginBottom: '16px'}} />
                     </SkeletonTheme>
                   </div>
                 </>
