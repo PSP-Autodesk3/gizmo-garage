@@ -41,7 +41,7 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                 setDuplicate(0);
             }, 3000);
         } else { // If no duplicates -> create folder
-            await fetch("http://localhost:3001/createFolder", {
+            await fetch("http://localhost:3001/folders/create", {
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: folderName.trim(), projectid: projectID, folder_id: id, type }),
@@ -73,7 +73,7 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                 setDuplicate(0);
             }, 3000);
         } else if (user) { // If no duplicates -> create file
-            await fetch("http://localhost:3001/createItem", {
+            await fetch("http://localhost:3001/items/create", {
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ itemName: itemName.trim(), email: user.email, project: projectID, id, type }),

@@ -34,7 +34,7 @@ function Home() {
                     console.log("Result:", result)
                     
                     if (result?.user) {
-                        const response = await fetch("http://localhost:3001/createUser", {
+                        const response = await fetch("http://localhost:3001/users/create", {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ email, fName, lName }),

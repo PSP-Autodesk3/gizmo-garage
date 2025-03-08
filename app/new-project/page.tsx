@@ -42,7 +42,7 @@ export default function Home() {
 
                 if (response[0].user_id) {
                     const id = response[0].user_id;
-                    const createProject = await fetch(`http://localhost:3001/createProjects`, {
+                    const createProject = await fetch(`http://localhost:3001/projects/create`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ name: name.trim(), owner: id }),
