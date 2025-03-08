@@ -29,4 +29,25 @@ router.post("/create", async (req, res, next) => {
     }
 });
 
+// Check item exists
+router.post("/exists", async (req, res, next) => {
+    try {
+        const {name, projectid, type, folder_id} = req.body;
+        const params = [name, projectid];
+        if (type !== 1) params.push(folder_id);
+        const [result] = await pool.execute(`
+            SELECT COUNT(*) AS ItemExists
+                FROM Object
+                WHERE name = ?
+                AND project_id = ?
+                AND folder_id ${type === 1 ? `IS NULL` : `= ?`};
+            `, params
+        );
+        return res.json(result[0]);
+    }
+    catch (error) {
+        next(error);
+    }
+});
+
 export default router;

@@ -60,14 +60,14 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
         e.preventDefault();
 
         // Check duplicates 
-        const alreadyExists = await fetch("/api/getItemExists", {
+        const alreadyExists = await fetch("http://localhost:3001/items/exists", {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name: itemName.trim(), projectid: projectID, folder_id: id, type }),
         });
         const resp = await alreadyExists.json();
 
-        if (resp[0].ItemExists === 1) { // If duplicates -> display message
+        if (resp.ItemExists === 1) { // If duplicates -> display message
             setDuplicate(2);
             setTimeout(() => {
                 setDuplicate(0);
