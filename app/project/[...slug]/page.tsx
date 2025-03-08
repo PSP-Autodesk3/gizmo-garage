@@ -46,7 +46,7 @@ interface folderTags {
 
 interface tags {
   tag_id: number;
-  name: string;
+  tag: string;
 }
 
 function Home({ params }: PageProps) {
@@ -274,7 +274,7 @@ function Home({ params }: PageProps) {
 
   useEffect(() => {
     if (TagQuery != '') {
-      setFilteredTags(alltags.filter(tags => tags.name.toLowerCase().includes(TagQuery.trim())));
+      setFilteredTags(alltags.filter(tags => tags.tag.toLowerCase().includes(TagQuery.trim())));
     } else {
       setFilteredTags(alltags);
     }
@@ -304,8 +304,8 @@ function Home({ params }: PageProps) {
       setFilteredFiles(files);
     }
     else {
-      setFilteredFolders(folders.filter(folder => folder.name.toLowerCase().includes(query.trim()) || folder.tags.some(tag => tag.name.toLowerCase().includes(query.trim()))));
-      setFilteredFiles(files.filter(file => file.name.toLowerCase().includes(query.trim()) || file.tags.some(tag => tag.name.toLowerCase().includes(query.trim()))));
+      setFilteredFolders(folders.filter(folder => folder.name.toLowerCase().includes(query.trim()) || folder.tags.some(tag => tag.tag.toLowerCase().includes(query.trim()))));
+      setFilteredFiles(files.filter(file => file.name.toLowerCase().includes(query.trim()) || file.tags.some(tag => tag.tag.toLowerCase().includes(query.trim()))));
     }
   }, [query])
 
@@ -330,7 +330,7 @@ function Home({ params }: PageProps) {
             {Array.isArray(folder.tags) && folder.tags.length > 0 && (
               folder.tags.map((tag) => (
                 <span className='rounded-full m-2 p-2 bg-blue-600 self-center' key={tag.tag_id}>
-                  {tag.name}
+                  {tag.tag}
                 </span>
               ))
             )}
@@ -418,7 +418,7 @@ function Home({ params }: PageProps) {
                           {Array.isArray(folder.tags) && folder.tags.length > 0 && (
                             folder.tags.map((tag) => (
                               <span className='rounded-full m-2 p-2 bg-blue-600 self-center' key={tag.tag_id}>
-                                {tag.name}
+                                {tag.tag}
                               </span>
                             ))
                           )}
@@ -459,7 +459,7 @@ function Home({ params }: PageProps) {
                               {Array.isArray(file.tags) && file.tags.length > 0 && (
                                 file.tags.map((tag) => (
                                   <span className='rounded-full m-2 p-2 bg-blue-600 self-center' key={tag.tag_id}>
-                                    {tag.name}
+                                    {tag.tag}
                                   </span>
                                 ))
                               )}
@@ -538,7 +538,7 @@ function Home({ params }: PageProps) {
                         {
                           FilteredTags.map((tag) => (
                             <>
-                              <button type="button" className='rounded-full m-2 p-3 bg-blue-600' onClick={() => applyTag(tag.tag_id)} key={tag.tag_id}>{tag.name}</button>
+                              <button type="button" className='rounded-full m-2 p-3 bg-blue-600' onClick={() => applyTag(tag.tag_id)} key={tag.tag_id}>{tag.tag}</button>
                             </>
                           ))
                         }
@@ -550,7 +550,7 @@ function Home({ params }: PageProps) {
                             <>
                               <button type='button' className='rounded-full m-2 p-3 bg-blue-600 flex' onClick={() => removeTag(tag.tag_id)} key={tag.tag_id}><svg className="w-6 h-6 text-blue-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24">
                                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18 17.94 6M18 18 6.06 6" />
-                              </svg>{tag.name}</button>
+                              </svg>{tag.tag}</button>
                             </>
                           ))
                         }

@@ -41,9 +41,9 @@ export async function POST(request: Request) {
             console.log("latest:",latestId.id);
             await connection.execute(`
                 INSERT INTO object_tag
-                (object_id, project_id, tag_id)
-                VALUES (?, ?, ?)   
-            `, [latestId.id, project, tag.tag_id]);
+                (object_id, tag_id)
+                VALUES (?, ?)   
+            `, [latestId.id, tag.tag_id]);
         }
 
         await connection.end();

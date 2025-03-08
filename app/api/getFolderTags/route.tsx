@@ -21,7 +21,7 @@ export async function GET(request: Request) {
             INNER JOIN object ON object_Tag.object_id = object.object_id
             INNER JOIN folder ON object.folder_id = folder.folder_id
             INNER JOIN tag ON object_Tag.tag_id = tag.tag_id
-            WHERE object_Tag.project_id = ?
+            WHERE object.project_id = ?
         `, [projectid]);
         
     

@@ -33,7 +33,7 @@ interface Project {
 
 interface projectTags {
   project_id: number,
-  name: string
+  tag: string
 }
 
 function Home() {
@@ -56,7 +56,7 @@ function Home() {
     }
     else {
       //display where the search equals the query or matches at least one of the tags
-      setFilteredProjects(projects.filter(project => project.name.toLowerCase().includes(query.trim()) || project.tags.some(tag => tag.name.toLowerCase().includes(query.trim()))));
+      setFilteredProjects(projects.filter(project => project.name.toLowerCase().includes(query.trim()) || project.tags.some(tag => tag.tag.toLowerCase().includes(query.trim()))));
     }
   }, [query]);
   useEffect(() => {
@@ -227,7 +227,7 @@ function Home() {
                           <p>Date: </p>
                           {project.tags.length > 0 && (
                             <p>Tags: {project.tags.map((tag, index) => (
-                              <span className='rounded-full m-2 p-2 bg-blue-600' key={index}>{tag.name}</span>
+                              <span className='rounded-full m-2 p-2 bg-blue-600' key={index}>{tag.tag}</span>
                             ))}</p>
                           )}
                         </div>
