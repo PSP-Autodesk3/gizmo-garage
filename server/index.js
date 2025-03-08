@@ -35,6 +35,20 @@ app.post("/createProjects", async (req, res) => {
   }
 });
 
+app.post("/createUser", async (req, res) => {
+  try {
+    const { email, fName, lName } = req.body;
+    const [result] = await pool.execute(
+      "INSERT INTO Users (email, fname, lname) VALUES (?, ?, ?)", [email, fName, lName]
+    )
+    res.json({ message: "User created"});
+  }
+  catch (error) {
+    console.error("Database error: ", error);
+    res.status(500).json({ error: "Failed to create user" });
+  }
+});
+
 app.post("/createFolder", async (req, res) => {
   try {
     const { name, projectid, folder_id, type } = req.body;
