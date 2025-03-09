@@ -15,6 +15,11 @@ export default function ProjectPreview({ project }: { project: Project }) {
                 <p>Name: {project.name} </p>
                 <p>Version: </p>
                 <p>Date: </p>
+                {project.tags.length > 0 && (
+                    <p>Tags: {project.tags.map((tag, index) => (
+                        <span className='rounded-full m-2 p-2 bg-blue-600' key={index}>{tag.tag}</span>
+                    ))}</p>
+                )}
             </div>
             <div className='content-center'>
                 <button

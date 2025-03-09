@@ -15,7 +15,7 @@ export default function Breadcrumbs({projectID, project, routes}: BreadcrumbsPro
         const selectedFolders = routes.slice(0, (num + 1)).join('/');
         const route = `/project/${projectID}+${project.replace(/%2B/g, '+')}/${selectedFolders.replace(/%2B/g, '+')}`;
         router.push(route);
-      }
+    }
 
     return (
         <div id="breadcrumbs" className="flex flex-row text-2xl p-4 rounded-lg mx-8 my-4">

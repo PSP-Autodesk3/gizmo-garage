@@ -20,10 +20,15 @@ import 'react-loading-skeleton/dist/skeleton.css'
 import { Project } from "@/app/shared/interfaces/project";
 
 // Components
-import Filters from '@/app/shared/components/Filter';
+import Filters from '@/app/shared/components/filter';
 import SigningIn from '@/app/shared/components/signingIn';
 import AuthenticatePrompt from '@/app/shared/components/authenticatePrompt';
 import ProjectPreview from '@/app/shared/components/projectPreview';
+
+interface ProjectTags {
+  project_id: number,
+  tag: string
+}
 
 function Home() {
   const [user, loadingAuth] = useAuthState(auth);
@@ -34,8 +39,20 @@ function Home() {
   const [projects, setProjects] = useState<Project[]>([] as Project[]);
   const [loading, setLoading] = useState(true);
   const [loadingProjects, setLoadingProjects] = useState(true);
+  const [filteredProjects, setFilteredProjects] = useState<Project[]>([] as Project[]);
+  const [projectTags, setProjectTags] = useState<ProjectTags[]>([] as ProjectTags[]);
   const [query, setQuery] = useState<string>('');
 
+
+  useEffect(() => {
+    if (query.trim() == '') {
+      setFilteredProjects(projects);
+    }
+    else {
+      //display where the search equals the query or matches at least one of the tags
+      setFilteredProjects(projects.filter(project => project.name.toLowerCase().includes(query.trim()) || project.tags.some(tag => tag.tag.toLowerCase().includes(query.trim()))));
+    }
+  }, [query]);
   useEffect(() => {
     // Only runs if the user has logged in
     if (user) {
@@ -56,7 +73,23 @@ function Home() {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }
               })
-              setProjects(await data.json());
+              const tagData = await fetch(`/api/getProjectTags?email=${encodeURIComponent(user?.email)}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+              })          
+              
+              const result = await data.json();
+              const tagResult = await tagData.json();
+
+              setProjects(result);
+              setFilteredProjects(result);
+              setProjectTags(tagResult);
+
+              //assigns tags to projects
+              result.forEach((project: Project) => {
+                project.tags = tagResult.filter((tag: ProjectTags) => tag.project_id === project.project_id);
+              });
+
               if (!data.ok) {
                 setDatabaseErrorMessage("Database not found, contact your system administrator");
               }
@@ -162,16 +195,16 @@ function Home() {
               </div>
 
               {!loadingProjects ? (
-                projects.map((project, index) => (
+                filteredProjects.map((project, index) => (
                   <div className="project" key={index}>
                     <ProjectPreview project={project} />
                   </div>
                 ))
               ) : (
                 <>
-                  <div>
+                  <div className='flex justify-center'>
                     <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
-                      <Skeleton width={400} height={100} />
+                      <Skeleton width={600} height={125} count={4} style={{marginBottom: '16px'}} />
                     </SkeletonTheme>
                   </div>
                 </>

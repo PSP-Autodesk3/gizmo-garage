@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState, useCallback } from 'react';
 
 // Components
-import Filters from "@/app/shared/components/Filter"
+import Filters from "@/app/shared/components/filter"
 import FileList from "@/app/shared/components/fileList";
 import FolderList from "@/app/shared/components/folderList";
 import Breadcrumbs from "@/app/shared/components/breadcrumbs";
@@ -18,6 +18,17 @@ import ConfirmModule from "./components/confirmModule";
 import { ParamProps } from "@/app/shared/interfaces/paramProps";
 import { Folder } from "@/app/shared/interfaces/folder";
 import { File } from "@/app/shared/interfaces/file";
+import { Tag } from "@/app/shared/interfaces/tag";
+
+interface ItemTags {
+  object_id: number,
+  name: string
+}
+
+interface FolderTags {
+  folder_id: number,
+  name: string
+}
 
 function Home({ params }: ParamProps) {
   const router = useRouter();
@@ -34,6 +45,12 @@ function Home({ params }: ParamProps) {
   const [moduleType, setModuleType] = useState(0); // 1 = Folder, 2 = Item
   const [duplicate, setDuplicate] = useState(0); // 0 = off, 1 = folder, 2 = item
 
+  //for tags
+  const [alltags, setTags] = useState<Tag[]>([]);
+  const [filteredTags, setFilteredTags] = useState<Tag[]>([]);
+  const [filteredFolders, setFilteredFolders] = useState<Folder[]>([]);
+  const [filteredFiles, setFilteredFiles] = useState<File[]>([]);
+
   const getData = useCallback(async () => {
     const resolved = await params;
     if (resolved) {
@@ -44,7 +61,6 @@ function Home({ params }: ParamProps) {
 
       // Get and display tree structure
 
-      // Tracks current file
       let currentFolder: Folder | null = null as Folder | null;
 
       // Get folders in the project
@@ -128,27 +144,76 @@ function Home({ params }: ParamProps) {
 
       if (currentFolder) {
         setFolders(folders.filter((folder: Folder) => folder.parent_folder_id === currentFolder?.folder_id));
+        setFilteredFolders(folders.filter((folder: Folder) => folder.parent_folder_id === currentFolder?.folder_id));
       } else {
         setFolders(folders.filter((folder: Folder) => folder.parent_folder_id === null));
+        setFilteredFolders(folders.filter((folder: Folder) => folder.parent_folder_id === null));
       }
 
       // Get Files
 
-      query = await fetch("/api/getObjects", {
+      const objectQuery = await fetch("/api/getObjects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, type }),
       });
 
-      let response = await query.json();
-      setFiles(response);
-    }
+      let objects = await objectQuery.json();
+      setFiles(objects);
+      setFilteredFiles(objects);
 
+      // Get Tags
+
+      // All Tags
+      const getTagsQuery = await fetch("/api/getAllTags", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
+      });
+      let tagResponse = await getTagsQuery.json();
+      setTags(tagResponse);
+      setFilteredTags(tagResponse);
+
+      // Object Tags
+      const objectTagsQuery = await fetch("/api/getObjectTags", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
+      });
+      let objectTags = await objectTagsQuery.json();
+      console.log("objecttags", objectTags);
+
+      // Adds tags to folders
+      const folderTagsQuery = await fetch(`/api/getFolderTags?fileID=${encodeURIComponent(Number.parseInt(resolved.slug[0].split('%2B')[0]))}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      })
+
+      let folderTags = await folderTagsQuery.json();
+
+      folders.forEach((folder: Folder) => {
+        folder.tags = folderTags.filter((tag: FolderTags) => tag.folder_id === folder.folder_id);
+      });
+
+      // Adds tags to files
+      objects.forEach((file: File) => {
+        file.tags = objectTags.filter((tag: ItemTags) => tag.object_id === file.object_id);
+      });
+    }
   }, [params, id, type]);
 
   useEffect(() => {
     getData();
   }, [getData]);
+
+  useEffect(() => {
+    if (query.trim() == '') {
+      setFilteredFolders(folders);
+      setFilteredFiles(files);
+    }
+    else {
+      setFilteredFolders(folders.filter(folder => folder.name.toLowerCase().includes(query.trim()) || folder.tags.some(tag => tag.tag.toLowerCase().includes(query.trim()))));
+      setFilteredFiles(files.filter(file => file.name.toLowerCase().includes(query.trim()) || file.tags.some(tag => tag.tag.toLowerCase().includes(query.trim()))));
+    }
+  }, [query])
 
   return (
     <>
@@ -193,7 +258,7 @@ function Home({ params }: ParamProps) {
               <div id="folders" className="mx-8 my-4">
                 <h1 className="text-3xl my-4">Folders:</h1>
                 <FolderList
-                  folders={folders}
+                  folders={filteredFolders}
                 />
                 <button
                   className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 flex justify-center"
@@ -210,7 +275,7 @@ function Home({ params }: ParamProps) {
               <div id="files" className="mx-8 my-4">
                 <h1 className="my-4 text-3xl">Files</h1>
                 <FileList
-                  files={files}
+                  files={filteredFiles}
                 />
                 <button
                   className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 flex justify-center"
@@ -236,6 +301,9 @@ function Home({ params }: ParamProps) {
                 setConfirmModule={setConfirmModule}
                 setDuplicate={setDuplicate}
                 getData={getData}
+                filteredTags={filteredTags}
+                allTags={alltags}
+                setFilteredTags={setFilteredTags}
               />
             </div>
           )}
