@@ -12,7 +12,7 @@ export async function GET() {
     });
 
     const [rows] = await connection.execute(`
-      SELECT * FROM tag;
+      SELECT * FROM Tag;
     `);
     await connection.end();
     return NextResponse.json(rows);
