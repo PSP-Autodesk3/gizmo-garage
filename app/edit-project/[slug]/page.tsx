@@ -64,9 +64,12 @@ function Home({ params }: ParamProps) {
             const response = await exists.json();
 
             if (response[0]?.ProjectExists == 0) {
-                await fetch(`/api/changeProjectName?name=${encodeURIComponent(name)}&id=${projectID}`, {
-                    method: 'GET',
-                    headers: { 'Content-Type': 'application/json' }
+                await fetch("http://localhost:3001/projects/change-name", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ name, id: projectID })
                 });
             }
 

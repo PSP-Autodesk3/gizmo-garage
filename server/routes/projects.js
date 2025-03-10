@@ -20,4 +20,24 @@ router.post("/create", async (req, res, next) => {
     }
 });
 
+// Change project name
+router.post("/change-name", async (req, res, next) => {
+    try {
+        console.log("body:", req.body);
+        const {name, id} = req.body;
+        if (!name || name.trim() === "") {
+            return res.status(400).json({ error: "Missing 'name' parameter" });
+        }
+        const [rows] = await pool.execute(`
+            UPDATE Projects
+            SET name = ?
+            WHERE project_id = ?
+        `, [name, id]);
+        res.json({ message: "Updated project name", project_id: rows.insertId });
+    }
+    catch (error) {
+        next(error);
+    }
+})
+
 export default router;
