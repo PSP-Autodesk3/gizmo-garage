@@ -19,7 +19,7 @@ interface ModuleProps {
     setConfirmModule: (value: boolean) => void;
     setDuplicate: (value: number) => void;
 
-    getData: Function;
+    getData: () => Promise<void>;
     allTags: Tag[];
 
     filteredTags: Tag[];

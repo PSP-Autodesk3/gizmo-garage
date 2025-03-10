@@ -43,7 +43,6 @@ function Home() {
   const [projectTags, setProjectTags] = useState<ProjectTags[]>([] as ProjectTags[]);
   const [query, setQuery] = useState<string>('');
 
-
   useEffect(() => {
     if (query.trim() == '') {
       setFilteredProjects(projects);

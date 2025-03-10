@@ -64,7 +64,7 @@ function Home({ params }: ParamProps) {
       let currentFolder: Folder | null = null as Folder | null;
 
       // Get folders in the project
-      let query = await fetch(`/api/getProjectsFolders?projectID=${projectID}`, {
+      const query = await fetch(`/api/getProjectsFolders?projectID=${projectID}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       })
@@ -158,7 +158,7 @@ function Home({ params }: ParamProps) {
         body: JSON.stringify({ id, type }),
       });
 
-      let objects = await objectQuery.json();
+      const objects = await objectQuery.json();
       setFiles(objects);
       setFilteredFiles(objects);
 
@@ -169,7 +169,7 @@ function Home({ params }: ParamProps) {
         method: "GET",
         headers: { "Content-Type": "application/json" }
       });
-      let tagResponse = await getTagsQuery.json();
+      const tagResponse = await getTagsQuery.json();
       setTags(tagResponse);
       setFilteredTags(tagResponse);
 
@@ -178,8 +178,7 @@ function Home({ params }: ParamProps) {
         method: "GET",
         headers: { "Content-Type": "application/json" }
       });
-      let objectTags = await objectTagsQuery.json();
-      console.log("objecttags", objectTags);
+      const objectTags = await objectTagsQuery.json();
 
       // Adds tags to folders
       const folderTagsQuery = await fetch(`/api/getFolderTags?fileID=${encodeURIComponent(Number.parseInt(resolved.slug[0].split('%2B')[0]))}`, {
@@ -187,7 +186,7 @@ function Home({ params }: ParamProps) {
         headers: { "Content-Type": "application/json" },
       })
 
-      let folderTags = await folderTagsQuery.json();
+      const folderTags = await folderTagsQuery.json();
 
       folders.forEach((folder: Folder) => {
         folder.tags = folderTags.filter((tag: FolderTags) => tag.folder_id === folder.folder_id);
