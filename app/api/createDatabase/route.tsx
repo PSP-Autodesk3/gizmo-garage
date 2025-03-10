@@ -34,6 +34,7 @@ export async function POST() {
       CREATE TABLE IF NOT EXISTS Projects (
         project_id INT PRIMARY KEY AUTO_INCREMENT,
         name VARCHAR(255) NOT NULL,
+        dateOfCreation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         owner INT NOT NULL,
         FOREIGN KEY (owner) REFERENCES Users(user_id)
       );

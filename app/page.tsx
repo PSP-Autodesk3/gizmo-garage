@@ -26,6 +26,7 @@ interface Project {
   project_id: number,
   name: string,
   ownsProject: number,
+  dateOfCreation: Date,
   error: string,
   tags: projectTags[]
 }
@@ -82,11 +83,10 @@ function Home() {
               const tagData = await fetch(`/api/getProjectTags?email=${encodeURIComponent(user?.email)}`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }
-              })          
-              
+              })
+
               const result = await data.json();
               const tagResult = await tagData.json();
-
               setProjects(result);
               setFilteredProjects(result);
               setProjectTags(tagResult);
@@ -136,6 +136,16 @@ function Home() {
       </>
     )
   }
+
+  if (filteredProjects) {
+    //goes through each UTC date from the database and updates it to display in the current systems timezone
+    filteredProjects.forEach((project: Project) => {
+      var UTCDate = project.dateOfCreation
+      var localTimeDate = new Date(UTCDate); //found how to convert from UTC to system dateTime using this from stackOverflow, post by Hulvej on July 16th 2015: http://stackoverflow.com/questions/6525538/convert-utc-date-time-to-local-date-time - Jacob
+      project.dateOfCreation = localTimeDate
+    });
+  }
+
 
   // Displays if the user is logged in, but the database doesn't exist
   if (databaseErrorMessage) {
@@ -194,6 +204,18 @@ function Home() {
     )
   }
 
+  const handleSortBy = (event: any) => {
+    console.log(event.target.value);
+    if (event.target.value == "newest") {
+      //sort filteredProjects newest first
+      console.log("sort newest");
+    }
+    else if (event.target.value == "oldest") {
+      //sort filteredProjects oldest first
+      console.log("oldest");
+    }
+  };
+
   // Displays if all other information is valid
   return (
     <>
@@ -215,7 +237,13 @@ function Home() {
                   Create new Project
                 </button>
               </div>
-              
+
+              <label>Sort By:</label>
+              <select onChange={handleSortBy}>
+                <option value="newest" >newest</option>
+                <option value="oldest" >oldest</option>
+              </select>
+
               {!loadingProjects ? (
                 filteredProjects.map((project, index) => (
                   <div className="project" key={index}>
@@ -224,7 +252,7 @@ function Home() {
                         <div className='p-2 pr-10'>
                           <p>Name: {project.name} </p>
                           <p>Version: </p>
-                          <p>Date: </p>
+                          <p>Date: {project.dateOfCreation.toLocaleDateString()} {project.dateOfCreation.toLocaleTimeString()} </p>
                           {project.tags.length > 0 && (
                             <p>Tags: {project.tags.map((tag, index) => (
                               <span className='rounded-full m-2 p-2 bg-blue-600' key={index}>{tag.tag}</span>
@@ -253,7 +281,7 @@ function Home() {
                 <>
                   <div className='flex justify-center'>
                     <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
-                      <Skeleton width={600} height={125} count={4} style={{marginBottom: '16px'}} />
+                      <Skeleton width={600} height={125} count={4} style={{ marginBottom: '16px' }} />
                     </SkeletonTheme>
                   </div>
                 </>

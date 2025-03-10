@@ -15,7 +15,7 @@ export async function GET(request: Request) {
     });
 
     const [rows] = await connection.execute(`
-        SELECT Projects.project_id, Projects.name, 
+        SELECT Projects.project_id, Projects.name, Projects.dateOfCreation,
         CASE WHEN Projects.owner = Users.user_id THEN 1 ELSE 0 END AS ownsProject
         FROM Projects
         INNER JOIN Users ON Users.email = ?
