@@ -34,6 +34,22 @@ router.post("/create", async (req, res, next) => {
   }
 });
 
+// Get folders
+router.post("/get", async (req, res, next) => {
+  try {
+    const {id} = req.body;
+    const [result] = await pool.execute(`
+      SELECT *
+      FROM Folder
+      WHERE project_id = ?
+  `, [id]);
+    res.json(result);
+  }
+  catch (error) {
+    next(error);
+  }
+});
+
 // Check folder exists
 router.post("/exists", async (req, res, next) => {
   try {

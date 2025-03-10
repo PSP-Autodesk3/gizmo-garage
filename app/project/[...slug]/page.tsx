@@ -64,9 +64,10 @@ function Home({ params }: ParamProps) {
       let currentFolder: Folder | null = null as Folder | null;
 
       // Get folders in the project
-      const query = await fetch(`/api/getProjectsFolders?projectID=${projectID}`, {
-        method: "GET",
+      const query = await fetch(`http://localhost:3001/folders/get`, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: projectID})
       })
 
       const folders = await query.json();
