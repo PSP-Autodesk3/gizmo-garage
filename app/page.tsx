@@ -85,6 +85,7 @@ function Home() {
               setProjectTags(tagResult);
 
               //assigns tags to projects
+              console.log("Tagresult: " + tagResult);
               result.forEach((project: Project) => {
                 project.tags = tagResult.filter((tag: ProjectTags) => tag.project_id === project.project_id);
               });

@@ -15,11 +15,11 @@ export async function GET(request: Request) {
     });
 
     const [rows] = await connection.execute(`
-      SELECT DISTINCT object.project_id, tag.tag
+      SELECT DISTINCT Object.project_id, Tag.tag
        FROM Object_Tag
-       INNER JOIN tag ON Object_Tag.tag_id = tag.tag_id
-       INNER JOIN object ON Object_Tag.object_id = object.object_id
-       WHERE object.Project_id IN (SELECT Projects.project_id
+       INNER JOIN Tag ON Object_Tag.tag_id = Tag.tag_id
+       INNER JOIN Object ON Object_Tag.object_id = Object.object_id
+       WHERE Object.Project_id IN (SELECT Projects.project_id
        FROM Projects
        INNER JOIN Users ON Users.email = ?
        LEFT JOIN Editor ON Editor.project_id = Projects.project_id AND Editor.user_id = Users.user_id
