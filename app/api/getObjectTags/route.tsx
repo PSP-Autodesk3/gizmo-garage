@@ -1,11 +1,8 @@
 import { NextResponse } from "next/server";
 import mysql from "mysql2/promise";
 
-export async function GET(request: Request) {
+export async function GET() {
     try {
-        const { searchParams } = new URL(request.url);
-        const email = searchParams.get("email");
-
         const connection = await mysql.createConnection({
             host: process.env.DB_HOST,
             port: Number(process.env.DB_PORT),
@@ -20,7 +17,7 @@ export async function GET(request: Request) {
             INNER JOIN tag ON Object_Tag.tag_id = tag.tag_id
             WHERE object_id IN ( SELECT object_id
             FROM object)
-    `) //may have to modify this in future so it fetches less tags for efficiency
+    `) // May have to modify this in future so it fetches less tags for efficiency
         await connection.end();
         return NextResponse.json(rows);
     } catch (error) {

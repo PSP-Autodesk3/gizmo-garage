@@ -1,14 +1,16 @@
 "use client";
 
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { useEffect } from 'react';
-import BackBtnBar from '@/app/backBtnBar';
-
-// For Firebase Auth
+// Firebase
 import { auth } from '@/app/firebase/config';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import Permissions from '../projectPermissions';
+
+// Components
+import Permissions from '@/app/shared/components/projectPermissions';
+import BackBtnBar from '@/app/shared/components/backBtnBar';
+
+// Other
+import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
 export default function Home() {
     const [user] = useAuthState(auth);
@@ -40,10 +42,10 @@ export default function Home() {
 
                 if (response[0].user_id) {
                     const id = response[0].user_id;
-                    const createProject = await fetch(`/api/createProject`, {
+                    const createProject = await fetch(`http://localhost:3001/projects/create`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ name: name.trim(), id }),
+                        body: JSON.stringify({ name: name.trim(), owner: id }),
                     })
                     response = await createProject.json();
 
