@@ -40,4 +40,23 @@ router.post("/change-name", async (req, res, next) => {
     }
 })
 
+// Get projects
+router.post("/get", async (req, res, next) => {
+    try {
+        const {email} = req.body;
+        const [result] = await pool.execute(`
+            SELECT Projects.project_id, Projects.name, 
+            CASE WHEN Projects.owner = Users.user_id THEN 1 ELSE 0 END AS ownsProject
+            FROM Projects
+            INNER JOIN Users ON Users.email = ?
+            LEFT JOIN Editor ON Editor.project_id = Projects.project_id AND Editor.user_id = Users.user_id
+            WHERE Projects.owner = Users.user_id OR Editor.user_id IS NOT NULL;
+        `, [email]);
+        res.json(result);
+    }
+    catch (error) {
+        next(error);
+    }
+});
+
 export default router;
