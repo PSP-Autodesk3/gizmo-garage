@@ -153,7 +153,7 @@ function Home({ params }: ParamProps) {
 
       // Get Files
 
-      const objectQuery = await fetch("/api/getObjects", {
+      const objectQuery = await fetch("http://localhost:3001/items/get", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, type }),
