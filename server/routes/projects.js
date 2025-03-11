@@ -57,4 +57,99 @@ router.post("/get", async (req, res, next) => {
     }
 });
 
+router.post("/details", async (req, res, next) => {
+    try {
+        const { id } = req.body;
+
+        const [result] = await pool.execute(`
+            SELECT *
+            FROM Projects
+            WHERE project_id = ?
+        `, [id]);
+
+        res.json(result);
+    }
+    catch (error) {
+        next(error);
+    }
+});
+
+router.post("/editors", async (req, res, next) => {
+    try {
+        const { project_id } = req.body;
+
+        const [result] = await pool.execute(`
+            SELECT email
+            FROM Users
+            INNER JOIN Editor ON  Users.user_id = Editor.user_id
+            INNER JOIN Projects ON Editor.project_id = Projects.project_id
+            WHERE Projects.project_id = ?
+        `, [project_id]);
+
+        res.json(result);
+    }
+    catch (error) {
+        next(error);
+    }
+})
+
+router.post("/invited", async (req, res, next) => {
+    try {
+        const { project_id } = req.body;
+
+        const [result] = await pool.execute(`
+            SELECT email
+            FROM Users
+            INNER JOIN Invite ON  Users.user_id = Invite.user_id
+            INNER JOIN Projects ON Invite.project_id = Projects.project_id
+            WHERE Projects.project_id = ?
+        `, [project_id]);
+
+        res.json(result);
+    }
+    catch (error) {
+        next(error);
+    }
+})
+
+router.post("/exists", async (req, res, next) => {
+    try {
+        const { name, email } = req.body;
+
+        const [result] = await pool.execute(`
+            SELECT COUNT(*) AS ProjectExists
+            FROM Projects
+            WHERE name = ? AND owner = (SELECT user_id FROM Users WHERE email = ?)
+        `, [name, email]);
+
+        res.json(result);
+    }
+    catch (error) {
+        next(error);
+    }
+})
+
+router.post("/tags", async (req, res, next) => {
+    try {
+        const { email } = req.body;
+
+        const [result] = await pool.execute(`
+            SELECT DISTINCT Object.project_id, Tag.tag
+            FROM Object_Tag
+            INNER JOIN Tag ON Object_Tag.tag_id = Tag.tag_id
+            INNER JOIN Object ON Object_Tag.object_id = Object.object_id
+            WHERE Object.Project_id IN (SELECT Projects.project_id
+            FROM Projects
+            INNER JOIN Users ON Users.email = ?
+            LEFT JOIN Editor ON Editor.project_id = Projects.project_id AND Editor.user_id = Users.user_id
+            WHERE Projects.owner = Users.user_id OR Editor.user_id IS NOT NULL);
+        `, [email]);
+
+        res.json(result);
+    }
+    catch (error) {
+        next(error);
+    }
+})
+
 export default router;

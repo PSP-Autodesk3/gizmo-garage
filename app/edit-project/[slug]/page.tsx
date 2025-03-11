@@ -30,9 +30,10 @@ function Home({ params }: ParamProps) {
         if (resolvedParams) {
             setProjectID(Number.parseInt(resolvedParams.slug[0]));
 
-            const details = await fetch(`/api/getProjectDetails?id=${resolvedParams.slug}`, {
-                method: "GET",
-                headers: { 'Content-Type': 'application/json' }
+            const details = await fetch("http://localhost:3001/projects/details", {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: resolvedParams.slug })
             })
             const response = await details.json();
 
@@ -57,9 +58,10 @@ function Home({ params }: ParamProps) {
     const saveProject = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         if (name && name.trim() != "" && user?.email) {
-            const exists = await fetch(`/api/getProjectExists?name=${encodeURIComponent(name)}&email=${encodeURIComponent(user?.email)}`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
+            const exists = await fetch("http://localhost:3001/projects/exists", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email: user?.email })
             });
             const response = await exists.json();
 
@@ -75,7 +77,7 @@ function Home({ params }: ParamProps) {
 
             editors.forEach(async (editor) => {
                 console.log("Processing Email:", editor);
-                const inviteUser = await fetch(`/api/inviteUser`, {
+                const inviteUser = await fetch("http://localhost:3001/invites/send", {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: editor, project: name }),

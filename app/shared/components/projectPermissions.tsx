@@ -21,9 +21,10 @@ export default function Permissions({ project, editors, setEditors }: Permission
     useEffect(() => {
         if (project && project > 0) {
             const getAccounts = async () => {
-                const response = await fetch(`/api/getProjectEditors?project_id=${project}`, {
-                    method: 'GET',
-                    headers: { 'Content-Type': 'application/json' }
+                const response = await fetch("http://localhost:3001/projects/editors", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ project_id: project })
                 })
                 
                 const emailResponse = await response.json()
@@ -33,9 +34,10 @@ export default function Permissions({ project, editors, setEditors }: Permission
             getAccounts();
 
             const getInvited = async () => {
-                const response = await fetch(`/api/getProjectInvited?project_id=${project}`, {
+                const response = await fetch("http://localhost:3001/projects/invited", {
                     method: 'GET',
-                    headers: { 'Content-Type': 'application/json' }
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ project_id: project })
                 })
 
                 const emailResponse = await response.json();

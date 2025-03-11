@@ -73,9 +73,10 @@ function Home() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: user?.email })
               })
-              const tagData = await fetch(`/api/getProjectTags?email=${encodeURIComponent(user?.email)}`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
+              const tagData = await fetch("http://localhost:3001/projects/tags", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: user?.email })
               })          
               
               const result = await data.json();

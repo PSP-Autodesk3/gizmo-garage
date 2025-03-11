@@ -22,9 +22,10 @@ export default function Home() {
     const newProjectSubmitted = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         if (name != null && name.trim() != "" && user?.email) {
-            const exists = await fetch(`/api/getProjectExists?name=${encodeURIComponent(name.trim())}&email=${encodeURIComponent(user?.email)}`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
+            const exists = await fetch("http://localhost:3001/projects/exists", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: name.trim(), email: user?.email })
             });
             let response = await exists.json();
             if (response[0]?.ProjectExists == 1) {
@@ -34,9 +35,10 @@ export default function Home() {
                 }, 3000);
             }
             if (response[0]?.ProjectExists == 0 && user?.email) {
-                const getUser = await fetch(`/api/getUserDetails?email=${encodeURIComponent(user?.email)}`, {
-                    method: 'GET',
+                const getUser = await fetch("http://localhost:3001/users/details", {
+                    method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: user?.email })
                 })
                 response = await getUser.json();
 

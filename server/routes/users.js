@@ -19,7 +19,7 @@ router.post("/create", async (req, res, next) => {
 });
 
 // Get all firebase users
-router.get("/getUsers", async (req, res, next)=> {
+router.get("/get-users", async (req, res, next)=> {
     try {
         const adminAuth = getAuth();
         const listUsersResult = await adminAuth.listUsers();
@@ -37,12 +37,30 @@ router.get("/getUsers", async (req, res, next)=> {
 })
 
 // Update user status
-router.put("/updateStatus", async (req, res, next) => {
+router.put("/update-status", async (req, res, next) => {
     try {
         const { uid, disabled } = req.body;
         const adminAuth = getAuth();
         await adminAuth.updateUser(uid, { disabled });
         res.json({ message: "User status updated" });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+
+router.put("/details", async (req, res, next) => {
+    try {
+        const { email } = req.body;
+
+        const [result] = await pool.execute(`
+            SELECT *
+            FROM Users
+            WHERE Users.email = ?    
+        `, [email]
+        )
+
+        res.json(result);
     }
     catch (error) {
         next(error);
