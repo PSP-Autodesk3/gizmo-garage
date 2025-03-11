@@ -19,7 +19,7 @@ router.post("/create", async (req, res, next) => {
 });
 
 // Change project name
-router.post("/change-name", async (req, res, next) => {
+router.post("/changeName", async (req, res, next) => {
     try {
         console.log("body:", req.body);
         const {name, id} = req.body;

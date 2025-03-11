@@ -66,7 +66,7 @@ function Home({ params }: ParamProps) {
             const response = await exists.json();
 
             if (response[0]?.ProjectExists == 0) {
-                await fetch("http://localhost:3001/projects/change-name", {
+                await fetch("http://localhost:3001/projects/changeName", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"

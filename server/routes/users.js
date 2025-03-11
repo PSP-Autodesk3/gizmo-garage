@@ -19,7 +19,7 @@ router.post("/create", async (req, res, next) => {
 });
 
 // Get all firebase users
-router.get("/get-users", async (req, res, next)=> {
+router.get("/getUsers", async (req, res, next)=> {
     try {
         const adminAuth = getAuth();
         const listUsersResult = await adminAuth.listUsers();
@@ -37,7 +37,7 @@ router.get("/get-users", async (req, res, next)=> {
 })
 
 // Update user status
-router.put("/update-status", async (req, res, next) => {
+router.put("/updateStatus", async (req, res, next) => {
     try {
         const { uid, disabled } = req.body;
         const adminAuth = getAuth();
