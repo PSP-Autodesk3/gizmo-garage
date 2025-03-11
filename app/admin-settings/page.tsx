@@ -109,8 +109,8 @@ function Home() {
       if (!user) return;
 
       // Call the api route to update the user status
-      await fetch("/api/manageUserStatus", {
-        method: "POST",
+      await fetch("http://localhost:3001/users/updateStatus", {
+        method: "PUT",
         headers: {
           'Content-Type': 'application/json'
         },
@@ -119,9 +119,9 @@ function Home() {
           disabled: !user.disabled
         })
       })
-      // Changing what is appearing on the user interface
+
       setUsers(users.map(u => u.uid === uid ? // If the user is the one being updated, change the disabled status
-        { ...u, disabled: !u.disabled } : u)) // Otherwise, keep the user as is
+        { ...u, disabled: !u.disabled } : u))
     } catch (error) {
       console.error('Error disabling user:', error);
     }
@@ -226,7 +226,7 @@ function Home() {
             </div>
           </div>
         </>
-      )}
+      )};
     </>
   )
 }

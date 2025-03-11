@@ -36,4 +36,17 @@ router.get("/getUsers", async (req, res, next)=> {
     }
 })
 
+// Update user status
+router.put("/updateStatus", async (req, res, next) => {
+    try {
+        const { uid, disabled } = req.body;
+        const adminAuth = getAuth();
+        await adminAuth.updateUser(uid, { disabled });
+        res.json({ message: "User status updated" });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+
 export default router;
