@@ -52,7 +52,7 @@ export default function Home() {
                     if (response.error == null) {
                         editors.forEach(async (editor) => {
                             console.log("Processing Email:", editor);
-                            const inviteUser = await fetch(`/api/inviteUser`, {
+                            const inviteUser = await fetch(`http://localhost:3001/invites/send`, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({ email: editor, project: name.trim() }),

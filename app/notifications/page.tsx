@@ -21,7 +21,7 @@ function Home() {
     const [invites, setInvites] = useState<Invite[]>([]);
 
     const fetchInvites = async () => {
-        const invites = await fetch("/api/getUserInvites", {
+        const invites = await fetch("http://localhost:3001/invites/get", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email: user?.email })
@@ -39,7 +39,7 @@ function Home() {
     const acceptInvite = async (invite: Invite) => {
         declineInvite(invite);
 
-        await fetch("/api/addEditor", {
+        await fetch("http://localhost:3001/editors/add", {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: user?.email, project: invite.project_id })
@@ -48,7 +48,7 @@ function Home() {
 
     const declineInvite = async (invite: Invite) => {
         console.log("Invite:", invite);
-        await fetch("/api/deleteInvite", {
+        await fetch("http://localhost:3001/invites/remove", {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ owner: invite.user_id, project: invite.project, email: user?.email }),
