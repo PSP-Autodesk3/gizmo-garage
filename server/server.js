@@ -8,6 +8,7 @@ import usersRouter from "./routes/users.js"
 import foldersRouter from "./routes/folders.js";
 import itemsRouter from "./routes/items.js";
 import databaseRouter from "./routes/database.js";
+import tagsRouter from "./routes/tags.js";
 
 dotenv.config();
 const app = express();
@@ -29,6 +30,7 @@ app.use("/users", usersRouter);
 app.use("/folders", foldersRouter);
 app.use("/items", itemsRouter);
 app.use("/database", databaseRouter)
+app.use("/tags", tagsRouter);
 
 // Error handling middleware.
 app.use((err, res) => {

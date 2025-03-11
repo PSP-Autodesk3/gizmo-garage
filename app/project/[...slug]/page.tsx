@@ -166,7 +166,7 @@ function Home({ params }: ParamProps) {
       // Get Tags
 
       // All Tags
-      const getTagsQuery = await fetch("/api/getAllTags", {
+      const getTagsQuery = await fetch("http://localhost:3001/tags/getAll", {
         method: "GET",
         headers: { "Content-Type": "application/json" }
       });
@@ -175,16 +175,17 @@ function Home({ params }: ParamProps) {
       setFilteredTags(tagResponse);
 
       // Object Tags
-      const objectTagsQuery = await fetch("/api/getObjectTags", {
+      const objectTagsQuery = await fetch("http://localhost:3001/tags/getObject", {
         method: "GET",
         headers: { "Content-Type": "application/json" }
       });
       const objectTags = await objectTagsQuery.json();
 
       // Adds tags to folders
-      const folderTagsQuery = await fetch(`/api/getFolderTags?fileID=${encodeURIComponent(Number.parseInt(resolved.slug[0].split('%2B')[0]))}`, {
-        method: "GET",
+      const folderTagsQuery = await fetch(`http://localhost:3001/tags/getFolder`, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectid: projectID}),
       })
 
       const folderTags = await folderTagsQuery.json();

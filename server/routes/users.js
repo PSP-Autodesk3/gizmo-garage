@@ -10,7 +10,7 @@ router.post("/create", async (req, res, next) => {
         const [result] = await pool.execute(
             "INSERT INTO Users (email, fname, lname) VALUES (?, ?, ?)", [email, fName, lName]
         )
-        res.json({ message: "User created"});
+        res.json({ message: "User created", user_id: result.insertId });
     }
     catch (error) {
         next(error);
