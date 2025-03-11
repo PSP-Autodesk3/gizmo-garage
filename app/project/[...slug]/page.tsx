@@ -166,7 +166,7 @@ function Home({ params }: ParamProps) {
       // Get Tags
 
       // All Tags
-      const getTagsQuery = await fetch("/api/getAllTags", {
+      const getTagsQuery = await fetch("http://localhost:3001/tags/getAll", {
         method: "GET",
         headers: { "Content-Type": "application/json" }
       });
@@ -175,7 +175,7 @@ function Home({ params }: ParamProps) {
       setFilteredTags(tagResponse);
 
       // Object Tags
-      const objectTagsQuery = await fetch("http://localhost:3001/items/getTags", {
+      const objectTagsQuery = await fetch("http://localhost:3001/tags/getObject", {
         method: "GET",
         headers: { "Content-Type": "application/json" }
       });
