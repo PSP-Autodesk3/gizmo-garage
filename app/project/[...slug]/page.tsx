@@ -175,7 +175,7 @@ function Home({ params }: ParamProps) {
       setFilteredTags(tagResponse);
 
       // Object Tags
-      const objectTagsQuery = await fetch("/api/getObjectTags", {
+      const objectTagsQuery = await fetch("http://localhost:3001/items/getTags", {
         method: "GET",
         headers: { "Content-Type": "application/json" }
       });
