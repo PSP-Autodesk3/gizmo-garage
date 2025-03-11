@@ -1,14 +1,16 @@
 "use client";
 
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { useEffect } from 'react';
-import BackBtnBar from '@/app/backBtnBar';
-
-// For Firebase Auth
+// Firebase
 import { auth } from '@/app/firebase/config';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import Permissions from '../projectPermissions';
+
+// Components
+import Permissions from '@/app/shared/components/projectPermissions';
+import BackBtnBar from '@/app/shared/components/backBtnBar';
+
+// Other
+import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
 export default function Home() {
     const [user] = useAuthState(auth);
@@ -20,9 +22,10 @@ export default function Home() {
     const newProjectSubmitted = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         if (name != null && name.trim() != "" && user?.email) {
-            const exists = await fetch(`/api/getProjectExists?name=${encodeURIComponent(name.trim())}&email=${encodeURIComponent(user?.email)}`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
+            const exists = await fetch("http://localhost:3001/projects/exists", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: name.trim(), email: user?.email })
             });
             let response = await exists.json();
             if (response[0]?.ProjectExists == 1) {
@@ -32,25 +35,26 @@ export default function Home() {
                 }, 3000);
             }
             if (response[0]?.ProjectExists == 0 && user?.email) {
-                const getUser = await fetch(`/api/getUserDetails?email=${encodeURIComponent(user?.email)}`, {
-                    method: 'GET',
+                const getUser = await fetch("http://localhost:3001/users/details", {
+                    method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: user?.email })
                 })
                 response = await getUser.json();
 
                 if (response[0].user_id) {
                     const id = response[0].user_id;
-                    const createProject = await fetch(`/api/createProject`, {
+                    const createProject = await fetch(`http://localhost:3001/projects/create`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ name: name.trim(), id }),
+                        body: JSON.stringify({ name: name.trim(), owner: id }),
                     })
                     response = await createProject.json();
 
                     if (response.error == null) {
                         editors.forEach(async (editor) => {
                             console.log("Processing Email:", editor);
-                            const inviteUser = await fetch(`/api/inviteUser`, {
+                            const inviteUser = await fetch(`http://localhost:3001/invites/send`, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({ email: editor, project: name.trim() }),

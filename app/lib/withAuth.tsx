@@ -37,7 +37,7 @@ export default function withAuth<T extends object>(
             router.push("/");
           } else if (user && !sessionToken) {
             // If the user is signed in, not autodesk authenticated, but the database doesn't exist, add admin-settings to the protected page
-            const response = await fetch("/api/getDatabaseExists");
+            const response = await fetch("http://localhost:3001/database/exists");
             const exists = await response.json();
             if (exists[0]?.DatabaseExists === 0 && pathname !== "/admin-settings") {
               router.push("/");

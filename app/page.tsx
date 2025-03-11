@@ -12,21 +12,22 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
+// Skeleton Loading
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 
-//components
-import Filters from './Filter';
-// import NavItem from './Filter';
-import SigningIn from './signingIn';
-// import Image from 'next/image';
+// Interfaces
+import { Project } from "@/app/shared/interfaces/project";
 
-// Format returned by api call to getProjects
-interface Project {
+// Components
+import Filters from '@/app/shared/components/filter';
+import SigningIn from '@/app/shared/components/signingIn';
+import AuthenticatePrompt from '@/app/shared/components/authenticatePrompt';
+import ProjectPreview from '@/app/shared/components/projectPreview';
+
+interface ProjectTags {
   project_id: number,
-  name: string,
-  ownsProject: number,
-  error: string
+  tag: string
 }
 
 function Home() {
@@ -38,17 +39,28 @@ function Home() {
   const [projects, setProjects] = useState<Project[]>([] as Project[]);
   const [loading, setLoading] = useState(true);
   const [loadingProjects, setLoadingProjects] = useState(true);
+  const [filteredProjects, setFilteredProjects] = useState<Project[]>([] as Project[]);
+  const [projectTags, setProjectTags] = useState<ProjectTags[]>([] as ProjectTags[]);
   const [query, setQuery] = useState<string>('');
 
+  useEffect(() => {
+    if (query.trim() == '') {
+      setFilteredProjects(projects);
+    }
+    else {
+      //display where the search equals the query or matches at least one of the tags
+      setFilteredProjects(projects.filter(project => project.name.toLowerCase().includes(query.trim()) || project.tags.some(tag => tag.tag.toLowerCase().includes(query.trim()))));
+    }
+  }, [query]);
   useEffect(() => {
     // Only runs if the user has logged in
     if (user) {
       // Runs APIs
       const getDatabaseData = async () => {
         // Checks if db exists
-        const response = await fetch("/api/getDatabaseExists");
+        const response = await fetch("http://localhost:3001/database/exists");
         const exists = await response.json();
-        if (exists[0]?.DatabaseExists !== 1 || exists.error === "Failed to check database status") {
+        if (exists?.DatabaseExists !== 1 || exists.error === "Failed to check database status") {
           setDatabaseErrorMessage("Database not found, contact your system administrator");
         }
         // Checks if the AutoDesk Auth token is set in session storage before accessing APIs
@@ -56,11 +68,30 @@ function Home() {
           // Gets projects that the user has access to
           const fetchProjectData = async () => {
             if (user?.email) {
-              const data = await fetch(`/api/getProjects?email=${encodeURIComponent(user?.email)}`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
+              const data = await fetch(`http://localhost:3001/projects/get`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: user?.email })
               })
-              setProjects(await data.json());
+              const tagData = await fetch("http://localhost:3001/projects/tags", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: user?.email })
+              })          
+              
+              const result = await data.json();
+              const tagResult = await tagData.json();
+
+              setProjects(result);
+              setFilteredProjects(result);
+              setProjectTags(tagResult);
+
+              //assigns tags to projects
+              console.log("Tagresult: " + tagResult);
+              result.forEach((project: Project) => {
+                project.tags = tagResult.filter((tag: ProjectTags) => tag.project_id === project.project_id);
+              });
+
               if (!data.ok) {
                 setDatabaseErrorMessage("Database not found, contact your system administrator");
               }
@@ -139,23 +170,7 @@ function Home() {
   // Displays if the user doesn't have a valid token
   if (!sessionStorage.getItem('token')) {
     return (
-      <div className="float-right my-2 mx-4 space-x-4">
-        <button
-          onClick={() => router.push(`https://developer.api.autodesk.com/authentication/v2/authorize?response_type=code&client_id=${process.env.NEXT_PUBLIC_AUTODESK_CLIENT_ID}&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fredirect&scope=${encodeURIComponent("data:read bucket:create bucket:read")}`)}
-          className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
-        >
-          Authenticate with AutoDesk
-        </button>
-        {loginErrorMessage && (
-          <div id="error-message">
-            <p>{loginErrorMessage}</p>
-            <p>Open the console to view more details</p>
-          </div>
-        )}
-        <Link href="/signout" className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">
-          Sign Out
-        </Link>
-      </div>
+      <AuthenticatePrompt loginErrorMessage={loginErrorMessage} />
     )
   }
 
@@ -180,40 +195,18 @@ function Home() {
                   Create new Project
                 </button>
               </div>
-              
+
               {!loadingProjects ? (
-                projects.map((project, index) => (
+                filteredProjects.map((project, index) => (
                   <div className="project" key={index}>
-                    <div id="folders">
-                      <div className="bg-slate-900 p-4 m-auto rounded-lg shadow-lg mx-8 my-4 flex flex-row justify-between">
-                        <div className='p-2 pr-10'>
-                          <p>Name: {project.name} </p>
-                          <p>Version: </p>
-                          <p>Date: </p>
-                        </div>
-                        <div className='content-center'>
-                          <button
-                            className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
-                            onClick={() => router.push(`/project/${project.project_id}+${project.name.replace(/ /g, '+')}`)}
-                          >
-                            View
-                          </button>
-                          <button
-                            className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
-                            onClick={() => router.push(`/edit-project/${project.project_id}`)}
-                          >
-                            Edit
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+                    <ProjectPreview project={project} />
                   </div>
                 ))
               ) : (
                 <>
-                  <div>
+                  <div className='flex justify-center'>
                     <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
-                      <Skeleton width={400} height={100} />
+                      <Skeleton width={600} height={125} count={4} style={{marginBottom: '16px'}} />
                     </SkeletonTheme>
                   </div>
                 </>
