@@ -182,9 +182,10 @@ function Home({ params }: ParamProps) {
       const objectTags = await objectTagsQuery.json();
 
       // Adds tags to folders
-      const folderTagsQuery = await fetch(`/api/getFolderTags?fileID=${encodeURIComponent(Number.parseInt(resolved.slug[0].split('%2B')[0]))}`, {
-        method: "GET",
+      const folderTagsQuery = await fetch(`http://localhost:3001/tags/getFolder`, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectid: projectID}),
       })
 
       const folderTags = await folderTagsQuery.json();
