@@ -39,7 +39,7 @@ function Home() {
     // Fetch users
     const fetchUsers = async () => {
       try {
-        const response = await fetch('/api/getAllUsers');
+        const response = await fetch("http://localhost:3001/users/getUsers");
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`); // Was for debugging a silly error i was getting.
         const data = await response.json();
         setUsers(data.users || []);

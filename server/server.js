@@ -1,6 +1,22 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import { initializeApp, cert } from 'firebase-admin/app';
+
+// Initialise Firebase Admin
+try {
+  initializeApp({
+    credential: cert({
+      projectId: process.env.FIREBASE_ADMIN_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    }),
+  });
+  console.log('Firebase Admin initialised successfully');
+} catch (error) {
+  console.error('Firebase Admin initialisation error:', error);
+}
+
 
 // Router imports
 import projectsRouter from "./routes/projects.js";

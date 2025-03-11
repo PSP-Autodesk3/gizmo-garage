@@ -1,5 +1,6 @@
 import express from "express";
 import pool from "../db.js";
+import { getAuth } from 'firebase-admin/auth';
 
 const router = express.Router();
 
@@ -16,5 +17,23 @@ router.post("/create", async (req, res, next) => {
         next(error);
     }
 });
+
+// Get all firebase users
+router.get("/getUsers", async (req, res, next)=> {
+    try {
+        const adminAuth = getAuth();
+        const listUsersResult = await adminAuth.listUsers();
+        const users = listUsersResult.users.map((userRecord) => ({
+            uid: userRecord.uid,
+            email: userRecord.email,
+            disabled: userRecord.disabled
+        }));
+
+        res.json({ users });
+    }
+    catch (error) {
+        next(error);
+    }
+})
 
 export default router;
