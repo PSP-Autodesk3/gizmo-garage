@@ -1,19 +1,24 @@
 "use client";
 
-import { useRouter } from 'next/navigation';
-import { useState, useEffect, useCallback } from 'react';
-import BackBtnBar from '@/app/backBtnBar';
+// Middleware
+import withAuth from "@/app/lib/withAuth";
 
-// For Firebase Auth
+// Firebase
 import { auth } from '@/app/firebase/config';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import Permissions from '../../projectPermissions';
 
-interface PageProps {
-    params: Promise<{ slug: string }>;
-  }
+// Components
+import Permissions from '@/app/shared/components/projectPermissions';
+import BackBtnBar from '@/app/shared/components/backBtnBar';
 
-export default function Home({ params }: PageProps) {
+// Other
+import { useRouter } from 'next/navigation';
+import { useState, useEffect, useCallback } from 'react';
+
+// Interfaces
+import { ParamProps } from "@/app/shared/interfaces/paramProps";
+
+function Home({ params }: ParamProps) {
     const [user] = useAuthState(auth);
     const router = useRouter();
     const [name, setName] = useState("");
@@ -23,14 +28,15 @@ export default function Home({ params }: PageProps) {
     const getProjectID = useCallback(async () => {
         const resolvedParams = await params;
         if (resolvedParams) {
-            setProjectID(Number.parseInt(resolvedParams.slug));
-    
-            const details = await fetch(`/api/getProjectDetails?id=${resolvedParams.slug}`, {
-                method: "GET",
-                headers: { 'Content-Type': 'application/json' }
+            setProjectID(Number.parseInt(resolvedParams.slug[0]));
+
+            const details = await fetch("http://localhost:3001/projects/details", {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: resolvedParams.slug })
             })
             const response = await details.json();
-    
+
             if (response[0].name) {
                 setName(response[0].name);
             }
@@ -41,7 +47,7 @@ export default function Home({ params }: PageProps) {
         getProjectID();
     }, [getProjectID]);
 
-    
+
 
     useEffect(() => {
         if (!user || !sessionStorage.getItem('token')) {
@@ -52,22 +58,26 @@ export default function Home({ params }: PageProps) {
     const saveProject = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         if (name && name.trim() != "" && user?.email) {
-            const exists = await fetch(`/api/getProjectExists?name=${encodeURIComponent(name)}&email=${encodeURIComponent(user?.email)}`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
+            const exists = await fetch("http://localhost:3001/projects/exists", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email: user?.email })
             });
             const response = await exists.json();
 
             if (response[0]?.ProjectExists == 0) {
-                await fetch(`/api/changeProjectName?name=${encodeURIComponent(name)}&id=${projectID}`, {
-                    method: 'GET',
-                    headers: { 'Content-Type': 'application/json' }
+                await fetch("http://localhost:3001/projects/changeName", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ name, id: projectID })
                 });
             }
 
             editors.forEach(async (editor) => {
                 console.log("Processing Email:", editor);
-                const inviteUser = await fetch(`/api/inviteUser`, {
+                const inviteUser = await fetch("http://localhost:3001/invites/send", {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: editor, project: name }),
@@ -103,3 +113,5 @@ export default function Home({ params }: PageProps) {
         </div>
     )
 }
+
+export default withAuth(Home);
