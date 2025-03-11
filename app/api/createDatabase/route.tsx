@@ -65,7 +65,8 @@ export async function POST() {
         project_id INT NOT NULL,
         FOREIGN KEY (project_id) REFERENCES Projects(project_id),
         parent_folder_id INT,
-        FOREIGN KEY (parent_folder_id) REFERENCES Folder(folder_id)
+        FOREIGN KEY (parent_folder_id) REFERENCES Folder(folder_id),
+        dateOfCreation TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
 
@@ -79,7 +80,8 @@ export async function POST() {
         FOREIGN KEY (project_id) REFERENCES Projects(project_id),
         folder_id INT,
         FOREIGN KEY (folder_id) REFERENCES Folder(folder_id),
-        bucket_id INT DEFAULT NULL
+        bucket_id INT DEFAULT NULL,
+        dateOfCreation TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
 

@@ -26,12 +26,14 @@ interface Folder {
   folder_id: number;
   name: string;
   tags: tags[];
+  dateOfCreation: Date;
   parent_folder_id: number | null;
 }
 
 interface File {
   object_id: number;
   name: string;
+  dateOfCreation: Date;
   tags: tags[];
 }
 
@@ -77,6 +79,12 @@ function Home({ params }: PageProps) {
   const [Filteredfolders, setFilteredFolders] = useState<Folder[]>([]);
   const [Filteredfiles, setFilteredFiles] = useState<File[]>([]);
   const [alreadyApplied, setAlreadyApplied] = useState(0);
+
+  const [FolderSortBy, SetFolderSortBy] = useState('newest');
+  const [FileSortBy, SetFileSortBy] = useState('newest');
+
+  const sortArray = require('sort-array');
+
 
   const getData = useCallback(async () => {
     const resolved = await params;
@@ -198,7 +206,7 @@ function Home({ params }: PageProps) {
           const details = document.createElement("details");
           details.className = "pl-6";
           if (newValid)
-          details.open = true;
+            details.open = true;
 
           // Creates a summary tag, which is the preview text
           const summary = document.createElement("summary");
@@ -412,19 +420,31 @@ function Home({ params }: PageProps) {
   }
 
 
-  useEffect(() => {
-    console.log("testsdasd:", Filteredfolders);
-  }, [folders])
 
-  console.log("foldejnjnjrs:", folders);
-
-  folders.map((folder, index) => {
-    if (folder.tags) {
-      console.log(`Tags in Folder ${index}:`, folder.tags);
-    } else {
-      console.log(`No tags in Folder ${index}`);
+  const handleFolderSortBy = (event: any) => {
+    SetFolderSortBy(event.target.value)
+    if (FolderSortBy == "newest") {
+      //sort filteredfolders newest first
+      setFilteredFolders(sortArray(Filteredfolders, { by: 'dateOfCreation', order: 'asc' }))
     }
-  });
+    else if (FolderSortBy == "oldest") {
+      //sort filteredfolders oldest first
+      setFilteredFolders(sortArray(Filteredfolders, { by: 'dateOfCreation', order: 'desc' }))
+    }
+  };
+
+  const handleFileSortBy = (event: any) => {
+    SetFileSortBy(event.target.value)
+    if (FileSortBy == "newest") {
+      //sort filteredfolders newest first
+      setFilteredFolders(sortArray(Filteredfiles, { by: 'dateOfCreation', order: 'asc' }))
+    }
+    else if (FileSortBy == "oldest") {
+      //sort filteredfolders oldest first
+      setFilteredFolders(sortArray(Filteredfiles, { by: 'dateOfCreation', order: 'desc' }))
+    }
+
+  }
 
   return (
     <>
@@ -479,6 +499,13 @@ function Home({ params }: PageProps) {
               )}
               <div id="folders" className="mx-8 my-4">
                 <h1 className="text-3xl my-4">Folders:</h1>
+
+                <label>Sort By:</label>
+                <select onChange={handleFolderSortBy}>
+                  <option value="newest" >newest</option>
+                  <option value="oldest" >oldest</option>
+                </select>
+
                 <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
                   {!Filteredfolders ? (
                     <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
@@ -494,6 +521,7 @@ function Home({ params }: PageProps) {
                           >
                             {folder.name}
                           </button>
+                          <span>{folder.dateOfCreation.toString()}</span>
                           {Array.isArray(folder.tags) && folder.tags.length > 0 && (
                             folder.tags.map((tag) => (
                               <span className='rounded-full m-2 p-2 bg-blue-600 self-center' key={tag.tag_id}>
@@ -515,6 +543,13 @@ function Home({ params }: PageProps) {
                 </button>
                 <div id="files" className=" my-4">
                   <h1 className="my-4 text-3xl">Files:</h1>
+
+                  <label>Sort By:</label>
+                  <select onChange={handleFileSortBy}>
+                    <option value="newest" >newest</option>
+                    <option value="oldest" >oldest</option>
+                  </select>
+
                   <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
                     {!Filteredfolders ? (
                       <>
@@ -535,6 +570,7 @@ function Home({ params }: PageProps) {
                               >
                                 {file.name}
                               </button>
+                              <span>{file.dateOfCreation.toString()} {file.dateOfCreation.toString()}</span>
                               {Array.isArray(file.tags) && file.tags.length > 0 && (
                                 file.tags.map((tag) => (
                                   <span className='rounded-full m-2 p-2 bg-blue-600 self-center' key={tag.tag_id}>

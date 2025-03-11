@@ -15,6 +15,7 @@ import { useEffect, useState } from 'react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 
+
 //components
 import Filters from './Filter';
 // import NavItem from './Filter';
@@ -49,6 +50,9 @@ function Home() {
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([] as Project[]);
   const [projectTags, setProjectTags] = useState<projectTags[]>([] as projectTags[])
   const [query, setQuery] = useState<string>('');
+  const [SortBy, SetSortBy] = useState('newest');
+
+  const sortArray = require('sort-array') //libarary used for sorting filter: https://www.npmjs.com/package/sort-array
 
 
   useEffect(() => {
@@ -204,17 +208,19 @@ function Home() {
     )
   }
 
+
   const handleSortBy = (event: any) => {
-    console.log(event.target.value);
-    if (event.target.value == "newest") {
+    SetSortBy(event.target.value)
+    if (SortBy == "newest") {
       //sort filteredProjects newest first
-      console.log("sort newest");
+      setFilteredProjects(sortArray(filteredProjects,{by: 'dateOfCreation', order:'asc'}))   //made using the sort-array library https://www.npmjs.com/package/sort-array   
     }
-    else if (event.target.value == "oldest") {
+    else if (SortBy == "oldest") {
       //sort filteredProjects oldest first
-      console.log("oldest");
+      setFilteredProjects(sortArray(filteredProjects,{by: 'dateOfCreation', order:'desc'}))
     }
   };
+
 
   // Displays if all other information is valid
   return (
