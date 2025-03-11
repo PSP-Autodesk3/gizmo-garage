@@ -49,14 +49,14 @@ router.put("/update-status", async (req, res, next) => {
     }
 });
 
-router.put("/details", async (req, res, next) => {
+router.post("/details", async (req, res, next) => {
     try {
         const { email } = req.body;
 
         const [result] = await pool.execute(`
             SELECT *
             FROM Users
-            WHERE Users.email = ?    
+            WHERE Users.email = ?
         `, [email]
         )
 
