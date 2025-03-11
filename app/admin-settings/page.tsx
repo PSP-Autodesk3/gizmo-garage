@@ -26,9 +26,12 @@ function Home() {
   useEffect(() => {
     if (databaseExists === 2) {
       const getDatabaseExists = async () => {
-        const response = await fetch("/api/getDatabaseExists");
+        const response = await fetch("http://localhost:3001/database/exists", {
+          method: "GET",
+          headers: { 'Content-Type': 'application/json' }
+        });
         const exists = await response.json();
-        setDatabaseExists(exists.DatabaseExists);
+        setDatabaseExists(exists?.DatabaseExists);
       }
       getDatabaseExists();
     }
@@ -81,8 +84,9 @@ function Home() {
   }
 
   const confirmSetupDatabase = async () => {
-    const response = await fetch("/api/createDatabase", {
-      method: "POST"
+    const response = await fetch("http://localhost:3001/database/create", {
+      method: "GET",
+      headers: { 'Content-Type': 'application/json' }
     });
     setConfirmModule(false);
     if (response.ok) {

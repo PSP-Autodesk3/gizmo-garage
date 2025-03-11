@@ -58,9 +58,9 @@ function Home() {
       // Runs APIs
       const getDatabaseData = async () => {
         // Checks if db exists
-        const response = await fetch("/api/getDatabaseExists");
+        const response = await fetch("http://localhost:3001/database/exists");
         const exists = await response.json();
-        if (exists[0]?.DatabaseExists !== 1 || exists.error === "Failed to check database status") {
+        if (exists?.DatabaseExists !== 1 || exists.error === "Failed to check database status") {
           setDatabaseErrorMessage("Database not found, contact your system administrator");
         }
         // Checks if the AutoDesk Auth token is set in session storage before accessing APIs

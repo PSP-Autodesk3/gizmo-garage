@@ -1,14 +1,17 @@
 import express from "express";
-import pool from "../db.js";
+import openPool from '../no-db.js';
+import { getPool } from '../db.js';
 
 const router = express.Router();
 
 // Create database
-router.post("/create", async (res, next) => {
+router.get("/create", async (_req, res, next) => {
   try {
     // Create database, drop if exists
-    await pool.execute("DROP DATABASE IF EXISTS gizmo_garage");
-    await pool.execute("CREATE DATABASE gizmo_garage");
+    await openPool.execute("DROP DATABASE IF EXISTS gizmo_garage");
+    await openPool.execute("CREATE DATABASE gizmo_garage");
+
+    const pool = getPool();
 
     // Create tables
     await pool.execute(`
@@ -102,8 +105,8 @@ router.post("/create", async (res, next) => {
           FOREIGN KEY (tag_id) REFERENCES Tag(tag_id)
         );
       `);
-
-    res.json({ message: "Database created successfully", affectedRows: result.affectedRows });
+    
+    res.json({ message: "Database created successfully" });
   }
   catch (error) {
     next(error);
@@ -111,13 +114,13 @@ router.post("/create", async (res, next) => {
 });
 
 // Check database exists
-router.get("/exists", async (res, next) => {
+router.get("/exists", async (_req, res, next) => {
   try {
-    const [result] = await pool.execute(`
-            SELECT COUNT(*) AS DatabaseExists 
-            FROM INFORMATION_SCHEMA.SCHEMATA 
-            WHERE SCHEMA_NAME = 'gizmo_garage';
-        `
+    const [result] = await openPool.execute(`
+      SELECT COUNT(*) AS DatabaseExists
+      FROM INFORMATION_SCHEMA.SCHEMATA
+      WHERE SCHEMA_NAME = 'gizmo_garage';
+    `
     );
     return res.json(result[0]);
   }

@@ -14,6 +14,15 @@ const app = express();
 app.use(express.json());
 app.use(cors({ origin: "http://localhost:3000" }));
 
+const startDatabase = async () => {
+  const exists = await fetch("http://localhost:3001/database/exists");
+  const response = await exists.json();
+  if (response?.DatabaseExists === 0) {
+    await fetch("http://localhost:3001/database/create");
+  }
+}
+startDatabase();
+
 // Routes
 app.use("/projects", projectsRouter);
 app.use("/users", usersRouter);
