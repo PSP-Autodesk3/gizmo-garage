@@ -127,7 +127,6 @@ function Home({ params }: PageProps) {
       })
 
       let objectTags = await query.json();
-      console.log("objecttags", objectTags)
 
       // Get folders
       let folderQuery = await fetch("/api/getFolders", {
@@ -137,8 +136,11 @@ function Home({ params }: PageProps) {
       });
 
       let folderResponse = await folderQuery.json();
-      setFolders(folderResponse);
-      setFilteredFolders(folderResponse);
+
+      //defaults it to newest first
+      let sortedFolders =  sortArray(folderResponse, { by: 'dateOfCreation', order: 'desc' })
+      setFolders(sortedFolders);
+      setFilteredFolders(sortedFolders);
 
       //adds tags to folders
       query = await fetch(`/api/getFolderTags?fileID=${encodeURIComponent(Number.parseInt(resolved.slug[0].split('%2B')[0]))}`, {
@@ -162,13 +164,35 @@ function Home({ params }: PageProps) {
       });
 
       let objectResults = await objectQuery.json();
-      setFiles(objectResults);
-      setFilteredFiles(objectResults);
+
+      let sortedObjects = sortArray(objectResults, { by: 'dateOfCreation', order: 'desc' })
+      setFiles(sortedObjects);
+      setFilteredFiles(sortedObjects);
 
       //adds tags to files
       objectResults.forEach((file: File) => {
         file.tags = objectTags.filter((tag: itemTags) => tag.object_id === file.object_id);
       });
+
+      if (Filteredfiles) {
+        //goes through each UTC date from the database and updates it to display in the current systems timezone
+        Filteredfiles.forEach((file: File) => {
+          var UTCDate = file.dateOfCreation
+          var localTimeDate = new Date(UTCDate);
+          file.dateOfCreation = localTimeDate
+        });
+      }
+
+      
+      if (Filteredfolders) {
+        //goes through each UTC date from the database and updates it to display in the current systems timezone
+        Filteredfolders.forEach((Folder: Folder) => {
+          var UTCDate = Folder.dateOfCreation
+          var localTimeDate = new Date(UTCDate);
+          Folder.dateOfCreation = localTimeDate
+        });
+      }
+
 
       // GET AND DISPLAY THE TREE STRUCTURE
 
@@ -176,6 +200,7 @@ function Home({ params }: PageProps) {
       query = await fetch(`/api/getProjectsFolders?projectID=${encodeURIComponent(Number.parseInt(resolved.slug[0].split('%2B')[0]))}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
+
       })
 
       const folders = await query.json();
@@ -377,7 +402,6 @@ function Home({ params }: PageProps) {
   }
 
   useEffect(() => {
-    console.log("query:", query);
     if (query.trim() == '') {
       setFilteredFolders(folders);
       setFilteredFiles(files);
@@ -388,48 +412,18 @@ function Home({ params }: PageProps) {
     }
   }, [query])
 
-  useEffect(() => {
-    console.log("test:", Filteredfiles);
-  }, [files])
-
-  {
-    Array.isArray(Filteredfolders) && Filteredfolders.length > 0 && (
-      Filteredfolders.map((folder) => {
-        console.log('Folder:', folder); // Log the entire folder object
-        console.log('Tags for folder:', folder.tags); // Log the tags array for each folder
-
-        return (
-          <div key={folder.folder_id}>
-            <button
-              className="bg-slate-900 rounded-lg text-xl my-4 px-4 py-2"
-              onClick={() => { router.push(pathname + `/${folder.name.replace(/ /g, '+')}`); }}
-            >
-              {folder.name}
-            </button>
-            {Array.isArray(folder.tags) && folder.tags.length > 0 && (
-              folder.tags.map((tag) => (
-                <span className='rounded-full m-2 p-2 bg-blue-600 self-center' key={tag.tag_id}>
-                  {tag.tag}
-                </span>
-              ))
-            )}
-          </div>
-        );
-      })
-    )
-  }
-
-
 
   const handleFolderSortBy = (event: any) => {
     SetFolderSortBy(event.target.value)
     if (FolderSortBy == "newest") {
       //sort filteredfolders newest first
       setFilteredFolders(sortArray(Filteredfolders, { by: 'dateOfCreation', order: 'asc' }))
+      console.log("filtered folders", Filteredfolders);
     }
     else if (FolderSortBy == "oldest") {
       //sort filteredfolders oldest first
       setFilteredFolders(sortArray(Filteredfolders, { by: 'dateOfCreation', order: 'desc' }))
+      console.log("filtered folders", Filteredfolders);
     }
   };
 
@@ -437,11 +431,11 @@ function Home({ params }: PageProps) {
     SetFileSortBy(event.target.value)
     if (FileSortBy == "newest") {
       //sort filteredfolders newest first
-      setFilteredFolders(sortArray(Filteredfiles, { by: 'dateOfCreation', order: 'asc' }))
+      setFilteredFiles(sortArray(Filteredfiles, { by: 'dateOfCreation', order: 'asc' }))
     }
     else if (FileSortBy == "oldest") {
       //sort filteredfolders oldest first
-      setFilteredFolders(sortArray(Filteredfiles, { by: 'dateOfCreation', order: 'desc' }))
+      setFilteredFiles(sortArray(Filteredfiles, { by: 'dateOfCreation', order: 'desc' }))
     }
 
   }
@@ -521,7 +515,7 @@ function Home({ params }: PageProps) {
                           >
                             {folder.name}
                           </button>
-                          <span>{folder.dateOfCreation.toString()}</span>
+                          <span>{new Date(folder.dateOfCreation).toLocaleDateString()} {new Date(folder.dateOfCreation).toLocaleTimeString()}</span>
                           {Array.isArray(folder.tags) && folder.tags.length > 0 && (
                             folder.tags.map((tag) => (
                               <span className='rounded-full m-2 p-2 bg-blue-600 self-center' key={tag.tag_id}>
@@ -570,7 +564,7 @@ function Home({ params }: PageProps) {
                               >
                                 {file.name}
                               </button>
-                              <span>{file.dateOfCreation.toString()} {file.dateOfCreation.toString()}</span>
+                              <span>{new Date(file.dateOfCreation).toLocaleDateString()} {new Date(file.dateOfCreation).toLocaleTimeString()}</span>
                               {Array.isArray(file.tags) && file.tags.length > 0 && (
                                 file.tags.map((tag) => (
                                   <span className='rounded-full m-2 p-2 bg-blue-600 self-center' key={tag.tag_id}>
