@@ -91,8 +91,11 @@ function Home() {
 
               const result = await data.json();
               const tagResult = await tagData.json();
-              setProjects(result);
-              setFilteredProjects(result);
+
+              const sortedResult = sortArray(result,{by: 'dateOfCreation', order:'desc'});
+
+              setProjects(sortedResult);
+              setFilteredProjects(sortedResult);
               setProjectTags(tagResult);
 
               //assigns tags to projects
