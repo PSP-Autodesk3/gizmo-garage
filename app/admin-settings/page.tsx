@@ -23,7 +23,7 @@ function Home() {
   const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [password, setPassword] = useState('');
-  const [resetEmail, setResetEmail] = useState<string>(''); // Tracking which email is going to be reset
+  const [resetEmail, setResetEmail] = useState<string>(''); 
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -44,7 +44,7 @@ function Home() {
       try {
         setIsLoading(true);
         const response = await fetch("http://localhost:3001/users/getUsers");
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`); // Was for debugging a silly error i was getting.
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`); 
         const data = await response.json();
         setUsers(data.users || []);
       } catch (error) {
@@ -67,7 +67,7 @@ function Home() {
         setTimeout(() => {
           popupPasswordResAlert?.classList.remove('show');
           popupPasswordResAlert?.classList.add('hidden');
-        }, 3000); // Hide after 3 seconds
+        }, 3000); 
       })
       .catch((err) => {
         alert(err.message);
@@ -114,7 +114,6 @@ function Home() {
       const user = users.find(u => u.uid === uid)
       if (!user) return;
 
-      // Call the api route to update the user status
       await fetch("http://localhost:3001/users/updateStatus", {
         method: "PUT",
         headers: {
@@ -126,12 +125,13 @@ function Home() {
         })
       })
 
-      setUsers(users.map(u => u.uid === uid ? // If the user is the one being updated, change the disabled status
+      setUsers(users.map(u => u.uid === uid ? 
         { ...u, disabled: !u.disabled } : u))
     } catch (error) {
       console.error('Error disabling user:', error);
     }
   };
+  
   // Validate password and then reset the database
   const validatePasswordAndReset = async () => {
     const currentUser = auth.currentUser;
@@ -257,7 +257,6 @@ function Home() {
                 </div>
               ))
             ) : (
-              // No users found message
               <div className="text-center text-slate-400 py-4">
                 No users found
               </div>
