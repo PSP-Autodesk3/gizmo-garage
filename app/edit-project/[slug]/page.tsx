@@ -93,22 +93,34 @@ function Home({ params }: ParamProps) {
     return (
         <div>
             <BackBtnBar />
-            <div className="bg-slate-900 py-4 px-8 rounded-lg flex flex-row w-[50%] m-auto my-16 justify-center items-center">
-                <form onSubmit={(e) => saveProject(e)}>
-                    <label htmlFor="name" className="text-2xl my-8">Project Name:</label>
-                    <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        className="rounded-lg bg-slate-800 p-2 m-8 text-2xl"
-                    />
-                    <button
-                        className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
-                    >
-                        Save
-                    </button>
-                </form>
-                <Permissions project={projectID} editors={editors} setEditors={setEditors} />
+            <div className="flex min-h-screen">
+                {/* Center Project Name Section */}
+                <div className="flex-1 flex justify-center items-start mt-16">
+                    <div className="bg-slate-900 py-8 px-12 rounded-lg w-auto">
+                        <form onSubmit={(e) => saveProject(e)} className="flex flex-col items-center">
+                            <div className='flex items-center justify-between w-full mb-8'>
+                                <label htmlFor="name" className="text-2xl text-slate-200 whitespace-nowrap">
+                                    Edit Project Name:
+                                </label>
+                                <input
+                                    type="text"
+                                    value={name}
+                                    placeholder="Edit Project Name"
+                                    onChange={(e) => setName(e.target.value)}
+                                    className="rounded-lg bg-slate-800 p-2 text-2xl ml-4 w-[300px] text-white"
+                                />
+                            </div>
+                            <button className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">
+                                Save Changes
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                {/* Right Side Permissions */}
+                <div className="w-[400px] pr-4 mr-16">
+                    <Permissions project={projectID} editors={editors} setEditors={setEditors} />
+                </div>
             </div>
         </div>
     )
