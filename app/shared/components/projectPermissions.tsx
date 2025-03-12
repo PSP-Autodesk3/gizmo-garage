@@ -47,7 +47,7 @@ export default function Permissions({ project, editors, setEditors }: Permission
             }
             getInvited();
         }
-    }, [project])
+    }, [project, setEditors])
 
     if (project) {
         return (
@@ -93,7 +93,10 @@ export default function Permissions({ project, editors, setEditors }: Permission
                                     <tr key={index} className="border-t border-slate-800">
                                         <td className="p-2 text-slate-400">{invite.email}</td>
                                         <td className="p-2 text-right">
-                                            <button className="px-4 py-2 text-sm font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">
+                                            <button
+                                                // onClick={() => handleDeleteInvite(invite.email)}
+                                                className="px-4 py-2 text-sm font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                                            >
                                                 Delete
                                             </button>
                                         </td>

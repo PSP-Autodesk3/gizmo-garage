@@ -53,7 +53,7 @@ function Home() {
       }
     };
     fetchUsers();
-  }, []);
+  }, [databaseExists]);
 
   // Reusing Adam's password reset function.
   function resetPassword(email: string) {

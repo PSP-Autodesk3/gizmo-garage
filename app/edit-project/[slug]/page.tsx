@@ -53,7 +53,7 @@ function Home({ params }: ParamProps) {
         if (!user || !sessionStorage.getItem('token')) {
             router.push("/");
         }
-    }, [user])
+    }, [user, router]);
 
     const saveProject = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -119,7 +119,7 @@ function Home({ params }: ParamProps) {
 
                 {/* Right Side Permissions */}
                 <div className="w-[400px] pr-4 mr-16">
-                    <Permissions project={projectID} editors={editors} setEditors={setEditors} />
+                    <Permissions project={projectID} editors={editors} setEditors={setEditors}/>
                 </div>
             </div>
         </div>

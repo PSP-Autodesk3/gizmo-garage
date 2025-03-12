@@ -80,7 +80,7 @@ export default function Home() {
         if (!user || !sessionStorage.getItem('token')) {
             router.push("/");
         }
-    }, [user])
+    }, [user, router]);
 
     return (
         <div>
@@ -109,7 +109,7 @@ export default function Home() {
                 {/* Right Side Permissions */}
                 <div className="w-[400px] pr-4 mr-16 mt-16">
                     <div className="bg-slate-900 p-4 rounded-lg shadow-lg mt-4">
-                        <Permissions editors={editors} setEditors={setEditors} />
+                        <Permissions editors={editors} setEditors={setEditors}/>
                     </div>
                 </div>
             </div>
