@@ -143,9 +143,7 @@ const EmailSender = ({ editors, setEditors }: EmailSenderProps) => {
     };
 
     const sendInvite = async (e: React.FormEvent<HTMLFormElement>) => {
-        console.log("Prevented 1");
         e.preventDefault();
-        console.log("Prevented");
         setEmailError("");
 
         if (!editors.includes(email.toLowerCase()) && user?.email !== email.toLowerCase()) {
@@ -175,12 +173,10 @@ const EmailSender = ({ editors, setEditors }: EmailSenderProps) => {
                 setEditors([...editors, email.toLowerCase()]);
                 setEmail("");
             } else {
-                console.log("Invalid email");
                 setEmailError("Please enter a valid email address");
                 return;
             }
         } else {
-            console.log("Email already exists");
             setEmailError("This email has already been added");
             return;
         }

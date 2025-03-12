@@ -39,7 +39,6 @@ function Home() {
       getDatabaseExists();
     }
 
-    // Fetch users
     const fetchUsers = async () => {
       try {
         setIsLoading(true);
@@ -107,7 +106,6 @@ function Home() {
     }
   }
 
-  // Disabling a user
   const handleDisableUser = async (uid: string) => {
     try {
       // Get the current user status
@@ -131,8 +129,7 @@ function Home() {
       console.error('Error disabling user:', error);
     }
   };
-  
-  // Validate password and then reset the database
+
   const validatePasswordAndReset = async () => {
     const currentUser = auth.currentUser;
     if (!currentUser?.email || !password){

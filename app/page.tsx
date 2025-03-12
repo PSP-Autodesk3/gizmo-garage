@@ -13,7 +13,6 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 // Skeleton Loading
-import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 
 // Interfaces
