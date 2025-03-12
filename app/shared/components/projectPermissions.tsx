@@ -29,13 +29,15 @@ export default function Permissions({ project, editors, setEditors }: Permission
                 
                 const emailResponse = await response.json()
                 updateEmails(emailResponse);
-                setEditors(emailResponse[0].email.toLowerCase());
+                if (emailResponse && emailResponse.length > 0) {
+                    setEditors(emailResponse[0].email.toLowerCase());
+                }
             }
             getAccounts();
 
             const getInvited = async () => {
                 const response = await fetch("http://localhost:3001/projects/invited", {
-                    method: 'GET',
+                    method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ project_id: project })
                 })
