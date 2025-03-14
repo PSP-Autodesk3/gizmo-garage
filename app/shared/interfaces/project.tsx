@@ -6,4 +6,5 @@ export interface Project {
     ownsProject: number;
     error: string;
     tags: Tag[];
+    dateOfCreation: Date;
 }

@@ -43,7 +43,7 @@ router.post("/get", async (req, res, next) => {
     try {
         const {email} = req.body;
         const [result] = await pool.execute(`
-            SELECT Projects.project_id, Projects.name, 
+            SELECT Projects.project_id, Projects.name, Projects.dateOfCreation,
             CASE WHEN Projects.owner = Users.user_id THEN 1 ELSE 0 END AS ownsProject
             FROM Projects
             INNER JOIN Users ON Users.email = ?

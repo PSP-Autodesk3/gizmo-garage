@@ -30,7 +30,7 @@ export default function FolderList({ folders }: { folders: Folder[] }) {
                             >
                                 {folder.name}
                             </button>
-                            {Array.isArray(folder.tags) && folder.tags.length > 0 && (
+                            <span>{folder.dateOfCreation.toLocaleDateString()} {folder.dateOfCreation.toLocaleTimeString()}</span>                            {Array.isArray(folder.tags) && folder.tags.length > 0 && (
                                 folder.tags.map((tag) => (
                                     <span className='rounded-full m-2 p-2 bg-blue-600 self-center' key={tag.tag_id}>
                                         {tag.tag}

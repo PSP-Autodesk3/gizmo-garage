@@ -14,7 +14,7 @@ export default function ProjectPreview({ project }: { project: Project }) {
             <div className='p-2 pr-10'>
                 <p>Name: {project.name} </p>
                 <p>Version: </p>
-                <p>Date: </p>
+                <p>Date: {project.dateOfCreation.toLocaleDateString()} {project.dateOfCreation.toLocaleTimeString()} </p>
                 {project.tags.length > 0 && (
                     <p>Tags: {project.tags.map((tag, index) => (
                         <span className='rounded-full m-2 p-2 bg-blue-600' key={index}>{tag.tag}</span>
