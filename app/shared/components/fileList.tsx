@@ -28,6 +28,7 @@ export default function FileList({ files }: { files: File[] }) {
                             >
                                 {file.name}
                             </button>
+                            <span>{file.dateOfCreation.toLocaleDateString()} {file.dateOfCreation.toLocaleTimeString()}</span>
                             {Array.isArray(file.tags) && file.tags.length > 0 && (
                                 file.tags.map((tag) => (
                                   <span className='rounded-full m-2 p-2 bg-blue-600 self-center' key={tag.tag_id}>

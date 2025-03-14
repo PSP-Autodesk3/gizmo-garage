@@ -34,6 +34,7 @@ router.get("/create", async (_req, res, next) => {
           name VARCHAR(255) NOT NULL,
           owner INT NOT NULL,
           FOREIGN KEY (owner) REFERENCES Users(user_id)
+          dateOfCreation TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
       `);
 
@@ -62,7 +63,8 @@ router.get("/create", async (_req, res, next) => {
           project_id INT NOT NULL,
           FOREIGN KEY (project_id) REFERENCES Projects(project_id),
           parent_folder_id INT,
-          FOREIGN KEY (parent_folder_id) REFERENCES Folder(folder_id)
+          FOREIGN KEY (parent_folder_id) REFERENCES Folder(folder_id),
+          dateOfCreation TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
       `);
 

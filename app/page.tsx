@@ -42,6 +42,10 @@ function Home() {
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([] as Project[]);
   const [projectTags, setProjectTags] = useState<ProjectTags[]>([] as ProjectTags[]);
   const [query, setQuery] = useState<string>('');
+  const [sortBy, setSortBy] = useState('newest');
+
+  const sortArray = require('sort-array') //libarary used for sorting filter: https://www.npmjs.com/package/sort-array
+
 
   useEffect(() => {
     if (query.trim() == '') {
@@ -77,8 +81,8 @@ function Home() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: user?.email })
-              })          
-              
+              })
+
               const result = await data.json();
               const tagResult = await tagData.json();
 
@@ -174,6 +178,25 @@ function Home() {
     )
   }
 
+  //goes through each UTC date from the database and updates it to display in the current systems timezone
+  if (filteredProjects) {
+    filteredProjects.forEach((project: Project) => {
+      var UTCDate = project.dateOfCreation
+      var localTimeDate = new Date(UTCDate); //found how to convert from UTC to system dateTime using this from stackOverflow, post by Hulvej on July 16th 2015: http://stackoverflow.com/questions/6525538/convert-utc-date-time-to-local-date-time - Jacob
+      project.dateOfCreation = localTimeDate
+    });
+  }
+
+  const handleSortBy = (event: any) => {
+    setSortBy(event.target.value)
+    if (sortBy == "newest") {
+      setFilteredProjects(sortArray(filteredProjects, { by: 'dateOfCreation', order: 'asc' })) //made using the sort-array library https://www.npmjs.com/package/sort-array 
+    }
+    else if (sortBy == "oldest") {
+      setFilteredProjects(sortArray(filteredProjects, { by: 'dateOfCreation', order: 'desc' }))
+    }
+  }
+
   // Displays if all other information is valid
   return (
     <>
@@ -195,7 +218,11 @@ function Home() {
                   Create new Project
                 </button>
               </div>
-
+              <label>Sort By:</label>
+              <select onChange={handleSortBy}>
+                <option value="newest" >newest</option>
+                <option value="oldest" >oldest</option>
+              </select>
               {!loadingProjects ? (
                 filteredProjects.map((project, index) => (
                   <div className="project" key={index}>
@@ -206,7 +233,7 @@ function Home() {
                 <>
                   <div className='flex justify-center'>
                     <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
-                      <Skeleton width={600} height={125} count={4} style={{marginBottom: '16px'}} />
+                      <Skeleton width={600} height={125} count={4} style={{ marginBottom: '16px' }} />
                     </SkeletonTheme>
                   </div>
                 </>

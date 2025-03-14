@@ -44,12 +44,16 @@ function Home({ params }: ParamProps) {
   const [type, setType] = useState(0);
   const [moduleType, setModuleType] = useState(0); // 1 = Folder, 2 = Item
   const [duplicate, setDuplicate] = useState(0); // 0 = off, 1 = folder, 2 = item
+  const [folderSortBy, setFolderSortBy] = useState('newest');
+  const [fileSortBy, setFileSortBy] = useState('newest');
 
   //for tags
   const [alltags, setTags] = useState<Tag[]>([]);
   const [filteredTags, setFilteredTags] = useState<Tag[]>([]);
   const [filteredFolders, setFilteredFolders] = useState<Folder[]>([]);
   const [filteredFiles, setFilteredFiles] = useState<File[]>([]);
+
+  const sortArray = require('sort-array');
 
   const getData = useCallback(async () => {
     const resolved = await params;
@@ -67,10 +71,16 @@ function Home({ params }: ParamProps) {
       const query = await fetch(`http://localhost:3001/folders/get`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: projectID})
+        body: JSON.stringify({ id: projectID })
       })
 
+      
       const folders = await query.json();
+
+      //defaults it to newest first
+      const sortedFolders =  sortArray(folders, { by: 'dateOfCreation', order: 'desc' })
+      setFolders(sortedFolders);
+      setFilteredFolders(sortedFolders);
 
       // Base information to be passed to outputFolder
       const baseFolders = folders.filter((folder: Folder) => folder.parent_folder_id === null);
@@ -160,8 +170,9 @@ function Home({ params }: ParamProps) {
       });
 
       const objects = await objectQuery.json();
-      setFiles(objects);
-      setFilteredFiles(objects);
+      const sortedObjects =  sortArray(objects, { by: 'dateOfCreation', order: 'desc' })
+      setFiles(sortedObjects);
+      setFilteredFiles(sortedObjects);
 
       // Get Tags
 
@@ -185,7 +196,7 @@ function Home({ params }: ParamProps) {
       const folderTagsQuery = await fetch(`http://localhost:3001/tags/getFolder`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ projectid: projectID}),
+        body: JSON.stringify({ projectid: projectID }),
       })
 
       const folderTags = await folderTagsQuery.json();
@@ -215,6 +226,48 @@ function Home({ params }: ParamProps) {
       setFilteredFiles(files.filter(file => file.name.toLowerCase().includes(query.trim()) || file.tags.some(tag => tag.tag.toLowerCase().includes(query.trim()))));
     }
   }, [query])
+
+  //handling sort by
+  const handleFolderSortBy = (event: any) => {
+    setFolderSortBy(event.target.value);
+    if (folderSortBy == "newest") {
+      //sort filteredfolders newest first
+      setFilteredFolders(sortArray(filteredFolders, { by: 'dateOfCreation', order: 'asc' }))
+    }
+    else if (folderSortBy == "oldest") {
+      //sort filteredfolders oldest first
+      setFilteredFolders(sortArray(filteredFolders, { by: 'dateOfCreation', order: 'desc' }))
+    }
+  }
+
+  const handleFileSortBy = (event: any) => {
+    setFileSortBy(event.target.value)
+    if (fileSortBy == "newest") {
+      setFilteredFiles(sortArray(filteredFiles, { by: 'dateOfCreation', order: 'asc' }))
+    }
+    else if (fileSortBy == "oldest") {
+      //sort filteredfolders oldest first
+      setFilteredFiles(sortArray(filteredFiles, { by: 'dateOfCreation', order: 'desc' }))
+    }
+  }
+
+
+  //goes through each UTC date from the database and updates it to display in the current systems timezone
+  if (filteredFiles) {
+    filteredFiles.forEach((file: File) => {
+      var UTCDate = file.dateOfCreation
+      var localTimeDate = new Date(UTCDate);
+      file.dateOfCreation = localTimeDate
+    });
+  }
+  
+  if (filteredFolders) {
+    filteredFolders.forEach((Folder: Folder) => {
+      var UTCDate = Folder.dateOfCreation
+      var localTimeDate = new Date(UTCDate);
+      Folder.dateOfCreation = localTimeDate
+    });
+  }
 
   return (
     <>
@@ -258,6 +311,11 @@ function Home({ params }: ParamProps) {
               {/* Folders */}
               <div id="folders" className="mx-8 my-4">
                 <h1 className="text-3xl my-4">Folders:</h1>
+                <label>Sort By:</label>
+                <select onChange={handleFolderSortBy}>
+                  <option value="newest" >newest</option>
+                  <option value="oldest" >oldest</option>
+                </select>
                 <FolderList
                   folders={filteredFolders}
                 />
@@ -274,7 +332,12 @@ function Home({ params }: ParamProps) {
 
               {/* Files */}
               <div id="files" className="mx-8 my-4">
-                <h1 className="my-4 text-3xl">Files</h1>
+                <h1 className="my-4 text-3xl">Files:</h1>
+                <label>Sort By:</label>
+                <select onChange={handleFileSortBy}>
+                  <option value="newest" >newest</option>
+                  <option value="oldest" >oldest</option>
+                </select>
                 <FileList
                   files={filteredFiles}
                 />
