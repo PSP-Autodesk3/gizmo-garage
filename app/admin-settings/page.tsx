@@ -5,17 +5,16 @@ import withAuth from "@/app/lib/withAuth";
 
 // Other
 import { useState, useEffect } from 'react'
-import BackBtnBar from '../backBtnBar';
 
-//Firebase
+// Components
+import BackBtnBar from '@/app/shared/components/backBtnBar';;
+
+// Firebase
 import { auth } from '@/app/firebase/config';
 import { sendPasswordResetEmail } from 'firebase/auth';
 
-interface User {
-  uid: string;
-  email: string;
-  disabled: boolean;
-}
+// Interfaces
+import { User } from '@/app/shared/interfaces/user';
 
 function Home() {
   const [databaseExists, setDatabaseExists] = useState(2);
@@ -27,11 +26,12 @@ function Home() {
   useEffect(() => {
     if (databaseExists === 2) {
       const getDatabaseExists = async () => {
-        const response = await fetch("/api/getDatabaseExists");
+        const response = await fetch("http://localhost:3001/database/exists", {
+          method: "GET",
+          headers: { 'Content-Type': 'application/json' }
+        });
         const exists = await response.json();
-        if (exists[0].DatabaseExists != null) {
-          setDatabaseExists(exists[0].DatabaseExists);
-        }
+        setDatabaseExists(exists?.DatabaseExists);
       }
       getDatabaseExists();
     }
@@ -39,10 +39,10 @@ function Home() {
     // Fetch users
     const fetchUsers = async () => {
       try {
-        const response = await fetch('/api/getAllUsers');
+        const response = await fetch("http://localhost:3001/users/getUsers");
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`); // Was for debugging a silly error i was getting.
         const data = await response.json();
-        setUsers(data.users || []); 
+        setUsers(data.users || []);
       } catch (error) {
         console.error('Error fetching users:', error);
       }
@@ -68,7 +68,7 @@ function Home() {
       });
   }
 
-  const filteredUsers = users.filter((user: User) => 
+  const filteredUsers = users.filter((user: User) =>
     user.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -84,8 +84,9 @@ function Home() {
   }
 
   const confirmSetupDatabase = async () => {
-    const response = await fetch("/api/createDatabase", {
-      method: "POST"
+    const response = await fetch("http://localhost:3001/database/create", {
+      method: "GET",
+      headers: { 'Content-Type': 'application/json' }
     });
     setConfirmModule(false);
     if (response.ok) {
@@ -94,12 +95,12 @@ function Home() {
       popupAlert?.classList.add('show');
       popupAlert?.classList.remove('hidden');
       setTimeout(() => {
-          popupAlert?.classList.remove('show');
-          popupAlert?.classList.add('hidden');
+        popupAlert?.classList.remove('show');
+        popupAlert?.classList.add('hidden');
       }, 3000); // Hide after 3 seconds
     }
   }
-  
+
   // Disabling a user
   const handleDisableUser = async (uid: string) => {
     try {
@@ -108,19 +109,19 @@ function Home() {
       if (!user) return;
 
       // Call the api route to update the user status
-      await fetch("/api/manageUserStatus", {
-        method: "POST",
-        headers:{
-          'Content-Type': 'application/json' 
+      await fetch("http://localhost:3001/users/updateStatus", {
+        method: "PUT",
+        headers: {
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           uid,
           disabled: !user.disabled
         })
       })
-      // Changing what is appearing on the user interface
+
       setUsers(users.map(u => u.uid === uid ? // If the user is the one being updated, change the disabled status
-        {...u, disabled: !u.disabled} : u)) // Otherwise, keep the user as is
+        { ...u, disabled: !u.disabled } : u))
     } catch (error) {
       console.error('Error disabling user:', error);
     }
@@ -129,16 +130,16 @@ function Home() {
 
   return (
     <>
-      <BackBtnBar/>
+      <BackBtnBar />
       <h1 className="text-3xl font-semibold text-slate-200 w-[40%] m-auto mb-2 mt-16">
         Admin Settings
       </h1>
       {/* Database Reset Popup */}
       <div className="fixed bottom-0 left-50 right-0 m-4 rounded-lg bg-indigo-500 p-2 text-white text-center text-sm popup hidden">
-        {(databaseExists == 1) ? ( <h1 className="text-xl font-bold">Database Reset.</h1> ) : ( <h1 className="text-xl font-bold">Database Created.</h1> )}
+        {(databaseExists == 1) ? (<h1 className="text-xl font-bold">Database Reset.</h1>) : (<h1 className="text-xl font-bold">Database Created.</h1>)}
       </div>
       <div className="fixed bottom-0 left-50 right-0 m-4 rounded-lg bg-indigo-500 p-2 text-white text-center text-sm popup hidden">
-        {(databaseExists == 1) ? ( <h1 className="text-xl font-bold">Database Reset.</h1> ) : ( <h1 className="text-xl font-bold">Database Created.</h1> )}
+        {(databaseExists == 1) ? (<h1 className="text-xl font-bold">Database Reset.</h1>) : (<h1 className="text-xl font-bold">Database Created.</h1>)}
       </div>
       {/* Password Reset Popup */}
       <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 m-4 rounded-lg bg-indigo-500 p-2 text-white text-center text-sm password-reset-popup hidden">
@@ -151,11 +152,12 @@ function Home() {
       </h2>
       <div className="bg-slate-900 p-4 w-[40%] mx-auto rounded-lg shadow-lg mt-4">
         <p className="mb-2">Reset the content of the database, to fix potential database related problems.</p>
-        {(databaseExists == 1) ? (
-          <button className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50" onClick={() => setupDatabase()}>Reset Database Content</button>
-        ) : (
-          <button className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50" onClick={() => setupDatabase()}>Initialise Database</button>
-        )}
+        <button
+          className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+          onClick={() => setupDatabase()}
+        >
+          {databaseExists === 1 ? 'Reset Database Content' : 'Initialise Database'}
+        </button>
       </div>
       {/* User Management */}
       <h2 className="text-xl font-semibold text-slate-200 w-[40%] mx-auto mb-2 mt-6">
@@ -189,16 +191,16 @@ function Home() {
               </div>
               <div className="flex justify-between items-center">
                 <p className="text-indigo-500 hover:underline cursor-pointer mt-3"
-                onClick={() => resetPassword(user.email)}
+                  onClick={() => resetPassword(user.email)}
                 > Reset Password</p>
                 {/* Disabling Accounts Toggle*/}
                 {/* Link where I got the button: https://flowbite.com/docs/forms/toggle/ */}
-                <label className="inline-flex items-center cursor-pointer"> 
-                  <input 
-                  type="checkbox" 
-                  className="sr-only peer" 
-                  checked={!user.disabled} 
-                  onChange={() => handleDisableUser(user.uid)}
+                <label className="inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={!user.disabled}
+                    onChange={() => handleDisableUser(user.uid)}
                   />
                   <div className="relative w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-600 dark:peer-checked:bg-green-600"></div>
                   <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
@@ -215,7 +217,7 @@ function Home() {
         <>
           <div className="fixed inset-0 flex items-center justify-center bg-opacity-95 bg-slate-900 w-[40%] h-[40%] m-auto rounded-3xl shadow-lg p-8">
             <div className="text-center">
-              <h1 className='text-3xl'>This will clear all data.</h1> 
+              <h1 className='text-3xl'>This will clear all data.</h1>
               <strong>This action is irreversible.</strong> <p>Are you sure you want to continue?</p>
               <div className="mt-4">
                 <button className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50" onClick={confirmSetupDatabase}>Yes</button>
@@ -224,7 +226,7 @@ function Home() {
             </div>
           </div>
         </>
-      )}
+      )};
     </>
   )
 }
