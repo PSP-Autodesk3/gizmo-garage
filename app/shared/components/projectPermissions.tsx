@@ -21,7 +21,7 @@ export default function Permissions({ project, editors, setEditors }: Permission
     useEffect(() => {
         if (project && project > 0) {
             const getAccounts = async () => {
-                const response = await fetch("http://localhost:3001/projects/editors", {
+                const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/projects/editors`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ project_id: project })
@@ -34,7 +34,7 @@ export default function Permissions({ project, editors, setEditors }: Permission
             getAccounts();
 
             const getInvited = async () => {
-                const response = await fetch("http://localhost:3001/projects/invited", {
+                const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/projects/invited`, {
                     method: 'GET',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ project_id: project })
@@ -120,9 +120,7 @@ const EmailSender = ({ editors, setEditors }: EmailSenderProps) => {
     };
 
     const sendInvite = async (e: React.FormEvent<HTMLFormElement>) => {
-        console.log("Prevented 1");
         e.preventDefault();
-        console.log("Prevented");
 
         if (!editors.includes(email.toLowerCase()) && user?.email !== email.toLowerCase()) {
             console.log(editors);
