@@ -22,7 +22,7 @@ export default function Home() {
     const newProjectSubmitted = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         if (name != null && name.trim() != "" && user?.email) {
-            const exists = await fetch("http://localhost:3001/projects/exists", {
+            const exists = await fetch(`http://${process.env.SERVER_HOST}:3001/projects/exists`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: name.trim(), email: user?.email })
@@ -35,7 +35,7 @@ export default function Home() {
                 }, 3000);
             }
             if (response[0]?.ProjectExists == 0 && user?.email) {
-                const getUser = await fetch("http://localhost:3001/users/details", {
+                const getUser = await fetch(`http://${process.env.SERVER_HOST}:3001/users/details`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: user?.email })
@@ -44,7 +44,7 @@ export default function Home() {
 
                 if (response[0].user_id) {
                     const id = response[0].user_id;
-                    const createProject = await fetch(`http://localhost:3001/projects/create`, {
+                    const createProject = await fetch(`http://${process.env.SERVER_HOST}:3001/projects/create`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ name: name.trim(), owner: id }),
@@ -54,7 +54,7 @@ export default function Home() {
                     if (response.error == null) {
                         editors.forEach(async (editor) => {
                             console.log("Processing Email:", editor);
-                            const inviteUser = await fetch(`http://localhost:3001/invites/send`, {
+                            const inviteUser = await fetch(`http://${process.env.SERVER_HOST}:3001/invites/send`, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({ email: editor, project: name.trim() }),

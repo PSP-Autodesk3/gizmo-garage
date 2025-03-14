@@ -30,7 +30,7 @@ function Home({ params }: ParamProps) {
         if (resolvedParams) {
             setProjectID(Number.parseInt(resolvedParams.slug[0]));
 
-            const details = await fetch("http://localhost:3001/projects/details", {
+            const details = await fetch(`http://${process.env.SERVER_HOST}:3001/projects/details`, {
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id: resolvedParams.slug })
@@ -58,7 +58,7 @@ function Home({ params }: ParamProps) {
     const saveProject = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         if (name && name.trim() != "" && user?.email) {
-            const exists = await fetch("http://localhost:3001/projects/exists", {
+            const exists = await fetch(`http://${process.env.SERVER_HOST}:3001/projects/exists`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, email: user?.email })
@@ -66,7 +66,7 @@ function Home({ params }: ParamProps) {
             const response = await exists.json();
 
             if (response[0]?.ProjectExists == 0) {
-                await fetch("http://localhost:3001/projects/changeName", {
+                await fetch(`http://${process.env.SERVER_HOST}:3001/projects/changeName`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -77,7 +77,7 @@ function Home({ params }: ParamProps) {
 
             editors.forEach(async (editor) => {
                 console.log("Processing Email:", editor);
-                const inviteUser = await fetch("http://localhost:3001/invites/send", {
+                const inviteUser = await fetch(`http://${process.env.SERVER_HOST}:3001/invites/send`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: editor, project: name }),

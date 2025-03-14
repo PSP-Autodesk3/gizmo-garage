@@ -64,7 +64,7 @@ function Home({ params }: ParamProps) {
       let currentFolder: Folder | null = null as Folder | null;
 
       // Get folders in the project
-      const query = await fetch(`http://localhost:3001/folders/get`, {
+      const query = await fetch(`http://${process.env.SERVER_HOST}:3001/folders/get`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: projectID})
@@ -153,7 +153,7 @@ function Home({ params }: ParamProps) {
 
       // Get Files
 
-      const objectQuery = await fetch("http://localhost:3001/items/get", {
+      const objectQuery = await fetch(`http://${process.env.SERVER_HOST}:3001/items/get`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, type }),
@@ -166,7 +166,7 @@ function Home({ params }: ParamProps) {
       // Get Tags
 
       // All Tags
-      const getTagsQuery = await fetch("http://localhost:3001/tags/getAll", {
+      const getTagsQuery = await fetch(`http://${process.env.SERVER_HOST}:3001/tags/getAll`, {
         method: "GET",
         headers: { "Content-Type": "application/json" }
       });
@@ -175,14 +175,14 @@ function Home({ params }: ParamProps) {
       setFilteredTags(tagResponse);
 
       // Object Tags
-      const objectTagsQuery = await fetch("http://localhost:3001/tags/getObject", {
+      const objectTagsQuery = await fetch(`http://${process.env.SERVER_HOST}:3001/tags/getObject`, {
         method: "GET",
         headers: { "Content-Type": "application/json" }
       });
       const objectTags = await objectTagsQuery.json();
 
       // Adds tags to folders
-      const folderTagsQuery = await fetch(`http://localhost:3001/tags/getFolder`, {
+      const folderTagsQuery = await fetch(`http://${process.env.SERVER_HOST}:3001/tags/getFolder`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ projectid: projectID}),

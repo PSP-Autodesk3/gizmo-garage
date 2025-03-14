@@ -48,7 +48,7 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
         e.preventDefault();
 
         // Check for duplicates
-        const alreadyExists = await fetch("http://localhost:3001/folders/exists", {
+        const alreadyExists = await fetch(`http://${process.env.SERVER_HOST}:3001/folders/exists`, {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name: folderName.trim(), projectid: projectID, type, parent_folder_id: id }),
@@ -61,7 +61,7 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                 setDuplicate(0);
             }, 3000);
         } else { // If no duplicates -> create folder
-            await fetch("http://localhost:3001/folders/create", {
+            await fetch(`http://${process.env.SERVER_HOST}:3001/folders/create`, {
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: folderName.trim(), projectid: projectID, folder_id: id, type }),
@@ -83,7 +83,7 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
         setAppliedTags([]);
 
         // Check duplicates 
-        const alreadyExists = await fetch("http://localhost:3001/items/exists", {
+        const alreadyExists = await fetch(`http://${process.env.SERVER_HOST}:3001/items/exists`, {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name: itemName.trim(), projectid: projectID, folder_id: id, type }),
@@ -96,7 +96,7 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                 setDuplicate(0);
             }, 3000);
         } else if (user) { // If no duplicates -> create file
-            await fetch("http://localhost:3001/items/create", {
+            await fetch(`http://${process.env.SERVER_HOST}:3001/items/create`, {
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ itemName: itemName.trim(), email: user.email, project: projectID, id, type }),
