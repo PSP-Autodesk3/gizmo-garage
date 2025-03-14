@@ -26,7 +26,7 @@ function Home() {
   useEffect(() => {
     if (databaseExists === 2) {
       const getDatabaseExists = async () => {
-        const response = await fetch("http://localhost:3001/database/exists", {
+        const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/database/exists`, {
           method: "GET",
           headers: { 'Content-Type': 'application/json' }
         });
@@ -39,7 +39,7 @@ function Home() {
     // Fetch users
     const fetchUsers = async () => {
       try {
-        const response = await fetch("http://localhost:3001/users/getUsers");
+        const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/users/getUsers`);
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`); // Was for debugging a silly error i was getting.
         const data = await response.json();
         setUsers(data.users || []);
@@ -84,7 +84,7 @@ function Home() {
   }
 
   const confirmSetupDatabase = async () => {
-    const response = await fetch("http://localhost:3001/database/create", {
+    const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/database/create`, {
       method: "GET",
       headers: { 'Content-Type': 'application/json' }
     });
@@ -109,7 +109,7 @@ function Home() {
       if (!user) return;
 
       // Call the api route to update the user status
-      await fetch("http://localhost:3001/users/updateStatus", {
+      await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/users/updateStatus`, {
         method: "PUT",
         headers: {
           'Content-Type': 'application/json'
