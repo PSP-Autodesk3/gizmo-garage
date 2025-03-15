@@ -96,10 +96,11 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                 setDuplicate(0);
             }, 3000);
         } else if (user) { // If no duplicates -> create file
+            console.log("appliedTags:",appliedTags);
             await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/items/create`, {
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ itemName: itemName.trim(), email: user.email, project: projectID, id, type }),
+                body: JSON.stringify({ itemName: itemName.trim(), email: user.email, project: projectID, id, type, appliedTags}),
             });
 
             // Gets the updated list
