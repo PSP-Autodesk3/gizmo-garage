@@ -29,7 +29,7 @@ function Home() {
   useEffect(() => {
     if (databaseExists === 2) {
       const getDatabaseExists = async () => {
-        const response = await fetch("http://localhost:3001/database/exists", {
+        const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/database/exists`, {
           method: "GET",
           headers: { 'Content-Type': 'application/json' }
         });
@@ -42,8 +42,8 @@ function Home() {
     const fetchUsers = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch("http://localhost:3001/users/getUsers");
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`); 
+        const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/users/getUsers`);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
         setUsers(data.users || []);
       } catch (error) {
@@ -89,7 +89,7 @@ function Home() {
   }
 
   const confirmSetupDatabase = async () => {
-    const response = await fetch("http://localhost:3001/database/create", {
+    const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/database/create`, {
       method: "GET",
       headers: { 'Content-Type': 'application/json' }
     });
@@ -112,7 +112,7 @@ function Home() {
       const user = users.find(u => u.uid === uid)
       if (!user) return;
 
-      await fetch("http://localhost:3001/users/updateStatus", {
+      await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/users/updateStatus`, {
         method: "PUT",
         headers: {
           'Content-Type': 'application/json'

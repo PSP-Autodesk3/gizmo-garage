@@ -57,7 +57,7 @@ function Home() {
       // Runs APIs
       const getDatabaseData = async () => {
         // Checks if db exists
-        const response = await fetch("http://localhost:3001/database/exists");
+        const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/database/exists`);
         const exists = await response.json();
         if (exists?.DatabaseExists !== 1 || exists.error === "Failed to check database status") {
           setDatabaseErrorMessage("Database not found, contact your system administrator");
@@ -67,12 +67,12 @@ function Home() {
           // Gets projects that the user has access to
           const fetchProjectData = async () => {
             if (user?.email) {
-              const data = await fetch(`http://localhost:3001/projects/get`, {
+              const data = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/projects/get`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: user?.email })
               })
-              const tagData = await fetch("http://localhost:3001/projects/tags", {
+              const tagData = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/projects/tags`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: user?.email })
