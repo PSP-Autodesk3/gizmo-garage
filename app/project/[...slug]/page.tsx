@@ -7,6 +7,9 @@ import withAuth from "@/app/lib/withAuth";
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useCallback } from 'react';
 
+//sort by
+import sortArray from 'sort-array';
+
 // Components
 import Filters from "@/app/shared/components/filter"
 import FileList from "@/app/shared/components/fileList";
@@ -53,7 +56,6 @@ function Home({ params }: ParamProps) {
   const [filteredFolders, setFilteredFolders] = useState<Folder[]>([]);
   const [filteredFiles, setFilteredFiles] = useState<File[]>([]);
 
-  const sortArray = require('sort-array');
 
   const getData = useCallback(async () => {
     const resolved = await params;
@@ -75,7 +77,7 @@ function Home({ params }: ParamProps) {
       })
 
       
-      const folders = await query.json();
+      const folders = await query.json() as Folder[];
 
       //defaults it to newest first
       const sortedFolders =  sortArray(folders, { by: 'dateOfCreation', order: 'desc' })
@@ -169,7 +171,7 @@ function Home({ params }: ParamProps) {
         body: JSON.stringify({ id, type }),
       });
 
-      const objects = await objectQuery.json();
+      const objects = await objectQuery.json() as File[];
       const sortedObjects =  sortArray(objects, { by: 'dateOfCreation', order: 'desc' })
       setFiles(sortedObjects);
       setFilteredFiles(sortedObjects);
@@ -228,7 +230,7 @@ function Home({ params }: ParamProps) {
   }, [query])
 
   //handling sort by
-  const handleFolderSortBy = (event: any) => {
+  const handleFolderSortBy = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setFolderSortBy(event.target.value);
     if (folderSortBy == "newest") {
       //sort filteredfolders newest first
@@ -240,7 +242,7 @@ function Home({ params }: ParamProps) {
     }
   }
 
-  const handleFileSortBy = (event: any) => {
+  const handleFileSortBy = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setFileSortBy(event.target.value)
     if (fileSortBy == "newest") {
       setFilteredFiles(sortArray(filteredFiles, { by: 'dateOfCreation', order: 'asc' }))
@@ -255,16 +257,16 @@ function Home({ params }: ParamProps) {
   //goes through each UTC date from the database and updates it to display in the current systems timezone
   if (filteredFiles) {
     filteredFiles.forEach((file: File) => {
-      var UTCDate = file.dateOfCreation
-      var localTimeDate = new Date(UTCDate);
+      const UTCDate = file.dateOfCreation
+      const localTimeDate = new Date(UTCDate);
       file.dateOfCreation = localTimeDate
     });
   }
   
   if (filteredFolders) {
     filteredFolders.forEach((Folder: Folder) => {
-      var UTCDate = Folder.dateOfCreation
-      var localTimeDate = new Date(UTCDate);
+      const UTCDate = Folder.dateOfCreation
+      const localTimeDate = new Date(UTCDate);
       Folder.dateOfCreation = localTimeDate
     });
   }

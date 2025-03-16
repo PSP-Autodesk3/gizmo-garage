@@ -12,6 +12,9 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
+//library used for sorting filter: https://www.npmjs.com/package/sort-array
+import sortArray from 'sort-array';
+
 // Skeleton Loading
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
@@ -40,11 +43,9 @@ function Home() {
   const [loading, setLoading] = useState(true);
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([] as Project[]);
-  const [projectTags, setProjectTags] = useState<ProjectTags[]>([] as ProjectTags[]);
+ // const [projectTags, setProjectTags] = useState<ProjectTags[]>([] as ProjectTags[]);
   const [query, setQuery] = useState<string>('');
   const [sortBy, setSortBy] = useState('newest');
-
-  const sortArray = require('sort-array') //libarary used for sorting filter: https://www.npmjs.com/package/sort-array
 
 
   useEffect(() => {
@@ -83,14 +84,14 @@ function Home() {
                 body: JSON.stringify({ email: user?.email })
               })
 
-              const result = await data.json();
+              const result = await data.json() as Project[];
               const tagResult = await tagData.json();
 
               //sets to newest by default
               const sortedResult = sortArray(result, { by: 'dateOfCreation', order: 'desc' })
               setProjects(sortedResult);
               setFilteredProjects(result);
-              setProjectTags(tagResult);
+         //     setProjectTags(tagResult);
 
               //assigns tags to projects
               console.log("Tagresult: " + tagResult);
@@ -183,13 +184,13 @@ function Home() {
   //goes through each UTC date from the database and updates it to display in the current systems timezone
   if (filteredProjects) {
     filteredProjects.forEach((project: Project) => {
-      var UTCDate = project.dateOfCreation
-      var localTimeDate = new Date(UTCDate); //found how to convert from UTC to system dateTime using this from stackOverflow, post by Hulvej on July 16th 2015: http://stackoverflow.com/questions/6525538/convert-utc-date-time-to-local-date-time - Jacob
+      const UTCDate = project.dateOfCreation
+      const localTimeDate = new Date(UTCDate); //found how to convert from UTC to system dateTime using this from stackOverflow, post by Hulvej on July 16th 2015: http://stackoverflow.com/questions/6525538/convert-utc-date-time-to-local-date-time - Jacob
       project.dateOfCreation = localTimeDate
     });
   }
 
-  const handleSortBy = (event: any) => {
+  const handleSortBy = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSortBy(event.target.value)
     if (sortBy == "newest") {
       setFilteredProjects(sortArray(filteredProjects, { by: 'dateOfCreation', order: 'asc' })) //made using the sort-array library https://www.npmjs.com/package/sort-array 
