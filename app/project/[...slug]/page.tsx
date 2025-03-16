@@ -76,11 +76,26 @@ function Home({ params }: ParamProps) {
         body: JSON.stringify({ id: projectID })
       })
 
-      
+
       const folders = await query.json() as Folder[];
 
-      //defaults it to newest first
-      const sortedFolders =  sortArray(folders, { by: 'dateOfCreation', order: 'desc' })
+      //get folder tags and add to folder
+
+      // Adds tags to folders
+      const folderTagsQuery = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/tags/getFolder`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectid: projectID }),
+      })
+
+      const folderTags = await folderTagsQuery.json();
+
+      folders.forEach((folder: Folder) => {
+        folder.tags = folderTags.filter((tag: FolderTags) => tag.folder_id === folder.folder_id);
+      });
+
+      //defaults folders to newest first
+      const sortedFolders = sortArray(folders, { by: 'dateOfCreation', order: 'desc' })
       setFolders(sortedFolders);
       setFilteredFolders(sortedFolders);
 
@@ -172,7 +187,20 @@ function Home({ params }: ParamProps) {
       });
 
       const objects = await objectQuery.json() as File[];
-      const sortedObjects =  sortArray(objects, { by: 'dateOfCreation', order: 'desc' })
+
+      // Object Tags
+      const objectTagsQuery = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/tags/getObject`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
+      });
+      const objectTags = await objectTagsQuery.json();
+
+      // Adds tags to files
+      objects.forEach((file: File) => {
+        file.tags = objectTags.filter((tag: ItemTags) => tag.object_id === file.object_id);
+      });
+      
+      const sortedObjects = sortArray(objects, { by: 'dateOfCreation', order: 'desc' })
       setFiles(sortedObjects);
       setFilteredFiles(sortedObjects);
 
@@ -186,31 +214,6 @@ function Home({ params }: ParamProps) {
       const tagResponse = await getTagsQuery.json();
       setTags(tagResponse);
       setFilteredTags(tagResponse);
-
-      // Object Tags
-      const objectTagsQuery = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/tags/getObject`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" }
-      });
-      const objectTags = await objectTagsQuery.json();
-
-      // Adds tags to folders
-      const folderTagsQuery = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/tags/getFolder`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ projectid: projectID }),
-      })
-
-      const folderTags = await folderTagsQuery.json();
-
-      folders.forEach((folder: Folder) => {
-        folder.tags = folderTags.filter((tag: FolderTags) => tag.folder_id === folder.folder_id);
-      });
-
-      // Adds tags to files
-      objects.forEach((file: File) => {
-        file.tags = objectTags.filter((tag: ItemTags) => tag.object_id === file.object_id);
-      });
     }
   }, [params, id, type]);
 
@@ -262,7 +265,7 @@ function Home({ params }: ParamProps) {
       file.dateOfCreation = localTimeDate
     });
   }
-  
+
   if (filteredFolders) {
     filteredFolders.forEach((Folder: Folder) => {
       const UTCDate = Folder.dateOfCreation
