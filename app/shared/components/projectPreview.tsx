@@ -20,7 +20,7 @@ export default function ProjectPreview({ project, query }: { project: Project, q
                         <span className='rounded-full m-2 p-2 bg-blue-600' key={index}>{tag.tag}</span>
                     ))}</p>
                 )}
-                {query.trim() && project.editors.length > 0 && project.editors.some(editor => editor.email?.toLowerCase().includes(query.trim())) && (
+                {query.trim()  && project.editors.length > 0 && (query.trim().length > 3 && project.editors.some(editor => editor.email?.toLowerCase().includes(query.trim()))) && (
                     <p>Editor: {project.editors.map((editor, index) => (
                         <span className='rounded-full m-2 p-2 bg-blue-600' key={index}>{editor.email}</span>
                     ))}</p>
