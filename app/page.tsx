@@ -109,8 +109,8 @@ function Home() {
               //assigns tags and editors to projects
               console.log("Tagresult: " + tagResult);
               result.forEach((project: Project) => {
-                project.tags = tagResult.filter((tag: ProjectTags) => tag.project_id === project.project_id);
-                project.editors = editorResult.filter((user: projectEditors) => user.project_id === project.project_id)
+                project.tags = tagResult?.filter((tag: ProjectTags) => tag.project_id === project.project_id) || [];
+                project.editors = editorResult?.filter((user: projectEditors) => user.project_id === project.project_id) || [];
               });
 
               //assigns editors to project

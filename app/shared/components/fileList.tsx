@@ -20,7 +20,7 @@ export default function FileList({ files }: { files: File[] }) {
                 </>
             ) : (
                 Array.isArray(files) && files.length > 0 && (
-                    files.map((file) => (
+                    files.map((file, index) => (
                         <div key={file.object_id}>
                             <button
                                 className="bg-slate-900 rounded-lg text-xl my-4 px-4 py-2"
@@ -31,7 +31,7 @@ export default function FileList({ files }: { files: File[] }) {
                             <span>{file.dateOfCreation.toLocaleDateString()} {file.dateOfCreation.toLocaleTimeString()}</span>
                             {Array.isArray(file.tags) && file.tags.length > 0 && (
                                 file.tags.map((tag) => (
-                                  <span className='rounded-full m-2 p-2 bg-blue-600 self-center' key={tag.tag_id}>
+                                  <span className='rounded-full m-2 p-2 bg-blue-600 self-center' key={index}>
                                     {tag.tag}
                                   </span>
                                 ))
