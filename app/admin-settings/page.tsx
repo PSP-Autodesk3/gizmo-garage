@@ -143,6 +143,7 @@ function Home() {
       );
       await reauthenticateWithCredential(currentUser, credential);
       await confirmSetupDatabase();
+      setPassword('');
     }
     catch{
       alert('Incorrect password');
@@ -268,13 +269,20 @@ function Home() {
             <div className="text-center">
               <h1 className='text-3xl'>This will clear all data.</h1> 
               <strong>This action is irreversible.</strong> <p> Your password is needed to complete this action.</p>
-              <input 
-                className="text-white w-full bg-slate-800 p-2 my-2 rounded-lg" 
-                type="password" 
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+              <form onSubmit={(e) => e.preventDefault()} autoComplete="off">
+                <input 
+                  className="text-white w-full bg-slate-800 p-2 my-2 rounded-lg" 
+                  type="password" 
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoCapitalize="off"
+                  autoCorrect="off"
+                  spellCheck="false"
+                  data-form-type="other"
+                  aria-autocomplete="none"
+                />
+              </form>
               {/* Buttons */}
               <div className="mt-4">
                 <button 
@@ -285,7 +293,10 @@ function Home() {
                 </button>
                 <button 
                   className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50" 
-                  onClick={() => setConfirmModule(false)}
+                  onClick={() => {
+                    setConfirmModule(false);
+                    setPassword('');
+                  }}
                 >
                   Cancel
                 </button>
