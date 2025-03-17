@@ -27,11 +27,18 @@ import Filters from '@/app/shared/components/filter';
 import SigningIn from '@/app/shared/components/signingIn';
 import AuthenticatePrompt from '@/app/shared/components/authenticatePrompt';
 import ProjectPreview from '@/app/shared/components/projectPreview';
+import { User } from './shared/interfaces/user';
 
 interface ProjectTags {
   project_id: number,
   tag: string
 }
+
+export interface projectEditors {
+  project_id: number,
+  email: string,
+}
+
 
 function Home() {
   const [user, loadingAuth] = useAuthState(auth);
@@ -54,7 +61,7 @@ function Home() {
     }
     else {
       //display where the search equals the query or matches at least one of the tags
-      setFilteredProjects(projects.filter(project => project.name.toLowerCase().includes(query.trim()) || project.tags.some(tag => tag.tag.toLowerCase().includes(query.trim()))));
+      setFilteredProjects(projects.filter(project => project.name.toLowerCase().includes(query.trim()) || project.tags.some(tag => tag.tag.toLowerCase().includes(query.trim())) || project.editors.some(editor => editor.email?.toLowerCase().includes(query.trim()))));
     }
   }, [query]);
   useEffect(() => {
@@ -83,21 +90,31 @@ function Home() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: user?.email })
               })
+              const editorData = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/editors/getEditors`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: user?.email })
+              })
 
               const result = await data.json() as Project[];
               const tagResult = await tagData.json();
+              const editorResult = await editorData.json();
 
               //sets to newest by default
               const sortedResult = sortArray(result, { by: 'dateOfCreation', order: 'desc' })
               setProjects(sortedResult);
               setFilteredProjects(result);
          //     setProjectTags(tagResult);
-
-              //assigns tags to projects
+              console.log("editorResult:",editorResult);
+              
+              //assigns tags and editors to projects
               console.log("Tagresult: " + tagResult);
               result.forEach((project: Project) => {
                 project.tags = tagResult.filter((tag: ProjectTags) => tag.project_id === project.project_id);
+                project.editors = editorResult.filter((user: projectEditors) => user.project_id === project.project_id)
               });
+
+              //assigns editors to project
 
               if (!data.ok) {
                 setDatabaseErrorMessage("Database not found, contact your system administrator");
@@ -229,7 +246,7 @@ function Home() {
               {!loadingProjects ? (
                 filteredProjects.map((project, index) => (
                   <div className="project" key={index}>
-                    <ProjectPreview project={project} />
+                    <ProjectPreview project={project} query={query} />
                   </div>
                 ))
               ) : (

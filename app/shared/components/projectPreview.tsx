@@ -6,7 +6,7 @@ import { Project } from "@/app/shared/interfaces/project";
 // Other
 import { useRouter } from "next/navigation";
 
-export default function ProjectPreview({ project }: { project: Project }) {
+export default function ProjectPreview({ project, query }: { project: Project, query: string }) {
     const router = useRouter();
 
     return (
@@ -18,6 +18,11 @@ export default function ProjectPreview({ project }: { project: Project }) {
                 {project.tags.length > 0 && (
                     <p>Tags: {project.tags.map((tag, index) => (
                         <span className='rounded-full m-2 p-2 bg-blue-600' key={index}>{tag.tag}</span>
+                    ))}</p>
+                )}
+                {query.trim() && project.editors.length > 0 && project.editors.some(editor => editor.email?.toLowerCase().includes(query.trim())) && (
+                    <p>Editor: {project.editors.map((editor, index) => (
+                        <span className='rounded-full m-2 p-2 bg-blue-600' key={index}>{editor.email}</span>
                     ))}</p>
                 )}
             </div>
