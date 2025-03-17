@@ -66,4 +66,21 @@ router.post("/get", async (req, res, next) => {
     }
 });
 
+// Retrieve info
+router.post("/info", async (req, res, next) => {
+    try {
+        const { id } = req.body;
+        const [result] = await pool.execute(`
+            SELECT *
+            FROM Object
+            INNER JOIN Users ON Object.author = Users.user_id
+            WHERE object_id = ?;
+        `, [id]);
+        res.json(result);
+    }
+    catch (error) {
+        next(error);
+    }
+});
+
 export default router;
