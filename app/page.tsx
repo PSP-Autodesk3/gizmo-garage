@@ -27,7 +27,6 @@ import Filters from '@/app/shared/components/filter';
 import SigningIn from '@/app/shared/components/signingIn';
 import AuthenticatePrompt from '@/app/shared/components/authenticatePrompt';
 import ProjectPreview from '@/app/shared/components/projectPreview';
-import { User } from './shared/interfaces/user';
 
 interface ProjectTags {
   project_id: number,
