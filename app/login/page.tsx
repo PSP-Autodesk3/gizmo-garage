@@ -29,7 +29,7 @@ function Home() {
         setPassword('');
 
         if (res && res.user) {
-          router.push('/');
+          router.push('/authenticate');
         } else {
           setError('Invalid email or password');
         }

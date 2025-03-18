@@ -20,8 +20,6 @@ import { Project } from "@/app/shared/interfaces/project";
 
 // Components
 import Filters from '@/app/shared/components/filter';
-import SigningIn from '@/app/shared/components/signingIn';
-import AuthenticatePrompt from '@/app/shared/components/authenticatePrompt';
 import ProjectPreview from '@/app/shared/components/projectPreview';
 
 interface ProjectTags {
@@ -34,7 +32,6 @@ function Home() {
   const router = useRouter();
   const admin = useState(true); // Needs a check once implemented into db as currently this makes everyone admin
   const [databaseErrorMessage, setDatabaseErrorMessage] = useState('');
-  const [loginErrorMessage, setLoginErrorMessage] = useState('');
   const [projects, setProjects] = useState<Project[]>([] as Project[]);
   const [loading, setLoading] = useState(true);
   const [loadingProjects, setLoadingProjects] = useState(true);
@@ -51,6 +48,7 @@ function Home() {
       setFilteredProjects(projects.filter(project => project.name.toLowerCase().includes(query.trim()) || project.tags.some(tag => tag.tag.toLowerCase().includes(query.trim()))));
     }
   }, [query]);
+  
   useEffect(() => {
     // Only runs if the user has logged in
     if (user) {
@@ -102,35 +100,19 @@ function Home() {
       }
       getDatabaseData();
     }
-
-    // Checks if the autodesk authentication returned an error
-    const getError = async () => {
-      // Gets error message to display on screen
-      let errorSession = sessionStorage.getItem("errorMessage");
-      if (errorSession) {
-        setLoginErrorMessage(errorSession);
-        sessionStorage.removeItem("errorMessage");
-      }
-
-      // Prompts to check console if a description is given
-      errorSession = sessionStorage.getItem("errorDescription");
-      if (errorSession) {
-        console.log("Error Description:", errorSession);
-        sessionStorage.removeItem("errorDescription");
-      }
-    }
-    getError();
     setLoading(false);
   }, [user]);
 
-  // Displays if any of the details are loading
-  if (loading || loadingAuth) {
-    return (
-      <>
-        <p>Loading Resources...</p>
-      </>
-    )
-  }
+  useEffect(() => {
+    // Redirects if the user is not logged into their account
+    if (!loading && !loadingAuth && !user) {
+      router.replace('/landing');
+    }
+    // Redirects if the user is not authenticated
+    if (!sessionStorage.getItem('token') && !loading && !loadingAuth && user) {
+      router.replace('/authenticate');
+    }
+  }, [loadingAuth, router]);
 
   // Displays if the user is logged in, but the database doesn't exist
   if (databaseErrorMessage) {
@@ -154,22 +136,6 @@ function Home() {
           Sign Out
         </Link>
       </>
-    )
-  }
-
-  // Displays if the user is not logged into their account
-  if (!user) {
-    return (
-      <>
-        <SigningIn />
-      </>
-    )
-  }
-
-  // Displays if the user doesn't have a valid token
-  if (!sessionStorage.getItem('token')) {
-    return (
-      <AuthenticatePrompt loginErrorMessage={loginErrorMessage} />
     )
   }
 
