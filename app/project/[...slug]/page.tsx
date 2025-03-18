@@ -229,7 +229,7 @@ function Home({ params }: ParamProps) {
           <button
             onClick={() => { router.push(`/project/${projectID}+${project.replace(/%2B/g, '+')}`); }}
           >
-            {project}
+            {project.replace(/%2B/g, ' ')}
           </button>
 
           {/* Folders are added to this div */}
