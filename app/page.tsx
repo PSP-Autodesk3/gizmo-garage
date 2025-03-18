@@ -104,14 +104,14 @@ function Home() {
               setProjects(sortedResult);
               setFilteredProjects(result);
          //     setProjectTags(tagResult);
-              console.log("editorResult:",editorResult);
               
               //assigns tags and editors to projects
-              console.log("Tagresult: " + tagResult);
               result.forEach((project: Project) => {
                 project.tags = tagResult?.filter((tag: ProjectTags) => tag.project_id === project.project_id) || [];
                 project.editors = editorResult?.filter((user: projectEditors) => user.project_id === project.project_id) || [];
               });
+
+              console.log("projects:", result);
 
               //assigns editors to project
 
