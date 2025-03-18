@@ -111,8 +111,6 @@ function Home() {
                 project.editors = editorResult?.filter((user: projectEditors) => user.project_id === project.project_id) || [];
               });
 
-              console.log("projects:", result);
-
               //assigns editors to project
 
               if (!data.ok) {
