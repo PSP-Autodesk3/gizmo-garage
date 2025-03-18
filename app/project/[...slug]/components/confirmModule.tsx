@@ -10,6 +10,9 @@ import { useAuthState } from "react-firebase-hooks/auth";
 // Interfaces
 import { Tag } from '@/app/shared/interfaces/tag';
 
+// OSS SDK
+import { ObjectDetails, OssClient } from "@aps_sdk/oss";
+
 interface ModuleProps {
     itemType: string;
     projectID: number;
@@ -66,7 +69,6 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: folderName.trim(), projectid: projectID, folder_id: id, type }),
             });
-
             // Gets the updated list
             getData();
         }
@@ -101,7 +103,21 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ itemName: itemName.trim(), email: user.email, project: projectID, id, type }),
             });
-
+            // Create bucket
+            const token = await sessionStorage.getItem("token"); // Get token
+            await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/oss/create`, {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: id, token: token }),
+            });
+            // Check bucket created
+            const retrieveBuckets = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/oss/getBuckets`, {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: token }),
+            });
+            const buckets = await retrieveBuckets.json();
+            console.log(buckets);
             // Gets the updated list
             getData();
         }
