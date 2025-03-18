@@ -7,7 +7,7 @@ const router = express.Router();
 router.post("/create", async (req, res, next) => {
     try {
         const { token, id } = req.body;
-        const [result] = await fetch("https://developer.api.autodesk.com/oss/v2/buckets", {
+        const result = await fetch("https://developer.api.autodesk.com/oss/v2/buckets", {
             method: "POST",
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -27,13 +27,15 @@ router.post("/create", async (req, res, next) => {
 });
 
 // Get buckets
-router.get("/getBuckets", async (req, res, next) => {
+router.post("/getBuckets", async (req, res, next) => {
     try {
         const { token } = req.body;
-        const [result] = await fetch("https://developer.api.autodesk.com/oss/v2/buckets", {
-            method: "POST",
+        const result = await fetch("https://developer.api.autodesk.com/oss/v2/buckets", {
+            method: "GET",
             headers: {
-                Authorization: `Bearer ${token}`
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`,
+                "region": "US"
             }
         })
         res.json(result);
