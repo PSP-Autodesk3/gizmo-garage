@@ -41,6 +41,7 @@ router.post("/getFolder", async (req, res, next) => {
             INNER JOIN Folder ON Object.folder_id = Folder.folder_id
             INNER JOIN Tag ON Object_Tag.tag_id = Tag.tag_id
             WHERE Object.project_id = ?
+            GROUP BY Tag.tag
         `, [projectid]);
         res.json(result);
     }

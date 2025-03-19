@@ -13,7 +13,7 @@ import 'react-loading-skeleton/dist/skeleton.css'
 export default function FolderList({ folders }: { folders: Folder[] }) {
     const pathname = usePathname();
     const router = useRouter();
-
+    console.log("FolderList", folders);
     return (
         <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
             {!folders ? (
@@ -32,8 +32,8 @@ export default function FolderList({ folders }: { folders: Folder[] }) {
                             </button>
                             <span>{folder.dateOfCreation.toLocaleDateString()} {folder.dateOfCreation.toLocaleTimeString()}</span>                            
                             {Array.isArray(folder.tags) && folder.tags.length > 0 && (
-                                folder.tags.map((tag) => (
-                                    <span className='rounded-full m-2 p-2 bg-blue-600 self-center' key={tag.tag_id}>
+                                folder.tags.map((tag, index) => (
+                                    <span className='rounded-full m-2 p-2 bg-blue-600 self-center' key={index}>
                                         {tag.tag}
                                     </span>
                                 ))
