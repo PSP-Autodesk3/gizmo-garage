@@ -64,7 +64,7 @@ function Home({ params }: ParamProps) {
       let currentFolder: Folder | null = null as Folder | null;
 
       const storedFolders = sessionStorage.getItem(`folders_${projectID}`);
-      let folderResults;
+      let folderResults: Folder[];
 
       if (storedFolders) {
         // If folders are in sessionStorage then take them
@@ -163,6 +163,17 @@ function Home({ params }: ParamProps) {
 
       if (baseFolders && tree) {
         await outputFolder(baseFolders, tree, [], 0, true);
+      }
+
+      if (storedFolders) {
+        const query = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/folders/get`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: projectID })
+        });
+
+        folderResults = await query.json();
+        sessionStorage.setItem(`folders_${projectID}`, JSON.stringify(folderResults));
       }
 
       // Get Folders
