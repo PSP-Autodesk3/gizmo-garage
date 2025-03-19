@@ -7,7 +7,6 @@ const router = express.Router();
 router.post("/create", async (req, res, next) => {
     try {
         const { itemName, email, project, type, id, bucketKey } = req.body;
-        console.log("key: ", bucketKey);
         const params = [itemName, email, project];
         if (type !== 1) {
             params.push(id);
