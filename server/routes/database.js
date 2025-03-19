@@ -103,9 +103,9 @@ router.get("/create", async (_req, res, next) => {
     await pool.execute(`
         CREATE TABLE IF NOT EXISTS Object_Tag (
           object_id INT NOT NULL,
-          FOREIGN KEY (object_id) REFERENCES Object(object_id),
+          FOREIGN KEY (object_id) REFERENCES Object(object_id) ON DELETE CASCADE,
           tag_id INT NOT NULL,
-          FOREIGN KEY (tag_id) REFERENCES Tag(tag_id)
+          FOREIGN KEY (tag_id) REFERENCES Tag(tag_id) ON DELETE CASCADE
         );
       `);
 

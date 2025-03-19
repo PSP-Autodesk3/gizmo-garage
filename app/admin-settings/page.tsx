@@ -15,6 +15,7 @@ import { sendPasswordResetEmail } from 'firebase/auth';
 
 // Interfaces
 import { User } from '@/app/shared/interfaces/user';
+import { Tag } from '@/app/shared/interfaces/tag';
 
 function Home() {
   const [databaseExists, setDatabaseExists] = useState(2);
@@ -22,6 +23,24 @@ function Home() {
   const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [resetEmail, setResetEmail] = useState<string>(''); // Tracking which email is going to be reset
+  const [allTags, setAllTags] = useState<Tag[]>([]);
+  const [tagName, setTagName] = useState('');
+  const [filteredTags, setFilteredTags] = useState<Tag[]>([]);
+  const [searchQuery, setSearchQuery] = useState(''); //used for searching tags
+  const [error, setError] = useState('');
+
+
+  //fetch all tags
+  const fetchTags = async () => {
+    try {
+      const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/tags/getAll`);
+      const data = await response.json();
+      setAllTags(data || []);
+      setFilteredTags(data || []);
+    } catch (error) {
+      console.error('Error fetching tags:', error);
+    }
+  };
 
   useEffect(() => {
     if (databaseExists === 2) {
@@ -48,8 +67,9 @@ function Home() {
       }
     };
     fetchUsers();
-  }, []);
 
+    fetchTags();
+  }, []);
   // Reusing Adam's password reset function.
   function resetPassword(email: string) {
     setResetEmail(email);
@@ -127,6 +147,73 @@ function Home() {
     }
   };
 
+  //deletes tag from tag list
+  const handleDeleteTag = async (event: number) => {
+    const tag_id = event;
+
+    const index = allTags.findIndex(tag => tag.tag_id == tag_id);
+    if (index > -1) {
+      //remove tag from the db
+      await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/tags/delete`, {
+        method: "DELETE",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          tag_id
+        })
+      })
+      fetchTags();
+    }
+    else {
+      setError("Tag not found");
+    }
+  }
+
+  //adds tag to tag list
+  const addTag = async (event: string) => {
+    // make api call to create a tag
+    const tagName = event;
+    if (tagName.length > 0 && !allTags.some(tag => tag.tag.toLowerCase() === tagName.toLowerCase())) {
+      await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/tags/create`, {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          tagName
+        })
+      })
+
+      fetchTags();
+      setTagName('');
+    }
+    else {
+      setError("Tag name is invalid or already exists");
+    }
+  }
+
+  useEffect(() => {
+    //for searching tags
+    if (searchQuery.trim() == '') {
+      setFilteredTags(allTags);
+    }
+    else {
+      //display where the search equals the query or matches at least one of the tags
+      setFilteredTags(allTags.filter(allTags => allTags.tag.toLowerCase().includes(searchQuery.trim())));
+    }
+  }, [searchQuery]);
+
+
+  //3 second timer for the errors
+  useEffect(() => {
+    if (error.length > 0) {
+      setTimeout(() => {
+        setError("");
+      }, 3000);
+    }
+  }, [error])
+
 
   return (
     <>
@@ -158,6 +245,57 @@ function Home() {
         >
           {databaseExists === 1 ? 'Reset Database Content' : 'Initialise Database'}
         </button>
+      </div>
+      {/* Create, delete and search tags */}
+      <div>
+        <h2 className="text-xl font-semibold text-slate-200 w-[40%] mx-auto mb-2 mt-6">
+          Tags
+        </h2>
+        <div>
+          <div className='bg-slate-900 p-4 w-[40%] mx-auto rounded-lg shadow-lg mt-4' >
+            <div>
+              <div id="Create" className='p-4'>
+                <label>Create</label>
+                <input
+                  className='text-white w-full p-2 my-2 rounded-lg bg-slate-800'
+                  type="text"
+                  placeholder="Create Tag"
+                  name="search"
+                  value={tagName}
+                  onChange={(e) => setTagName(e.target.value)}
+                />
+              </div>
+              <button type="submit" className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50" onClick={() => addTag(tagName)}>Create</button>
+            </div>
+            <div>
+              <div id="Search" className='p-4'>
+                <label htmlFor="search=bar">Search</label>
+                <input
+                  className='text-white w-full p-2 my-2 rounded-lg bg-slate-800'
+                  type="text"
+                  placeholder="Search Tags"
+                  name="search"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+            </div>
+            <div>
+              {filteredTags.length > 0 ? (
+                filteredTags.map((tag: Tag) => (
+                  <>
+                    <button type="button" className='rounded-full m-2 p-3 bg-blue-600' onClick={() => handleDeleteTag(tag.tag_id)} key={tag.tag_id}><svg className="w-6 h-6 text-blue-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24">
+                      <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18 17.94 6M18 18 6.06 6" />
+                    </svg>{tag.tag}</button>
+                  </>
+                ))
+              ) : <p className='flex justify-center'>No tags found</p>}
+            </div>
+            {error.length > 0 ? (
+              <p className='text-red-500'>{error}</p>
+            ) : ""}
+          </div>
+        </div>
       </div>
       {/* User Management */}
       <h2 className="text-xl font-semibold text-slate-200 w-[40%] mx-auto mb-2 mt-6">
