@@ -63,17 +63,26 @@ function Home({ params }: ParamProps) {
 
       let currentFolder: Folder | null = null as Folder | null;
 
-      // Get folders in the project
-      const query = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/folders/get`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: projectID})
-      })
+      const storedFolders = sessionStorage.getItem(`folders_${projectID}`);
+      let folderResults;
 
-      const folders = await query.json();
+      if (storedFolders) {
+        // If folders are in sessionStorage then take them
+        folderResults = JSON.parse(storedFolders);
+      } else {
+        // If not then get them through the API
+        const query = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/folders/get`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: projectID })
+        });
+
+        folderResults = await query.json();
+        sessionStorage.setItem(`folders_${projectID}`, JSON.stringify(folderResults));
+      }
 
       // Base information to be passed to outputFolder
-      const baseFolders = folders.filter((folder: Folder) => folder.parent_folder_id === null);
+      const baseFolders = folderResults.filter((folder: Folder) => folder.parent_folder_id === null);
       const tree = document.getElementById("trees");
       if (tree) {
         while (tree.firstChild) {
@@ -115,13 +124,13 @@ function Home({ params }: ParamProps) {
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                     d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
             </svg>`; // Site I used for the SVG, https://heroicons.com/outline
-          
+
           // Create folder button
           const button = document.createElement("button");
-          button.className = `${newValid ? 'text-indigo-200 font-medium': 'text-slate-300'} 
+          button.className = `${newValid ? 'text-indigo-200 font-medium' : 'text-slate-300'} 
             hover:text-slate-100 transition-colors duration-200 flex-1 text-left`;
           button.textContent = folder.name;
-        
+
           summary.appendChild(icon);
           summary.appendChild(button);
 
@@ -143,7 +152,7 @@ function Home({ params }: ParamProps) {
           parentDetails.appendChild(details);
 
           // Gets folders that are a child of the current folder
-          const childFolders = folders.filter((childFolder: Folder) => childFolder.parent_folder_id === folder.folder_id);
+          const childFolders = folderResults.filter((childFolder: Folder) => childFolder.parent_folder_id === folder.folder_id);
 
           // Does this again for each child folder iteratively
           if (childFolders.length > 0) {
@@ -162,11 +171,11 @@ function Home({ params }: ParamProps) {
       setType(currentFolder ? (0) : (1));
 
       if (currentFolder) {
-        setFolders(folders.filter((folder: Folder) => folder.parent_folder_id === currentFolder?.folder_id));
-        setFilteredFolders(folders.filter((folder: Folder) => folder.parent_folder_id === currentFolder?.folder_id));
+        setFolders(folderResults.filter((folder: Folder) => folder.parent_folder_id === currentFolder?.folder_id));
+        setFilteredFolders(folderResults.filter((folder: Folder) => folder.parent_folder_id === currentFolder?.folder_id));
       } else {
-        setFolders(folders.filter((folder: Folder) => folder.parent_folder_id === null));
-        setFilteredFolders(folders.filter((folder: Folder) => folder.parent_folder_id === null));
+        setFolders(folderResults.filter((folder: Folder) => folder.parent_folder_id === null));
+        setFilteredFolders(folderResults.filter((folder: Folder) => folder.parent_folder_id === null));
       }
 
       // Get Files
@@ -203,12 +212,12 @@ function Home({ params }: ParamProps) {
       const folderTagsQuery = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/tags/getFolder`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ projectid: projectID}),
+        body: JSON.stringify({ projectid: projectID }),
       })
 
       const folderTags = await folderTagsQuery.json();
 
-      folders.forEach((folder: Folder) => {
+      folderResults.forEach((folder: Folder) => {
         folder.tags = folderTags.filter((tag: FolderTags) => tag.folder_id === folder.folder_id);
       });
 
