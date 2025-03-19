@@ -1,7 +1,8 @@
 import express from "express";
-import pool from "../db.js";
+import multer from "multer";
 
 const router = express.Router();
+const upload = multer({ storage: multer.memoryStorage() });
 
 // Create bucket on Object Creation.
 router.post("/create", async (req, res, next) => {
@@ -43,6 +44,50 @@ router.post("/getBuckets", async (req, res, next) => {
         const data = await result.json();
         res.json(data);
     } catch (error) {
+        next(error);
+    }
+});
+
+// Upload file to bucket
+router.post("/upload", upload.single("file"), async (req, res, next) => {
+    try {
+        const {token, bucketKey} = req.body;
+        console.log("SignedURL: Token:", token);
+        const file = req.file;
+        if (!file) {
+            throw new Error("No file uploaded");
+        }
+        const url = `https://developer.api.autodesk.com/oss/v2/buckets/${bucketKey}/objects/${file.originalname}/signeds3upload`;
+        const result = await fetch(url, { // Get signed URL
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json",
+                "region": "US"
+            },
+        });
+        const data = await result.json();
+        const { urls } = data;
+        if (!urls || urls.length === 0) {
+            throw new Error("No signed URL returned");
+        }
+        const upload = await fetch(urls[0], {
+            method: "PUT",
+            headers: {
+                "Content-Type": file.mimetype
+            },
+            body: file.buffer
+        });
+        if (!upload.ok) {
+            throw new Error("Failed to upload file");
+        }
+        res.json({
+            message: "File uploaded successfully!",
+            objectKey: file.originalname,
+            bucketKey: bucketKey
+        });
+    }
+    catch (error) {
         next(error);
     }
 });

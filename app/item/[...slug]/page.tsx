@@ -28,6 +28,50 @@ function Home({ params }: PageProps) {
      const [itemId, setItemId] = useState<number | null>(null);
      const [itemName, setItemName] = useState<string | null>(null);
      const [author, setAuthor] = useState<string | null>(null);
+     // File uploads
+     const [file, setFile] = useState<File | null>(null);
+     const [uploading, setUploading] = useState<boolean>(false);
+     const [message, setMessage] = useState<string | null>(null);
+
+        const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+            if (event.target.files && event.target.files.length > 0) {
+                setFile(event.target.files[0]);
+            }
+        };
+
+        const handleUpload = async () => {
+            if (!file) {
+                setMessage("No file selected");
+                return;
+            }
+            setUploading(true);
+            setMessage("");
+            const formData = new FormData();
+            formData.append("file", file);
+            const token = sessionStorage.getItem("token");
+            if (token) {
+                formData.append("token", token);
+            }
+            formData.append("bucketKey", "78c1b942-08df-4540-acd3-a9e93184c585"); // Make this grab automatically later - AJ
+            try {
+                const response = await fetch("http://localhost:3001/oss/upload", {
+                    method: "POST",
+                    body: formData,
+                });
+                const data = await response.json();
+                console.log(data);
+                if (response.ok) {
+                    setMessage("File uploaded successfully");
+                } else {
+                    setMessage("Error uploading file");
+                }
+            }
+            catch (error) {
+                setMessage("Error uploading file");
+            } finally {
+                setUploading(false);
+            }
+        }
 
      useEffect(() => {
         const resolveParams = async () => {
@@ -73,7 +117,19 @@ function Home({ params }: PageProps) {
                 </div>
             </div>
             {/*/ Row 2 */}
-        </div>
+            <div className="px-8">
+                <input type="file" onChange={handleFileChange} className="mb-4 bg-slate-800 rounded-lg p-4 text-lg" />
+                <br />
+                <button
+                    onClick={handleUpload}
+                    className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                    disabled={uploading}
+                >
+                    {uploading ? "Uploading..." : "Upload File"}
+                </button>
+                {message && <p className="mt-2 text-sm">{message}</p>}
+            </div>
+        </div>      
         </>
      )
 }
