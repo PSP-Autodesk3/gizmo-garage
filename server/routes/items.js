@@ -6,21 +6,21 @@ const router = express.Router();
 // Create item
 router.post("/create", async (req, res, next) => {
     try {
-        const { itemName, email, project, type, id } = req.body;
-
+        const { itemName, email, project, type, id, bucketKey } = req.body;
+        console.log("key: ", bucketKey);
         const params = [itemName, email, project];
         if (type !== 1) {
             params.push(id);
         } else {
             params.push(null);
         }
-
+        params.push(bucketKey || null); // Add bucketKey after folder check
         const [result] = await pool.execute(`
             INSERT INTO Object
-            (name, author, project_id, folder_id)
+            (name, author, project_id, folder_id, bucket_id)
             VALUES (?, 
             (SELECT user_id FROM Users WHERE email = ?),
-            ?, ?)
+            ?, ?, ?)
         `, params);
         res.json({ message: "Object created successfully", affectedRows: result.affectedRows });
         }

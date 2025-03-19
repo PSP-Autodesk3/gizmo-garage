@@ -98,26 +98,27 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                 setDuplicate(0);
             }, 3000);
         } else if (user) { // If no duplicates -> create file
-            await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/items/create`, {
-                method: "POST",
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ itemName: itemName.trim(), email: user.email, project: projectID, id, type }),
-            });
             // Create bucket
             const token = await sessionStorage.getItem("token"); // Get token
-            await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/oss/create`, {
-                method: "POST",
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: id, token: token }),
-            });
-            // Check bucket created
-            const retrieveBuckets = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/oss/getBuckets`, {
+            const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/oss/create`, {
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ token: token }),
             });
-            const buckets = await retrieveBuckets.json();
-            console.log(buckets);
+            const data = await response.json();
+            const bucketKey = data.bucketKey;
+            // Create item in DB and pass through created bucket key
+            await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/items/create`, {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ itemName: itemName.trim(), email: user.email, project: projectID, id, type, bucketKey }),
+            });
+            // Check bucket created
+            await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/oss/getBuckets`, {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: token }),
+            });
             // Gets the updated list
             getData();
         }

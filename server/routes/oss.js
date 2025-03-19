@@ -6,7 +6,8 @@ const router = express.Router();
 // Create bucket on Object Creation.
 router.post("/create", async (req, res, next) => {
     try {
-        const { token, id } = req.body;
+        const { token } = req.body;
+        const key = crypto.randomUUID();
         const result = await fetch("https://developer.api.autodesk.com/oss/v2/buckets", {
             method: "POST",
             headers: {
@@ -15,11 +16,12 @@ router.post("/create", async (req, res, next) => {
                 region: "US"
             },
             body: JSON.stringify({
-                bucketKey: id,
+                bucketKey: key,
                 policyKey: "persistent"
             })
         })
-        res.json(result);
+        const data = await result.json();
+        res.json({ bucketKey: key, ...data });
     }
     catch (error) {
         next(error);
@@ -38,7 +40,8 @@ router.post("/getBuckets", async (req, res, next) => {
                 "region": "US"
             }
         })
-        res.json(result);
+        const data = await result.json();
+        res.json(data);
     } catch (error) {
         next(error);
     }
