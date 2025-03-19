@@ -25,9 +25,12 @@ export default function FolderList({ folders }: { folders: Folder[] }) {
                     folders.map((folder) => (
                         <div key={folder.folder_id}>
                             <button
-                                className="bg-slate-900 rounded-lg text-xl my-4 px-4 py-2"
+                                className="bg-slate-900 rounded-lg text-xl my-4 px-4 py-2 gap-2 items-center flex"
                                 onClick={() => { router.push(pathname + `/${folder.name.replace(/ /g, '+')}`); }}
                             >
+                                <svg className="w-5 h-5 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                                </svg>
                                 {folder.name}
                             </button>
                             {Array.isArray(folder.tags) && folder.tags.length > 0 && (
