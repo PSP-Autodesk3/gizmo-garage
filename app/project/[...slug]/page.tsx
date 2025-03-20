@@ -269,11 +269,12 @@ function Home({ params }: ParamProps) {
         file.tags = objectTags.filter((tag: ItemTags) => tag.object_id === file.object_id);
       });
 
-      const checkbox = document.getElementById('file-checkbox');
-      if (checkbox)
+      const checkbox = document.getElementById('file-checkbox'); 
+      if (checkbox) {
+        (checkbox as HTMLInputElement).checked = checkboxOpen === 'true'; // Docs on HTMLInputElement https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement#instance_properties_that_apply_only_to_elements_of_type_checkbox_or_radio
         checkbox.addEventListener('change', () => {
           const treeFiles = document.getElementsByClassName("tree-file");
-          if (treeFiles[0].classList.contains("hidden")) {
+          if ((checkbox as HTMLInputElement).checked) {
             Array.from(treeFiles).forEach((file) => {
               file.classList.remove('hidden');
             });
@@ -284,7 +285,8 @@ function Home({ params }: ParamProps) {
             });
             sessionStorage.setItem('checkboxOpen', 'false');
           }
-        })
+        });
+      }
     }
   }, [params, id, type]);
 
@@ -326,11 +328,12 @@ function Home({ params }: ParamProps) {
                 {project.replace(/%2B/g, ' ')}
               </button>
               <div className="flex flex-row mt-[20px] gap-[7.5px]">
-                <input
-                  id="file-checkbox"
-                  type="checkbox"
-                  className={`m-1 w-4 h-4 bg-red-600 checked:bg-green-600 border-red-600 checked:border-green-600 border-2 appearance-none rounded transition-colors duration-200`}
-                />
+              <input
+                id="file-checkbox"
+                type="checkbox"
+                defaultChecked={sessionStorage.getItem('checkboxOpen') === 'true'}
+                className={`m-1 w-4 h-4 checked:bg-green-600 checked:border-green-600 bg-red-600 border-red-600 border-2 appearance-none rounded transition-colors duration-200`}
+              />
                 <p>Show files</p>
               </div>
             </div>
