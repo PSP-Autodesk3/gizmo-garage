@@ -16,7 +16,9 @@ import { useEffect, useState } from 'react';
 import sortArray from 'sort-array';
 
 // Skeleton Loading
+import Skeleton, {SkeletonTheme} from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
+
 
 // Interfaces
 import { Project } from "@/app/shared/interfaces/project";
@@ -160,22 +162,6 @@ function Home() {
     )
   }
 
-  // Displays if the user is not logged into their account
-  if (!user) {
-    return (
-      <>
-        <SigningIn />
-      </>
-    )
-  }
-
-  // Displays if the user doesn't have a valid token
-  if (!sessionStorage.getItem('token')) {
-    return (
-      <AuthenticatePrompt loginErrorMessage={loginErrorMessage} />
-    )
-  }
-
   //goes through each UTC date from the database and updates it to display in the current systems timezone
   if (filteredProjects) {
     filteredProjects.forEach((project: Project) => {
@@ -235,7 +221,6 @@ function Home() {
                       <Skeleton width={600} height={125} count={4} style={{ marginBottom: '16px' }} />
                     </SkeletonTheme>
                   </div>
-                </>
                 <div className='space-y-4 ml-10'>
                   {[...Array(4)].map((_, index) => (
                     <div key={index} className="bg-slate-800 p-4 rounded-lg animate-pulse">
@@ -251,6 +236,7 @@ function Home() {
                     </div>
                   ))}
                 </div>
+                </>
               )}
             </div>
           </div>

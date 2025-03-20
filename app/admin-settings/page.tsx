@@ -30,7 +30,6 @@ function Home() {
   const [searchQuery, setSearchQuery] = useState(''); //used for searching tags
   const [error, setError] = useState('');
   const [password, setPassword] = useState('');
-  const [resetEmail, setResetEmail] = useState<string>(''); 
   const [isLoading, setIsLoading] = useState(true);
 
 
