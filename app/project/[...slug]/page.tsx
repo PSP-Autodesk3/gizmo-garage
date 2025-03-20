@@ -90,7 +90,17 @@ function Home({ params }: ParamProps) {
         }
       }
 
-      const outputFolder = (parentFolders: Folder[], parentDetails: HTMLElement, history: string[], depth: number, valid: boolean) => {
+      // Get Files
+
+      const objectQuery = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/items/get`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: Number.parseInt(resolved.slug[0].split('%2B')[0]) }),
+      });
+
+      const objects = await objectQuery.json();
+
+      const outputFolder = async (parentFolders: Folder[], parentDetails: HTMLElement, history: string[], depth: number, valid: boolean) => {
 
         // Iterates foreach child in the folder
         parentFolders.forEach((folder: Folder) => {
@@ -117,19 +127,28 @@ function Home({ params }: ParamProps) {
 
           // Create folder icon and changing its colour dependending on if it is open or not
           const icon = document.createElement("span");
-          icon.innerHTML = `
-            <svg class="w-4 h-4 ${newValid ? 'text-indigo-400' : 'text-slate-400'} 
-              transition-colors duration-200" 
-                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                    d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-            </svg>`; // Site I used for the SVG, https://heroicons.com/outline
+          icon.innerHTML = details.open ? "▼" : "►";
 
           // Create folder button
           const button = document.createElement("button");
           button.className = `${newValid ? 'text-indigo-200 font-medium' : 'text-slate-300'} 
             hover:text-slate-100 transition-colors duration-200 flex-1 text-left`;
           button.textContent = folder.name;
+
+          // Double clicking routes to the folder
+          button.onclick = () => {
+            const route = `/project/${projectID}+${project}${newHistory.join('/')}`;
+            router.push(route);
+          }
+
+          let foldersObjects = objects.filter((object: File) => object.folder_id === folder.folder_id );
+          
+          foldersObjects.forEach((object: File) => {
+            const file = document.createElement("p");
+            file.innerHTML = object.name;
+            file.className = `ml-[30px] hidden tree-file`;
+            details.appendChild(file);
+          });
 
           summary.appendChild(icon);
           summary.appendChild(button);
@@ -141,11 +160,11 @@ function Home({ params }: ParamProps) {
           const newHistory = [...history, `/${folder.name.replace(/ /g, "+")}`];
           const newDepth = depth + 1;
 
-          // Double clicking routes to the folder
-          summary.ondblclick = () => {
-            const route = `/project/${projectID}+${project}${newHistory.join('/')}`;
-            router.push(route);
-          }
+          // Flips the symbol if open/closed
+
+          details.addEventListener("toggle", () => {
+            icon.textContent = details.open ? "▼" : "►";
+          })
 
           // Adds the new elements to each other and the DOM
           details.appendChild(summary);
@@ -165,6 +184,21 @@ function Home({ params }: ParamProps) {
         await outputFolder(baseFolders, tree, [], 0, true);
       }
 
+      console.log(currentFolder);
+      
+      setFiles(objects.filter((object: File) => 
+        currentFolder === undefined || currentFolder === null ? object.folder_id === null : object.folder_id === currentFolder.folder_id
+      ))
+      setFilteredFiles(objects.filter((object: File) => 
+        currentFolder === undefined || currentFolder === null ? object.folder_id === null : object.folder_id === currentFolder.folder_id
+      ))
+
+      /*
+      setFilteredFiles(objects.filter((object: File) => {
+        currentFolder !== undefined && currentFolder !== null ? object.folder_id = currentFolder.folder_id : object.folder_id === null
+      }))
+        */
+
       if (storedFolders) {
         const query = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/folders/get`, {
           method: "POST",
@@ -176,7 +210,7 @@ function Home({ params }: ParamProps) {
         sessionStorage.setItem(`folders_${projectID}`, JSON.stringify(folderResults));
       }
 
-      // Get Folders
+      // Set Folders
 
       setID(currentFolder ? (currentFolder.folder_id) : (projectID));
       setType(currentFolder ? (0) : (1));
@@ -188,18 +222,6 @@ function Home({ params }: ParamProps) {
         setFolders(folderResults.filter((folder: Folder) => folder.parent_folder_id === null));
         setFilteredFolders(folderResults.filter((folder: Folder) => folder.parent_folder_id === null));
       }
-
-      // Get Files
-
-      const objectQuery = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/items/get`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, type }),
-      });
-
-      const objects = await objectQuery.json();
-      setFiles(objects);
-      setFilteredFiles(objects);
 
       // Get Tags
 
@@ -236,6 +258,21 @@ function Home({ params }: ParamProps) {
       objects.forEach((file: File) => {
         file.tags = objectTags.filter((tag: ItemTags) => tag.object_id === file.object_id);
       });
+
+      const checkbox = document.getElementById('file-checkbox');
+      if (checkbox)
+        checkbox.addEventListener('change', () => {
+          const treeFiles = document.getElementsByClassName("tree-file");
+          if (treeFiles[0].classList.contains("hidden")) {
+            Array.from(treeFiles).forEach((file) => {
+              file.classList.remove('hidden');
+            });
+          } else {
+            Array.from(treeFiles).forEach((file) => {
+              file.classList.add('hidden');
+            });
+          }
+        })
     }
   }, [params, id, type]);
 
@@ -263,12 +300,12 @@ function Home({ params }: ParamProps) {
         </div>
 
         {/* Folder tree */}
-        <div id="tree-folders" className="min-w-[280px] flex-shrink-0">
+        <div id="tree-folders" className="min-w-[280px] flex-shrink-0 mt-[80px]">
           <div className="bg-slate-800/50 backdrop-blur mx-8 my-4 rounded-lg overflow-hidden shadow-xl border border-slate-700/50">
             <div className="p-4 border-b border-slate-700/50">
               <button
                 className="w-full text-left px-3 py-2 rounded-md bg-slate-700/30 hover:bg-slate-700/50 
-                          transition-all duration-200 text-slate-200 font-medium flex items-center gap-2 shadow-sm hover:shadow"
+                                  transition-all duration-200 text-slate-200 font-medium flex items-center gap-2 shadow-sm hover:shadow"
                 onClick={() => { router.push(`/project/${projectID}+${project.replace(/%2B/g, '+')}`); }}
               >
                 <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -276,6 +313,13 @@ function Home({ params }: ParamProps) {
                 </svg>
                 {project.replace(/%2B/g, ' ')}
               </button>
+              <div className="flex flex-row ml-[30px] mt-[20px] gap-[15px]">
+                <input
+                  id="file-checkbox"
+                  type="checkbox"
+                />
+                <p>Show files</p>
+              </div>
             </div>
             <div id="trees" className="p-3 space-y-0.5"></div>
           </div>
