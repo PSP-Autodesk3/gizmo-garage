@@ -12,7 +12,7 @@ export default function ProjectPreview({ project, query }: { project: Project, q
     return (
         <div className="bg-slate-900 p-4 m-auto rounded-lg shadow-lg mx-8 my-4 flex flex-row justify-between">
             <div className='p-2 pr-10'>
-                <p>Name: {project.name} </p>
+                <p className="text-xl font-bold">Name: {project.name} </p>
                 <p>Version: </p>
                 <p>Date: {project.dateOfCreation.toLocaleDateString()} {project.dateOfCreation.toLocaleTimeString()} </p>
                 {project.tags.length > 0 && (
@@ -28,7 +28,7 @@ export default function ProjectPreview({ project, query }: { project: Project, q
             </div>
             <div className='content-center'>
                 <button
-                    className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                    className="px-6 py-3 mr-4 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
                     onClick={() => router.push(`/project/${project.project_id}+${project.name.replace(/ /g, '+')}`)}
                 >
                     View
