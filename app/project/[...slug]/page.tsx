@@ -100,6 +100,8 @@ function Home({ params }: ParamProps) {
 
       const objects = await objectQuery.json();
 
+      const checkboxOpen = sessionStorage.getItem('checkboxOpen') || 'false';
+
       const outputFolder = async (parentFolders: Folder[], parentDetails: HTMLElement, history: string[], depth: number, valid: boolean) => {
 
         // Iterates foreach child in the folder
@@ -135,17 +137,21 @@ function Home({ params }: ParamProps) {
             hover:text-slate-100 transition-colors duration-200 flex-1 text-left`;
           button.textContent = folder.name;
 
-          // Double clicking routes to the folder
+          // Clicking routes to the folder
           button.onclick = () => {
             const route = `/project/${projectID}+${project}${newHistory.join('/')}`;
             router.push(route);
           }
 
-          let foldersObjects = objects.filter((object: File) => object.folder_id === folder.folder_id );
-          
+          let foldersObjects = objects.filter((object: File) => object.folder_id === folder.folder_id);
+          console.log(foldersObjects)
+
+          console.log(checkboxOpen);
+
           foldersObjects.forEach((object: File) => {
             const file = document.createElement("button");
-            file.className = "pl-4 flex items-center gap-2 py-2 px-3 text-slate-300 hover:text-slate-100 transition-colors duration-200 flex-1 text-left hidden tree-file";
+            file.className = `pl-4 flex items-center gap-2 py-2 px-3 text-slate-300 hover:text-slate-100 transition-colors duration-200 flex-1 text-left tree-file
+                              ${checkboxOpen === 'false' && 'hidden'}`;
             file.innerHTML = `
               <svg class="ml-2 w-5 h-5 text-slate-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
@@ -189,11 +195,11 @@ function Home({ params }: ParamProps) {
       }
 
       console.log(currentFolder);
-      
-      setFiles(objects.filter((object: File) => 
+
+      setFiles(objects.filter((object: File) =>
         currentFolder === undefined || currentFolder === null ? object.folder_id === null : object.folder_id === currentFolder.folder_id
       ))
-      setFilteredFiles(objects.filter((object: File) => 
+      setFilteredFiles(objects.filter((object: File) =>
         currentFolder === undefined || currentFolder === null ? object.folder_id === null : object.folder_id === currentFolder.folder_id
       ))
 
@@ -271,10 +277,12 @@ function Home({ params }: ParamProps) {
             Array.from(treeFiles).forEach((file) => {
               file.classList.remove('hidden');
             });
+            sessionStorage.setItem('checkboxOpen', 'true');
           } else {
             Array.from(treeFiles).forEach((file) => {
               file.classList.add('hidden');
             });
+            sessionStorage.setItem('checkboxOpen', 'false');
           }
         })
     }
@@ -321,7 +329,7 @@ function Home({ params }: ParamProps) {
                 <input
                   id="file-checkbox"
                   type="checkbox"
-                  className="m-1 w-4 h-4 bg-red-600 checked:bg-green-600 border-red-600 checked:border-green-600 border-2 appearance-none rounded transition-colors duration-200"
+                  className={`m-1 w-4 h-4 bg-red-600 checked:bg-green-600 border-red-600 checked:border-green-600 border-2 appearance-none rounded transition-colors duration-200`}
                 />
                 <p>Show files</p>
               </div>
