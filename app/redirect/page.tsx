@@ -48,14 +48,15 @@ function Home() {
                 const data = await response.json();
                 if (data.access_token && response.ok) {
                     sessionStorage.setItem('token', data.access_token);
+                    router.push("/");
                 } else {
                     sessionStorage.setItem("errorMessage", "Error exchanging Auth for token.");
                 }
             }
         }
+        router.push("/authenticate");
 
         fetchToken();
-        router.push("/");
     }, [code, basicAuth, error, errorDescription, router])
 
     return (
