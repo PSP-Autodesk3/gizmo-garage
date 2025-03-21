@@ -9,7 +9,6 @@ import 'react-loading-skeleton/dist/skeleton.css'
 
 
 export default function FileList({ files }: { files: File[] }) {
-    console.log("FileList", files);
     return (
         <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
             {!files ? (

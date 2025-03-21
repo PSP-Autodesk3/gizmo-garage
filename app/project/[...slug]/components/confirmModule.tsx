@@ -179,7 +179,7 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                             onChange={(e) => setTagQuery(e.target.value)}
                         />
                     </div>
-                    <div className='bg-slate-900 rounded-lg grid overflow-hidden grid-cols-4 gap-2 w-[90%] flex-wrap'>
+                    <div className='bg-slate-900 rounded-lg overflow-hidden flex flex-wrap w-[90%]'>
                         {filteredTags.length > 0 ? (
                             filteredTags.map((tag: Tag) => (
                                 <button type="button" className='m-2 rounded-full bg-blue-600 text-white text-sm px-4 py-2 flex items-center text-center' onClick={() => applyTag(tag.tag_id)} key={tag.tag_id}>{tag.tag}</button>
