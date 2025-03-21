@@ -36,6 +36,52 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
     const [tagQuery, setTagQuery] = useState<string>('');
     const [alreadyApplied, setAlreadyApplied] = useState(0);
     const [appliedTags, setAppliedTags] = useState<Tag[]>([]);
+    // File uploads
+    const [file, setFile] = useState<File | null>(null);
+    const [uploading, setUploading] = useState<boolean>(false);
+    const [message, setMessage] = useState<string | null>(null);
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files.length > 0) {
+            setFile(event.target.files[0]);
+        }
+    };
+
+    const handleUpload = async (bucketKey: string) => {
+        if (!file) {
+            setMessage("No file selected");
+            return;
+        }
+        setUploading(true);
+        setMessage("");
+        const formData = new FormData();
+        formData.append("file", file);
+        const token = sessionStorage.getItem("token");
+        if (token) {
+            formData.append("token", token);
+        }
+        if (bucketKey) {
+            formData.append("bucketKey", bucketKey);
+        }
+        try {
+            const response = await fetch("http://localhost:3001/oss/upload", {
+                method: "POST",
+                body: formData,
+            });
+            const data = await response.json();
+            console.log(data);
+            if (response.ok) {
+                setMessage("File uploaded successfully");
+            } else {
+                setMessage("Error uploading file");
+            }
+        }
+        catch (error) {
+            setMessage("Error uploading file");
+        } finally {
+            setUploading(false);
+        }
+    }
 
     useEffect(() => {
       if (tagQuery != '') {
@@ -113,6 +159,8 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ itemName: itemName.trim(), email: user.email, project: projectID, id, type, bucketKey }),
             });
+            // Upload file to bucket
+            handleUpload(bucketKey);
             // Check bucket created
             await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/oss/getBuckets`, {
                 method: "POST",
@@ -224,6 +272,12 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                         </div>
                     </div>
                 </div>
+
+                <div className="px-8">
+                <input type="file" onChange={handleFileChange} className="mb-4 bg-slate-800 rounded-lg p-4 text-lg" />
+                <br />
+                {message && <p className="mt-2 text-sm">{message}</p>}
+            </div>
 
                 <div className="mt-4">
                     <button
