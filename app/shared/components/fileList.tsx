@@ -26,18 +26,18 @@ export default function FileList({ files }: { files: File[] }) {
                         <div key={file.object_id}>
                             <button
                                 key={index}
-                                className="bg-slate-900 rounded-lg text-xl my-10 px-10 py-2"
+                                className="bg-slate-900 rounded-lg text-xl my-10 px-10 py-2 flex flex-col"
                                 onClick={() => { }}
                             >
                                 <div className="flex flex-col">
                                     <span className="font-bold">{file.name}</span>
                                     <span className="text-sm">{file.dateOfCreation.toLocaleDateString()}</span>
-                                    <div className='flex flex-wrap'>
+                                    <div className='flex flex-wrap max-w-full'>
                                         {Array.isArray(file.tags) && file.tags.length > 0 && (
                                             file.tags.map((tag, index) => (
-                                                    <span key={index} className='rounded-full m-1 p-1 text-xs bg-blue-600 self-center'>
-                                                        {tag.tag}
-                                                    </span>
+                                                <span key={index} className='rounded-full m-1 p-1 text-xs bg-blue-600 self-center'>
+                                                    {tag.tag}
+                                                </span>
                                             ))
                                         )}
                                     </div>
