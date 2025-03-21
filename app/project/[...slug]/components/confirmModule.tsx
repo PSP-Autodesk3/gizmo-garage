@@ -10,9 +10,6 @@ import { useAuthState } from "react-firebase-hooks/auth";
 // Interfaces
 import { Tag } from '@/app/shared/interfaces/tag';
 
-// OSS SDK
-import { ObjectDetails, OssClient } from "@aps_sdk/oss";
-
 interface ModuleProps {
     itemType: string;
     projectID: number;
@@ -38,7 +35,6 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
     const [appliedTags, setAppliedTags] = useState<Tag[]>([]);
     // File uploads
     const [file, setFile] = useState<File | null>(null);
-    const [uploading, setUploading] = useState<boolean>(false);
     const [message, setMessage] = useState<string | null>(null);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,7 +48,6 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
             setMessage("No file selected");
             return;
         }
-        setUploading(true);
         setMessage("");
         const formData = new FormData();
         formData.append("file", file);
@@ -78,8 +73,7 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
         }
         catch (error) {
             setMessage("Error uploading file");
-        } finally {
-            setUploading(false);
+            console.log(error);
         }
     }
 
