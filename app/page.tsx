@@ -47,7 +47,7 @@ function Home() {
       //display where the search equals the query or matches at least one of the tags
       setFilteredProjects(projects.filter(project => project.name.toLowerCase().includes(query.trim()) || project.tags.some(tag => tag.tag.toLowerCase().includes(query.trim()))));
     }
-  }, [query]);
+  }, [query, projects]);
   
   useEffect(() => {
     // Only runs if the user has logged in
@@ -112,7 +112,7 @@ function Home() {
     if (!sessionStorage.getItem('token') && !loading && !loadingAuth && user) {
       router.replace('/authenticate');
     }
-  }, [loadingAuth, router]);
+  }, [loadingAuth, router, loading, user]);
 
   // Displays if the user is logged in, but the database doesn't exist
   if (databaseErrorMessage) {

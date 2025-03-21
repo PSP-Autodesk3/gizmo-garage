@@ -40,7 +40,7 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
       } else {
         setFilteredTags(allTags);
       }
-    }, [tagQuery]);
+    }, [tagQuery, allTags, setFilteredTags]);
 
     // Create new folder
     const newFolder = async (e: React.FormEvent<HTMLFormElement>) => {
