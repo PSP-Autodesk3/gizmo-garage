@@ -63,17 +63,26 @@ function Home({ params }: ParamProps) {
 
       let currentFolder: Folder | null = null as Folder | null;
 
-      // Get folders in the project
-      const query = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/folders/get`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: projectID})
-      })
+      const storedFolders = sessionStorage.getItem(`folders_${projectID}`);
+      let folderResults: Folder[];
 
-      const folders = await query.json();
+      if (storedFolders) {
+        // If folders are in sessionStorage then take them
+        folderResults = JSON.parse(storedFolders);
+      } else {
+        // If not then get them through the API
+        const query = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/folders/get`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: projectID })
+        });
+
+        folderResults = await query.json();
+        sessionStorage.setItem(`folders_${projectID}`, JSON.stringify(folderResults));
+      }
 
       // Base information to be passed to outputFolder
-      const baseFolders = folders.filter((folder: Folder) => folder.parent_folder_id === null);
+      const baseFolders = folderResults.filter((folder: Folder) => folder.parent_folder_id === null);
       const tree = document.getElementById("trees");
       if (tree) {
         while (tree.firstChild) {
@@ -81,7 +90,19 @@ function Home({ params }: ParamProps) {
         }
       }
 
-      const outputFolder = (parentFolders: Folder[], parentDetails: HTMLElement, history: string[], depth: number, valid: boolean) => {
+      // Get Files
+
+      const objectQuery = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/items/get`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: Number.parseInt(resolved.slug[0].split('%2B')[0]) }),
+      });
+
+      const objects = await objectQuery.json();
+
+      const checkboxOpen = sessionStorage.getItem('checkboxOpen') || 'false';
+
+      const outputFolder = async (parentFolders: Folder[], parentDetails: HTMLElement, history: string[], depth: number, valid: boolean) => {
 
         // Iterates foreach child in the folder
         parentFolders.forEach((folder: Folder) => {
@@ -108,20 +129,37 @@ function Home({ params }: ParamProps) {
 
           // Create folder icon and changing its colour dependending on if it is open or not
           const icon = document.createElement("span");
-          icon.innerHTML = `
-            <svg class="w-4 h-4 ${newValid ? 'text-indigo-400' : 'text-slate-400'} 
-              transition-colors duration-200" 
-                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                    d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-            </svg>`; // Site I used for the SVG, https://heroicons.com/outline
-          
+          icon.innerHTML = details.open ? "▼" : "►";
+
           // Create folder button
           const button = document.createElement("button");
-          button.className = `${newValid ? 'text-indigo-200 font-medium': 'text-slate-300'} 
+          button.className = `${newValid ? 'text-indigo-200 font-medium' : 'text-slate-300'} 
             hover:text-slate-100 transition-colors duration-200 flex-1 text-left`;
           button.textContent = folder.name;
-        
+
+          // Clicking routes to the folder
+          button.onclick = () => {
+            const route = `/project/${projectID}+${project}${newHistory.join('/')}`;
+            router.push(route);
+          }
+
+          let foldersObjects = objects.filter((object: File) => object.folder_id === folder.folder_id);
+          console.log(foldersObjects)
+
+          console.log(checkboxOpen);
+
+          foldersObjects.forEach((object: File) => {
+            const file = document.createElement("button");
+            file.className = `pl-4 flex items-center gap-2 py-2 px-3 text-slate-300 hover:text-slate-100 transition-colors duration-200 flex-1 text-left tree-file
+                              ${checkboxOpen === 'false' && 'hidden'}`;
+            file.innerHTML = `
+              <svg class="ml-2 w-5 h-5 text-slate-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+              </svg>
+              ${object.name}`;
+            details.appendChild(file);
+          });
+
           summary.appendChild(icon);
           summary.appendChild(button);
 
@@ -132,18 +170,18 @@ function Home({ params }: ParamProps) {
           const newHistory = [...history, `/${folder.name.replace(/ /g, "+")}`];
           const newDepth = depth + 1;
 
-          // Double clicking routes to the folder
-          summary.ondblclick = () => {
-            const route = `/project/${projectID}+${project}${newHistory.join('/')}`;
-            router.push(route);
-          }
+          // Flips the symbol if open/closed
+
+          details.addEventListener("toggle", () => {
+            icon.textContent = details.open ? "▼" : "►";
+          })
 
           // Adds the new elements to each other and the DOM
           details.appendChild(summary);
           parentDetails.appendChild(details);
 
           // Gets folders that are a child of the current folder
-          const childFolders = folders.filter((childFolder: Folder) => childFolder.parent_folder_id === folder.folder_id);
+          const childFolders = folderResults.filter((childFolder: Folder) => childFolder.parent_folder_id === folder.folder_id);
 
           // Does this again for each child folder iteratively
           if (childFolders.length > 0) {
@@ -156,30 +194,44 @@ function Home({ params }: ParamProps) {
         await outputFolder(baseFolders, tree, [], 0, true);
       }
 
-      // Get Folders
+      console.log(currentFolder);
+
+      setFiles(objects.filter((object: File) =>
+        currentFolder === undefined || currentFolder === null ? object.folder_id === null : object.folder_id === currentFolder.folder_id
+      ))
+      setFilteredFiles(objects.filter((object: File) =>
+        currentFolder === undefined || currentFolder === null ? object.folder_id === null : object.folder_id === currentFolder.folder_id
+      ))
+
+      /*
+      setFilteredFiles(objects.filter((object: File) => {
+        currentFolder !== undefined && currentFolder !== null ? object.folder_id = currentFolder.folder_id : object.folder_id === null
+      }))
+        */
+
+      if (storedFolders) {
+        const query = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/folders/get`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: projectID })
+        });
+
+        folderResults = await query.json();
+        sessionStorage.setItem(`folders_${projectID}`, JSON.stringify(folderResults));
+      }
+
+      // Set Folders
 
       setID(currentFolder ? (currentFolder.folder_id) : (projectID));
       setType(currentFolder ? (0) : (1));
 
       if (currentFolder) {
-        setFolders(folders.filter((folder: Folder) => folder.parent_folder_id === currentFolder?.folder_id));
-        setFilteredFolders(folders.filter((folder: Folder) => folder.parent_folder_id === currentFolder?.folder_id));
+        setFolders(folderResults.filter((folder: Folder) => folder.parent_folder_id === currentFolder?.folder_id));
+        setFilteredFolders(folderResults.filter((folder: Folder) => folder.parent_folder_id === currentFolder?.folder_id));
       } else {
-        setFolders(folders.filter((folder: Folder) => folder.parent_folder_id === null));
-        setFilteredFolders(folders.filter((folder: Folder) => folder.parent_folder_id === null));
+        setFolders(folderResults.filter((folder: Folder) => folder.parent_folder_id === null));
+        setFilteredFolders(folderResults.filter((folder: Folder) => folder.parent_folder_id === null));
       }
-
-      // Get Files
-
-      const objectQuery = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/items/get`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, type }),
-      });
-
-      const objects = await objectQuery.json();
-      setFiles(objects);
-      setFilteredFiles(objects);
 
       // Get Tags
 
@@ -203,12 +255,12 @@ function Home({ params }: ParamProps) {
       const folderTagsQuery = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/tags/getFolder`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ projectid: projectID}),
+        body: JSON.stringify({ projectid: projectID }),
       })
 
       const folderTags = await folderTagsQuery.json();
 
-      folders.forEach((folder: Folder) => {
+      folderResults.forEach((folder: Folder) => {
         folder.tags = folderTags.filter((tag: FolderTags) => tag.folder_id === folder.folder_id);
       });
 
@@ -216,6 +268,25 @@ function Home({ params }: ParamProps) {
       objects.forEach((file: File) => {
         file.tags = objectTags.filter((tag: ItemTags) => tag.object_id === file.object_id);
       });
+
+      const checkbox = document.getElementById('file-checkbox'); 
+      if (checkbox) {
+        (checkbox as HTMLInputElement).checked = checkboxOpen === 'true'; // Docs on HTMLInputElement https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement#instance_properties_that_apply_only_to_elements_of_type_checkbox_or_radio
+        checkbox.addEventListener('change', () => {
+          const treeFiles = document.getElementsByClassName("tree-file");
+          if ((checkbox as HTMLInputElement).checked) {
+            Array.from(treeFiles).forEach((file) => {
+              file.classList.remove('hidden');
+            });
+            sessionStorage.setItem('checkboxOpen', 'true');
+          } else {
+            Array.from(treeFiles).forEach((file) => {
+              file.classList.add('hidden');
+            });
+            sessionStorage.setItem('checkboxOpen', 'false');
+          }
+        });
+      }
     }
   }, [params, id, type]);
 
@@ -243,12 +314,12 @@ function Home({ params }: ParamProps) {
         </div>
 
         {/* Folder tree */}
-        <div id="tree-folders" className="min-w-[280px] flex-shrink-0">
+        <div id="tree-folders" className="min-w-[280px] flex-shrink-0 mt-[80px]">
           <div className="bg-slate-800/50 backdrop-blur mx-8 my-4 rounded-lg overflow-hidden shadow-xl border border-slate-700/50">
             <div className="p-4 border-b border-slate-700/50">
               <button
                 className="w-full text-left px-3 py-2 rounded-md bg-slate-700/30 hover:bg-slate-700/50 
-                          transition-all duration-200 text-slate-200 font-medium flex items-center gap-2 shadow-sm hover:shadow"
+                                  transition-all duration-200 text-slate-200 font-medium flex items-center gap-2 shadow-sm hover:shadow"
                 onClick={() => { router.push(`/project/${projectID}+${project.replace(/%2B/g, '+')}`); }}
               >
                 <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -256,6 +327,15 @@ function Home({ params }: ParamProps) {
                 </svg>
                 {project.replace(/%2B/g, ' ')}
               </button>
+              <div className="flex flex-row mt-[20px] gap-[7.5px]">
+              <input
+                id="file-checkbox"
+                type="checkbox"
+                defaultChecked={sessionStorage.getItem('checkboxOpen') === 'true'}
+                className={`m-1 w-4 h-4 checked:bg-green-600 checked:border-green-600 bg-red-600 border-red-600 border-2 appearance-none rounded transition-colors duration-200`}
+              />
+                <p>Show files</p>
+              </div>
             </div>
             <div id="trees" className="p-3 space-y-0.5"></div>
           </div>
@@ -299,7 +379,7 @@ function Home({ params }: ParamProps) {
 
               {/* Files */}
               <div id="files" className="mx-8 my-4">
-                <h1 className="my-4 text-3xl">Files</h1>
+                <h1 className="my-4 text-3xl">Files:</h1>
                 <FileList
                   files={filteredFiles}
                 />

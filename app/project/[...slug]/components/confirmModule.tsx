@@ -2,6 +2,7 @@
 
 // Other
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 // Firebase
 import { auth } from "@/app/firebase/config"
@@ -33,6 +34,7 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
     const [tagQuery, setTagQuery] = useState<string>('');
     const [alreadyApplied, setAlreadyApplied] = useState(0);
     const [appliedTags, setAppliedTags] = useState<Tag[]>([]);
+    const router= useRouter();
 
     useEffect(() => {
       if (tagQuery != '') {
@@ -72,6 +74,7 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
         }
         setConfirmModule(false);
         setFolderName("");
+        router.refresh();
     }
 
     // Create new item
