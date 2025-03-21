@@ -52,7 +52,6 @@ router.post("/getBuckets", async (req, res, next) => {
 router.post("/upload", upload.single("file"), async (req, res, next) => {
     try {
         const {token, bucketKey} = req.body;
-        console.log("SignedURL: Token:", token);
         const file = req.file;
         if (!file) {
             throw new Error("No file uploaded");

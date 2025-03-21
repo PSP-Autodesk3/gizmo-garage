@@ -64,8 +64,7 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                 body: formData,
             });
             const data = await response.json();
-            console.log(data);
-            if (response.ok) {
+            if (data.ok) {
                 setMessage("File uploaded successfully");
             } else {
                 setMessage("Error uploading file");

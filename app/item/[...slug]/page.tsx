@@ -51,8 +51,7 @@ function Home({ params }: PageProps) {
                     body: formData,
                 });
                 const data = await response.json();
-                console.log(data);
-                if (response.ok) {
+                if (data.ok) {
                     setMessage("File uploaded successfully");
                 } else {
                     setMessage("Error uploading file");
@@ -84,7 +83,6 @@ function Home({ params }: PageProps) {
                     body: JSON.stringify({ id: itemId }),
                 });
                 const itemData = await response.json();
-                console.log(itemData);
                 setItemName(itemData[0]?.name);
                 setAuthor(itemData[0]?.fname + " " + itemData[0]?.lname);
                 setBucketKey(itemData[0]?.bucket_id);
