@@ -4,11 +4,7 @@
 import withAuth from "@/app/lib/withAuth";
  
 // Other
-import { useRouter, usePathname } from 'next/navigation';
-import { use, useCallback, useState, useEffect } from "react";
-// Auth
-import { auth } from "@/app/firebase/config"
-import { useAuthState } from "react-firebase-hooks/auth";
+import { useState, useEffect } from "react";
 
 //Filter component
 import BackBtnBar from "@/app/shared/components/backBtnBar";
@@ -17,14 +13,7 @@ interface PageProps {
   params: { slug: string[] };
 }
 
-interface Item {
-    object_id: number;
-    name: string;
-}
-
 function Home({ params }: PageProps) {
-     const router = useRouter();
-     const [item, setItem] = useState<Item | null>(null);
      const [itemId, setItemId] = useState<number | null>(null);
      const [itemName, setItemName] = useState<string | null>(null);
      const [author, setAuthor] = useState<string | null>(null);
@@ -71,6 +60,7 @@ function Home({ params }: PageProps) {
             }
             catch (error) {
                 setMessage("Error uploading file");
+                console.log(error);
             } finally {
                 setUploading(false);
             }
