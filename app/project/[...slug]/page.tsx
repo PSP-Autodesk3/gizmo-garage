@@ -59,178 +59,165 @@ function Home({ params }: ParamProps) {
       setProjectID(Number.parseInt(resolved.slug[0].split('%2B')[0]));
       setRoutes(resolved.slug.slice(1));
 
-      // Get and display tree structure
-
-      let currentFolder: Folder | null = null as Folder | null;
-
-      const storedFolders = sessionStorage.getItem(`folders_${projectID}`);
-      let folderResults: Folder[];
-
-      if (storedFolders) {
-        // If folders are in sessionStorage then take them
-        folderResults = JSON.parse(storedFolders);
-      } else {
-        // If not then get them through the API
+      async function getFolders(): Promise<Folder[]> {
         const query = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/folders/get`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ id: projectID })
         });
 
-        folderResults = await query.json();
-        sessionStorage.setItem(`folders_${projectID}`, JSON.stringify(folderResults));
+        return await query.json();
       }
+      async function getFiles(): Promise<File[]>  {
+        const query = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/items/get`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: projectID })
+        });
 
-      // Base information to be passed to outputFolder
-      const baseFolders = folderResults.filter((folder: Folder) => folder.parent_folder_id === null);
-      const tree = document.getElementById("trees");
-      if (tree) {
-        while (tree.firstChild) {
-          tree.removeChild(tree.firstChild);
-        }
+        return await query.json();
       }
-
-      // Get Files
-
-      const objectQuery = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/items/get`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: Number.parseInt(resolved.slug[0].split('%2B')[0]) }),
-      });
-
-      const objects = await objectQuery.json();
 
       const checkboxOpen = sessionStorage.getItem('checkboxOpen') || 'false';
 
-      const outputFolder = async (parentFolders: Folder[], parentDetails: HTMLElement, history: string[], depth: number, valid: boolean) => {
+      let currentFolder: Folder | null = null as Folder | null;
 
-        // Iterates foreach child in the folder
-        parentFolders.forEach((folder: Folder) => {
-
-          // Tests if the folder is opened
-          let newValid = false;
-          if (valid) {
-            if (routes[depth] === folder.name) {
-              newValid = true;
-              currentFolder = folder;
-            }
+      async function displayTree(folders: Folder[], files: File[]) {
+        const tree = document.getElementById("trees");
+        if (tree) {
+          while (tree.firstChild) {
+            tree.removeChild(tree.firstChild);
           }
+        }
 
-          // Creates a details tag, which by default is collapsible
-          const details = document.createElement("details");
-          details.className = "pl-4 mb-1 relative";
-          if (newValid) details.open = true;
+        const outputFolder = async (folderID: number | null, parentObject: HTMLElement, valid: boolean, depth: number, history: string[]) => {
+          const baseFiles = files.filter((file: File) => file.folder_id === folderID);
 
-          // Creates a summary tag, which is the preview text
-          const summary = document.createElement("summary");
-          summary.className = `flex items-center gap-2 py-2 px-3 rounded-md cursor-pointer mt-1
-            ${newValid ? "bg-indigo-500/20 hover:bg-indigo-500/30" : "hover:bg-slate-700/50"}
-            transition-all duration-200 relative`; // Using tailwindcss conditional styling, basically if newValid is true, use the first set of classes, otherwise use the second set 
-
-          // Create folder icon and changing its colour dependending on if it is open or not
-          const icon = document.createElement("span");
-          icon.innerHTML = details.open ? "▼" : "►";
-
-          // Create folder button
-          const button = document.createElement("button");
-          button.className = `${newValid ? 'text-indigo-200 font-medium' : 'text-slate-300'} 
-            hover:text-slate-100 transition-colors duration-200 flex-1 text-left`;
-          button.textContent = folder.name;
-
-          // Clicking routes to the folder
-          button.onclick = () => {
-            const route = `/project/${projectID}+${project}${newHistory.join('/')}`;
-            router.push(route);
-          }
-
-          let foldersObjects = objects.filter((object: File) => object.folder_id === folder.folder_id);
-          console.log(foldersObjects)
-
-          console.log(checkboxOpen);
-
-          foldersObjects.forEach((object: File) => {
-            const file = document.createElement("button");
-            file.className = `pl-4 flex items-center gap-2 py-2 px-3 text-slate-300 hover:text-slate-100 transition-colors duration-200 flex-1 text-left tree-file
+          baseFiles.forEach((file: File) => {
+            const button = document.createElement("button");
+            button.className = `pl-4 flex items-center gap-2 py-2 px-3 text-slate-300 hover:text-slate-100 transition-colors duration-200 flex-1 text-left tree-file
                               ${checkboxOpen === 'false' && 'hidden'}`;
-            file.innerHTML = `
+                              button.innerHTML = `
               <svg class="ml-2 w-5 h-5 text-slate-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
               </svg>
-              ${object.name}`;
-            details.appendChild(file);
-          });
-
-          summary.appendChild(icon);
-          summary.appendChild(button);
-
-          // Styling for open folders, commented this out for now, as it was causing svg of open folders to push the text onto a new line
-          // if (newValid) summary.innerHTML = "<strong>" + summary.innerHTML + "</strong>"; 
-
-          // Assigns the route function
-          const newHistory = [...history, `/${folder.name.replace(/ /g, "+")}`];
-          const newDepth = depth + 1;
-
-          // Flips the symbol if open/closed
-
-          details.addEventListener("toggle", () => {
-            icon.textContent = details.open ? "▼" : "►";
+              ${file.name}`;
+            parentObject.appendChild(button);
           })
 
-          // Adds the new elements to each other and the DOM
-          details.appendChild(summary);
-          parentDetails.appendChild(details);
+          const baseFolders = folders.filter((folder: Folder) => folder.parent_folder_id === folderID);
 
-          // Gets folders that are a child of the current folder
-          const childFolders = folderResults.filter((childFolder: Folder) => childFolder.parent_folder_id === folder.folder_id);
+          baseFolders.forEach((folder: Folder) => {
+            let newValid = false;
+            if (valid) {
+              if (routes[depth] === folder.name) {
+                newValid = true;
+                currentFolder = folder;
+              }
+            }
 
-          // Does this again for each child folder iteratively
-          if (childFolders.length > 0) {
-            outputFolder(childFolders, details, newHistory, newDepth, newValid);
-          }
-        })
+            // Creates a details tag, which by default is collapsible
+            const details = document.createElement("details");
+            details.className = "pl-4 mb-1 relative";
+            if (newValid) details.open = true;
+
+            // Creates a summary tag, which is the preview text
+            const summary = document.createElement("summary");
+            summary.className = `flex items-center gap-2 py-2 px-3 rounded-md cursor-pointer mt-1
+              ${newValid ? "bg-indigo-500/20 hover:bg-indigo-500/30" : "hover:bg-slate-700/50"}
+              transition-all duration-200 relative`; // Using tailwindcss conditional styling, basically if newValid is true, use the first set of classes, otherwise use the second set 
+
+            // Create folder icon and changing its colour dependending on if it is open or not
+            const icon = document.createElement("span");
+            icon.innerHTML = details.open ? "▼" : "►";
+
+            // Create folder button
+            const button = document.createElement("button");
+            button.className = `${newValid ? 'text-indigo-200 font-medium' : 'text-slate-300'} 
+              hover:text-slate-100 transition-colors duration-200 flex-1 text-left`;
+            button.textContent = folder.name;
+
+            const newHistory = [...history, `/${folder.name.replace(/ /g, "+")}`];
+            const newDepth = depth + 1;
+
+            // Clicking routes to the folder
+            button.onclick = () => {
+              const route = `/project/${projectID}+${project}${newHistory.join('/')}`;
+              router.push(route);
+            }
+
+            details.addEventListener("toggle", () => {
+              icon.textContent = details.open ? "▼" : "►";
+            })
+
+            summary.appendChild(icon);
+            summary.appendChild(button);
+            details.appendChild(summary);
+            parentObject.appendChild(details);
+            
+            outputFolder(folder.folder_id, details, newValid, newDepth, newHistory);
+          })
+        }
+
+        if (tree)
+          outputFolder(null, tree, true, 0, []);
       }
 
-      if (baseFolders && tree) {
-        await outputFolder(baseFolders, tree, [], 0, true);
-      }
-
-      console.log(currentFolder);
-
-      setFiles(objects.filter((object: File) =>
-        currentFolder === undefined || currentFolder === null ? object.folder_id === null : object.folder_id === currentFolder.folder_id
-      ))
-      setFilteredFiles(objects.filter((object: File) =>
-        currentFolder === undefined || currentFolder === null ? object.folder_id === null : object.folder_id === currentFolder.folder_id
-      ))
-
-      /*
-      setFilteredFiles(objects.filter((object: File) => {
-        currentFolder !== undefined && currentFolder !== null ? object.folder_id = currentFolder.folder_id : object.folder_id === null
-      }))
-        */
-
+      // Get stored data
+      const storedFolders = sessionStorage.getItem(`folders_${projectID}`);
+      const storedFiles = sessionStorage.getItem(`files_${projectID}`);
+      
+      // Load stored folders
+      let folders: Folder[];
       if (storedFolders) {
-        const query = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/folders/get`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: projectID })
-        });
-
-        folderResults = await query.json();
-        sessionStorage.setItem(`folders_${projectID}`, JSON.stringify(folderResults));
+        folders = JSON.parse(storedFolders);
+      } else {
+        folders = await getFolders();
+        sessionStorage.setItem(`folders_${projectID}`, JSON.stringify(folders));
       }
 
-      // Set Folders
+      // Load stored files
+      let files: File[];
+      if (storedFiles) {
+        files = JSON.parse(storedFiles);
+      } else {
+        files = await getFiles();
+        sessionStorage.setItem(`files_${projectID}`, JSON.stringify(files));
+      }
+
+      displayTree(folders, files);
+
+      let newFolders = folders;
+      if (storedFolders) {
+        newFolders = await getFolders();
+        sessionStorage.setItem(`folders_${projectID}`, JSON.stringify(newFolders));
+      }
+      let newFiles = files;
+      if (storedFiles) {
+        newFiles = await getFiles();
+        sessionStorage.setItem(`files_${projectID}`, JSON.stringify(files));
+      }
+      if (folders != newFolders || files != newFiles) {
+        displayTree(newFolders, newFiles);
+      }
+
+      if (currentFolder) {
+        setFiles(newFiles.filter((file: File) => file.folder_id === currentFolder?.folder_id))
+        setFilteredFiles(newFiles.filter((file: File) => file.folder_id === currentFolder?.folder_id))
+      } else {
+        setFiles(newFiles.filter((file: File) => file.folder_id === null))
+        setFilteredFiles(newFiles.filter((file: File) => file.folder_id === null))
+      }
 
       setID(currentFolder ? (currentFolder.folder_id) : (projectID));
       setType(currentFolder ? (0) : (1));
 
       if (currentFolder) {
-        setFolders(folderResults.filter((folder: Folder) => folder.parent_folder_id === currentFolder?.folder_id));
-        setFilteredFolders(folderResults.filter((folder: Folder) => folder.parent_folder_id === currentFolder?.folder_id));
+        setFolders(newFolders.filter((folder: Folder) => folder.parent_folder_id === currentFolder?.folder_id));
+        setFilteredFolders(newFolders.filter((folder: Folder) => folder.parent_folder_id === currentFolder?.folder_id));
       } else {
-        setFolders(folderResults.filter((folder: Folder) => folder.parent_folder_id === null));
-        setFilteredFolders(folderResults.filter((folder: Folder) => folder.parent_folder_id === null));
+        setFolders(newFolders.filter((folder: Folder) => folder.parent_folder_id === null));
+        setFilteredFolders(newFolders.filter((folder: Folder) => folder.parent_folder_id === null));
       }
 
       // Get Tags
@@ -260,12 +247,12 @@ function Home({ params }: ParamProps) {
 
       const folderTags = await folderTagsQuery.json();
 
-      folderResults.forEach((folder: Folder) => {
+      folders.forEach((folder: Folder) => {
         folder.tags = folderTags.filter((tag: FolderTags) => tag.folder_id === folder.folder_id);
       });
 
       // Adds tags to files
-      objects.forEach((file: File) => {
+      files.forEach((file: File) => {
         file.tags = objectTags.filter((tag: ItemTags) => tag.object_id === file.object_id);
       });
 
