@@ -28,6 +28,7 @@ function Home({ params }: PageProps) {
      const [itemId, setItemId] = useState<number | null>(null);
      const [itemName, setItemName] = useState<string | null>(null);
      const [author, setAuthor] = useState<string | null>(null);
+     const [bucketKey, setBucketKey] = useState<string | null>(null);
      // File uploads
      const [file, setFile] = useState<File | null>(null);
      const [uploading, setUploading] = useState<boolean>(false);
@@ -52,7 +53,9 @@ function Home({ params }: PageProps) {
             if (token) {
                 formData.append("token", token);
             }
-            formData.append("bucketKey", "78c1b942-08df-4540-acd3-a9e93184c585"); // Make this grab automatically later - AJ
+            if (bucketKey) {
+                formData.append("bucketKey", bucketKey);
+            }
             try {
                 const response = await fetch("http://localhost:3001/oss/upload", {
                     method: "POST",
@@ -94,6 +97,7 @@ function Home({ params }: PageProps) {
                 console.log(itemData);
                 setItemName(itemData[0]?.name);
                 setAuthor(itemData[0]?.fname + " " + itemData[0]?.lname);
+                setBucketKey(itemData[0]?.bucket_id);
             }
         }
         fetchInfo();
@@ -113,6 +117,7 @@ function Home({ params }: PageProps) {
                         <p>ID: {itemId}</p>
                         <p>Name: {itemName}</p>
                         <p>Author: {author}</p>
+                        <p>Bucket Key: {bucketKey}</p>
                     </div>
                 </div>
             </div>
