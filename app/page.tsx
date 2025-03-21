@@ -15,10 +15,6 @@ import { useEffect, useState } from 'react';
 //library used for sorting filter: https://www.npmjs.com/package/sort-array
 import sortArray from 'sort-array';
 
-// Skeleton Loading
-import Skeleton, {SkeletonTheme} from 'react-loading-skeleton'
-import 'react-loading-skeleton/dist/skeleton.css'
-
 
 // Interfaces
 import { Project } from "@/app/shared/interfaces/project";
@@ -216,11 +212,6 @@ function Home() {
                 ))
               ) : (
                 <>
-                  <div className='flex justify-center'>
-                    <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
-                      <Skeleton width={600} height={125} count={4} style={{ marginBottom: '16px' }} />
-                    </SkeletonTheme>
-                  </div>
                 <div className='space-y-4 ml-10'>
                   {[...Array(4)].map((_, index) => (
                     <div key={index} className="bg-slate-800 p-4 rounded-lg animate-pulse">
