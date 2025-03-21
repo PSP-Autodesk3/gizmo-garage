@@ -18,7 +18,7 @@ function Home() {
         const handleSignOut = async () => {
             sessionStorage.setItem("token", "");
             await signOut(auth);
-            router.push("/");
+            router.push("/landing");
         };
         handleSignOut();
     }, [router]);

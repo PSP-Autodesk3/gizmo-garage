@@ -27,7 +27,7 @@ export default function withAuth<T extends object>(
 
     useEffect(() => {
       // List of routes that are exempt from this middleware
-      const protectedRoutes = ["/", "/login", "/register", "/redirect", "/admin-settings"]; // To fix: make admin-settings not a protected route. Only for devel.
+      const protectedRoutes = ["/", "/login", "/register", "/redirect", "/admin-settings", "/landing", "/authenticate"]; // To fix: make admin-settings not a protected route. Only for devel.
 
       const checkRedirect = async () => {
         // If nothing is loading
@@ -37,7 +37,7 @@ export default function withAuth<T extends object>(
             router.push("/");
           } else if (user && !sessionToken) {
             // If the user is signed in, not autodesk authenticated, but the database doesn't exist, add admin-settings to the protected page
-            const response = await fetch("http://localhost:3001/database/exists");
+            const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/database/exists`);
             const exists = await response.json();
             if (exists[0]?.DatabaseExists === 0 && pathname !== "/admin-settings") {
               router.push("/");

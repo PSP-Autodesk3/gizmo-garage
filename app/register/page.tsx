@@ -30,17 +30,15 @@ function Home() {
             if (password1.length >= 6) {
                 if (password1 && password1.trim() != "" && email && email.trim() != "" && fName && fName.trim() != "" && lName && lName.trim() != "") {
                     const result = await createUserWithEmailAndPassword(email, password1);
-    
-                    console.log("Result:", result)
                     
                     if (result?.user) {
-                        const response = await fetch("http://localhost:3001/users/create", {
+                        const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/users/create`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ email, fName, lName }),
                         })
                         if (response.status == 200) {
-                            router.push("/");
+                            router.push("/authenticate");
                         }
                     }
                     else setError("Account creation failed. Please try again.");

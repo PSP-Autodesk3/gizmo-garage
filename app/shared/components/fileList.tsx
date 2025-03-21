@@ -2,12 +2,14 @@
 
 // Interfaces
 import { File } from "@/app/shared/interfaces/file";
+import { useRouter } from "next/navigation";
 
 // Skeleton Loading
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 
 export default function FileList({ files }: { files: File[] }) {
+    const router = useRouter();
     return (
         <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
             {!files ? (
@@ -24,7 +26,7 @@ export default function FileList({ files }: { files: File[] }) {
                         <div key={file.object_id}>
                             <button
                                 className="bg-slate-900 rounded-lg text-xl my-4 px-4 py-2"
-                                onClick={() => { }}
+                                onClick={() => {router.push(`/item/${file.object_id}`);}}
                             >
                                 {file.name}
                             </button>

@@ -13,7 +13,6 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 // Skeleton Loading
-import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 
 // Interfaces
@@ -21,8 +20,6 @@ import { Project } from "@/app/shared/interfaces/project";
 
 // Components
 import Filters from '@/app/shared/components/filter';
-import SigningIn from '@/app/shared/components/signingIn';
-import AuthenticatePrompt from '@/app/shared/components/authenticatePrompt';
 import ProjectPreview from '@/app/shared/components/projectPreview';
 
 interface ProjectTags {
@@ -35,7 +32,6 @@ function Home() {
   const router = useRouter();
   const admin = useState(true); // Needs a check once implemented into db as currently this makes everyone admin
   const [databaseErrorMessage, setDatabaseErrorMessage] = useState('');
-  const [loginErrorMessage, setLoginErrorMessage] = useState('');
   const [projects, setProjects] = useState<Project[]>([] as Project[]);
   const [loading, setLoading] = useState(true);
   const [loadingProjects, setLoadingProjects] = useState(true);
@@ -51,14 +47,15 @@ function Home() {
       //display where the search equals the query or matches at least one of the tags
       setFilteredProjects(projects.filter(project => project.name.toLowerCase().includes(query.trim()) || project.tags.some(tag => tag.tag.toLowerCase().includes(query.trim()))));
     }
-  }, [query]);
+  }, [query, projects]);
+  
   useEffect(() => {
     // Only runs if the user has logged in
     if (user) {
       // Runs APIs
       const getDatabaseData = async () => {
         // Checks if db exists
-        const response = await fetch("http://localhost:3001/database/exists");
+        const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/database/exists`);
         const exists = await response.json();
         if (exists?.DatabaseExists !== 1 || exists.error === "Failed to check database status") {
           setDatabaseErrorMessage("Database not found, contact your system administrator");
@@ -68,12 +65,12 @@ function Home() {
           // Gets projects that the user has access to
           const fetchProjectData = async () => {
             if (user?.email) {
-              const data = await fetch(`http://localhost:3001/projects/get`, {
+              const data = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/projects/get`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: user?.email })
               })
-              const tagData = await fetch("http://localhost:3001/projects/tags", {
+              const tagData = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/projects/tags`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: user?.email })
@@ -103,35 +100,19 @@ function Home() {
       }
       getDatabaseData();
     }
-
-    // Checks if the autodesk authentication returned an error
-    const getError = async () => {
-      // Gets error message to display on screen
-      let errorSession = sessionStorage.getItem("errorMessage");
-      if (errorSession) {
-        setLoginErrorMessage(errorSession);
-        sessionStorage.removeItem("errorMessage");
-      }
-
-      // Prompts to check console if a description is given
-      errorSession = sessionStorage.getItem("errorDescription");
-      if (errorSession) {
-        console.log("Error Description:", errorSession);
-        sessionStorage.removeItem("errorDescription");
-      }
-    }
-    getError();
     setLoading(false);
   }, [user]);
 
-  // Displays if any of the details are loading
-  if (loading || loadingAuth) {
-    return (
-      <>
-        <p>Loading Resources...</p>
-      </>
-    )
-  }
+  useEffect(() => {
+    // Redirects if the user is not logged into their account
+    if (!loading && !loadingAuth && !user) {
+      router.replace('/landing');
+    }
+    // Redirects if the user is not authenticated
+    if (!sessionStorage.getItem('token') && !loading && !loadingAuth && user) {
+      router.replace('/authenticate');
+    }
+  }, [loadingAuth, router, loading, user]);
 
   // Displays if the user is logged in, but the database doesn't exist
   if (databaseErrorMessage) {
@@ -158,22 +139,6 @@ function Home() {
     )
   }
 
-  // Displays if the user is not logged into their account
-  if (!user) {
-    return (
-      <>
-        <SigningIn />
-      </>
-    )
-  }
-
-  // Displays if the user doesn't have a valid token
-  if (!sessionStorage.getItem('token')) {
-    return (
-      <AuthenticatePrompt loginErrorMessage={loginErrorMessage} />
-    )
-  }
-
   // Displays if all other information is valid
   return (
     <>
@@ -196,6 +161,7 @@ function Home() {
                 </button>
               </div>
 
+              {/* Loading */}
               {!loadingProjects ? (
                 filteredProjects.map((project, index) => (
                   <div className="project" key={index}>
@@ -203,13 +169,21 @@ function Home() {
                   </div>
                 ))
               ) : (
-                <>
-                  <div className='flex justify-center'>
-                    <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
-                      <Skeleton width={600} height={125} count={4} style={{marginBottom: '16px'}} />
-                    </SkeletonTheme>
-                  </div>
-                </>
+                <div className='space-y-4 ml-10'>
+                  {[...Array(4)].map((_, index) => (
+                    <div key={index} className="bg-slate-800 p-4 rounded-lg animate-pulse">
+                      <div className='flex justify-between items-center mb-4'>
+                        <div className='h-6 bg-slate-700 rounded-lg w-2/4'></div>
+                      </div>
+                      <div className='space-y-3'>
+                        <div className='h-4 bg-slate-700 rounded-lg w-1/4'></div>
+                      </div>
+                      <div className='flex gap-2 mt-4'>
+                        <div className='h-4 bg-slate-700 rounded-lg w-20'></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           </div>

@@ -33,6 +33,48 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
     const [tagQuery, setTagQuery] = useState<string>('');
     const [alreadyApplied, setAlreadyApplied] = useState(0);
     const [appliedTags, setAppliedTags] = useState<Tag[]>([]);
+    // File uploads
+    const [file, setFile] = useState<File | null>(null);
+    const [message, setMessage] = useState<string | null>(null);
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files.length > 0) {
+            setFile(event.target.files[0]);
+        }
+    };
+
+    const handleUpload = async (bucketKey: string) => {
+        if (!file) {
+            setMessage("No file selected");
+            return;
+        }
+        setMessage("");
+        const formData = new FormData();
+        formData.append("file", file);
+        const token = sessionStorage.getItem("token");
+        if (token) {
+            formData.append("token", token);
+        }
+        if (bucketKey) {
+            formData.append("bucketKey", bucketKey);
+        }
+        try {
+            const response = await fetch("http://localhost:3001/oss/upload", {
+                method: "POST",
+                body: formData,
+            });
+            const data = await response.json();
+            if (data.ok) {
+                setMessage("File uploaded successfully");
+            } else {
+                setMessage("Error uploading file");
+            }
+        }
+        catch (error) {
+            setMessage("Error uploading file");
+            console.log(error);
+        }
+    }
 
     useEffect(() => {
       if (tagQuery != '') {
@@ -40,7 +82,7 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
       } else {
         setFilteredTags(allTags);
       }
-    }, [tagQuery]);
+    }, [tagQuery, allTags, setFilteredTags]);
 
     // Create new folder
     const newFolder = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -48,7 +90,7 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
         e.preventDefault();
 
         // Check for duplicates
-        const alreadyExists = await fetch("http://localhost:3001/folders/exists", {
+        const alreadyExists = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/folders/exists`, {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name: folderName.trim(), projectid: projectID, type, parent_folder_id: id }),
@@ -61,12 +103,11 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                 setDuplicate(0);
             }, 3000);
         } else { // If no duplicates -> create folder
-            await fetch("http://localhost:3001/folders/create", {
+            await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/folders/create`, {
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: folderName.trim(), projectid: projectID, folder_id: id, type }),
             });
-
             // Gets the updated list
             getData();
         }
@@ -83,7 +124,7 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
         setAppliedTags([]);
 
         // Check duplicates 
-        const alreadyExists = await fetch("http://localhost:3001/items/exists", {
+        const alreadyExists = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/items/exists`, {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name: itemName.trim(), projectid: projectID, folder_id: id, type }),
@@ -96,12 +137,29 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                 setDuplicate(0);
             }, 3000);
         } else if (user) { // If no duplicates -> create file
-            await fetch("http://localhost:3001/items/create", {
+            // Create bucket
+            const token = await sessionStorage.getItem("token"); // Get token
+            const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/oss/create`, {
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ itemName: itemName.trim(), email: user.email, project: projectID, id, type }),
+                body: JSON.stringify({ token: token }),
             });
-
+            const data = await response.json();
+            const bucketKey = data.bucketKey;
+            // Create item in DB and pass through created bucket key
+            await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/items/create`, {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ itemName: itemName.trim(), email: user.email, project: projectID, id, type, bucketKey }),
+            });
+            // Upload file to bucket
+            handleUpload(bucketKey);
+            // Check bucket created
+            await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/oss/getBuckets`, {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: token }),
+            });
             // Gets the updated list
             getData();
         }
@@ -207,6 +265,12 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                         </div>
                     </div>
                 </div>
+
+                <div className="px-8">
+                <input type="file" onChange={handleFileChange} className="mb-4 bg-slate-800 rounded-lg p-4 text-lg" />
+                <br />
+                {message && <p className="mt-2 text-sm">{message}</p>}
+            </div>
 
                 <div className="mt-4">
                     <button
