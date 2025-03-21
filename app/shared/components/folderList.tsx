@@ -4,6 +4,7 @@
 import { Folder } from "@/app/shared/interfaces/folder";
 
 // Other
+import { useRouter } from 'next/navigation';
 import { usePathname } from 'next/navigation';
 import Link from "next/link";
 
