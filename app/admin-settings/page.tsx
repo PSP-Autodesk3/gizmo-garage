@@ -87,7 +87,7 @@ function Home() {
         setTimeout(() => {
           popupPasswordResAlert?.classList.remove('show');
           popupPasswordResAlert?.classList.add('hidden');
-        }, 3000); 
+        }, 3000);
       })
       .catch((err) => {
         alert(err.message);
@@ -144,7 +144,7 @@ function Home() {
         })
       })
 
-      setUsers(users.map(u => u.uid === uid ? 
+      setUsers(users.map(u => u.uid === uid ?
         { ...u, disabled: !u.disabled } : u))
     } catch (error) {
       console.error('Error disabling user:', error);
@@ -153,7 +153,7 @@ function Home() {
 
   const validatePasswordAndReset = async () => {
     const currentUser = auth.currentUser;
-    if (!currentUser?.email || !password){
+    if (!currentUser?.email || !password) {
       alert('Please enter your password');
       return;
     }
@@ -166,12 +166,12 @@ function Home() {
       await confirmSetupDatabase();
       setPassword('');
     }
-    catch{
+    catch {
       alert('Incorrect password');
     }
   }
-          
-   //deletes tag from tag list
+
+  //deletes tag from tag list
   const handleDeleteTag = async (event: number) => {
     const tag_id = event;
 
@@ -241,14 +241,14 @@ function Home() {
   return (
     <>
       <div className={`min-h-screen bg-slate-950 ${confirmModule ? 'blur-xl bg-opacity-40' : ''}`}>
-        <BackBtnBar/>
+        <BackBtnBar />
         {/* Header */}
         <h1 className="text-4xl font-semibold text-slate-200 w-[40%] m-auto mb-2 mt-16">
           Admin Settings
         </h1>
         {/* Database Reset Popup */}
         <div className="fixed bottom-0 left-50 right-0 m-4 rounded-lg bg-indigo-500 p-2 text-white text-center text-sm popup hidden">
-          {(databaseExists == 1) ? ( <h1 className="text-xl font-bold">Database Reset.</h1> ) : ( <h1 className="text-xl font-bold">Database Created.</h1> )}
+          {(databaseExists == 1) ? (<h1 className="text-xl font-bold">Database Reset.</h1>) : (<h1 className="text-xl font-bold">Database Created.</h1>)}
         </div>
         {/* Password Reset Popup */}
         <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 m-4 rounded-lg bg-indigo-500 p-2 text-white text-center text-sm password-reset-popup hidden">
@@ -268,56 +268,54 @@ function Home() {
           )}
         </div>
         {/* Create, delete and search tags */}
-      <div>
-        <h2 className="text-xl font-semibold text-slate-200 w-[40%] mx-auto mb-2 mt-6">
-          Tags
-        </h2>
         <div>
-          <div className='bg-slate-900 p-4 w-[40%] mx-auto rounded-lg shadow-lg mt-4' >
-            <div>
-              <div id="Create" className='p-4'>
-                <label>Create</label>
-                <input
-                  className='text-white w-full p-2 my-2 rounded-lg bg-slate-800'
-                  type="text"
-                  placeholder="Create Tag"
-                  name="search"
-                  value={tagName}
-                  onChange={(e) => setTagName(e.target.value)}
-                />
+          <h2 className="text-xl font-semibold text-slate-200 w-[40%] mx-auto mb-2 mt-6">
+            Tags
+          </h2>
+          <div>
+            <div className='bg-slate-900 p-4 w-[40%] mx-auto rounded-lg shadow-lg mt-4' >
+              <div>
+                <div id="Create" className='p-4'>
+                  <label>Create</label>
+                  <input
+                    className='text-white w-full p-2 my-2 rounded-lg bg-slate-800'
+                    type="text"
+                    placeholder="Create Tag"
+                    name="search"
+                    value={tagName}
+                    onChange={(e) => setTagName(e.target.value)}
+                  />
+                </div>
+                <button type="submit" className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50" onClick={() => addTag(tagName)}>Create</button>
               </div>
-              <button type="submit" className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50" onClick={() => addTag(tagName)}>Create</button>
-            </div>
-            <div>
-              <div id="Search" className='p-4'>
-                <label htmlFor="search=bar">Search</label>
-                <input
-                  className='text-white w-full p-2 my-2 rounded-lg bg-slate-800'
-                  type="text"
-                  placeholder="Search Tags"
-                  name="search"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
+              <div>
+                <div id="Search" className='p-4'>
+                  <label htmlFor="search=bar">Search</label>
+                  <input
+                    className='text-white w-full p-2 my-2 rounded-lg bg-slate-800'
+                    type="text"
+                    placeholder="Search Tags"
+                    name="search"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
               </div>
+                <div className='bg-slate-800 rounded-lg grid grid-cols-6 gap-4 p-3'>
+                {filteredTags.length > 0 ? (
+                  filteredTags.map((tag: Tag) => (
+                    <button type="button" className="rounded-full bg-blue-600 text-white text-sm px-4 py-2 flex items-center text-center" onClick={() => handleDeleteTag(tag.tag_id)} key={tag.tag_id}><svg className="w-4 h-4 flex-shrink-0 text-blue-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18 17.94 6M18 18 6.06 6" />
+                  </svg>{tag.tag}</button>
+                  ))
+                ) : <p className='flex justify-center col-span-6 text-slate-400 text-sm'>No tags found</p>}
+              </div>
+              {error.length > 0 ? (
+                <p className='text-red-500 p-2 flex justify-center items-center'>{error}</p>
+              ) : ""}
             </div>
-            <div>
-              {filteredTags.length > 0 ? (
-                filteredTags.map((tag: Tag) => (
-                  <>
-                    <button type="button" className='rounded-full m-2 p-3 bg-blue-600' onClick={() => handleDeleteTag(tag.tag_id)} key={tag.tag_id}><svg className="w-6 h-6 text-blue-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24">
-                      <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18 17.94 6M18 18 6.06 6" />
-                    </svg>{tag.tag}</button>
-                  </>
-                ))
-              ) : <p className='flex justify-center'>No tags found</p>}
-            </div>
-            {error.length > 0 ? (
-              <p className='text-red-500'>{error}</p>
-            ) : ""}
           </div>
         </div>
-      </div>
         {/* User Management */}
         <h2 className="text-2xl font-semibold text-slate-200 w-[40%] mx-auto mb-2 mt-8">
           User Management
@@ -371,17 +369,17 @@ function Home() {
                     <p className="text-slate-500 text-xs">{user.uid}</p>
                   </div>
                   <div className="flex justify-between items-center">
-                    <p 
+                    <p
                       className="text-indigo-500 hover:underline cursor-pointer mt-3"
                       onClick={() => resetPassword(user.email)}
                     >
                       Reset Password
                     </p>
-                    <label className="inline-flex items-center cursor-pointer"> 
-                      <input 
-                        type="checkbox" 
-                        className="sr-only peer" 
-                        checked={!user.disabled} 
+                    <label className="inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        className="sr-only peer"
+                        checked={!user.disabled}
                         onChange={() => handleDisableUser(user.uid)}
                       />
                       <div className="relative w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-600 dark:peer-checked:bg-green-600"></div>
@@ -405,12 +403,12 @@ function Home() {
         <>
           <div className="fixed inset-0 flex items-center justify-center bg-opacity-95 bg-slate-900 w-[40%] h-[40%] m-auto rounded-3xl shadow-lg p-8">
             <div className="text-center">
-              <h1 className='text-3xl'>This will clear all data.</h1> 
+              <h1 className='text-3xl'>This will clear all data.</h1>
               <strong>This action is irreversible.</strong> <p> Your password is needed to complete this action.</p>
               <form onSubmit={(e) => e.preventDefault()} autoComplete="off">
-                <input 
-                  className="text-white w-full bg-slate-800 p-2 my-2 rounded-lg" 
-                  type="password" 
+                <input
+                  className="text-white w-full bg-slate-800 p-2 my-2 rounded-lg"
+                  type="password"
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -423,14 +421,14 @@ function Home() {
               </form>
               {/* Buttons */}
               <div className="mt-4">
-                <button 
+                <button
                   className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
                   onClick={validatePasswordAndReset}
                 >
                   Reset
                 </button>
-                <button 
-                  className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50" 
+                <button
+                  className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
                   onClick={() => {
                     setConfirmModule(false);
                     setPassword('');

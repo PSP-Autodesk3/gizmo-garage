@@ -157,7 +157,7 @@ router.post("/tags", async (req, res, next) => {
             FROM Object_Tag
             INNER JOIN Tag ON Object_Tag.tag_id = Tag.tag_id
             INNER JOIN Object ON Object_Tag.object_id = Object.object_id
-            WHERE Object.Project_id IN (SELECT Projects.project_id
+            WHERE Object.project_id IN (SELECT Projects.project_id
             FROM Projects
             INNER JOIN Users ON Users.email = ?
             LEFT JOIN Editor ON Editor.project_id = Projects.project_id AND Editor.user_id = Users.user_id

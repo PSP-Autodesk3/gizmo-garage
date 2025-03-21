@@ -25,13 +25,10 @@ router.post("/create", async (req, res, next) => {
 
         // Get the ID of the item just created
         const latestId = result.insertId //found that i can get the primary key of the previously inserted record using insertId from here: https://www.webslesson.info/2023/08/how-to-get-last-inserted-id-in-nodejs-using-mysql.html
-        console.log("latestId:", latestId);
         // Insert tags into object_tag table
         for (const tag of appliedTags) {
-            console.log("object id", latestId);
-            console.log("applied tags:", tag.tag_id);
             await pool.execute(`
-                INSERT INTO object_tag
+                INSERT INTO Object_Tag
                 (object_id, tag_id)
                 VALUES (?, ?)   
             `, [latestId, tag.tag_id]);

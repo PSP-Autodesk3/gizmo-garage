@@ -18,20 +18,13 @@ import sortArray from 'sort-array';
 
 // Interfaces
 import { Project } from "@/app/shared/interfaces/project";
+import { projectEditors } from "@/app/shared/interfaces/projectEditors";
+import { ProjectTags } from "@/app/shared/interfaces/projectTags";
 
 // Components
 import Filters from '@/app/shared/components/filter';
 import ProjectPreview from '@/app/shared/components/projectPreview';
 
-interface ProjectTags {
-  project_id: number,
-  tag: string
-}
-
-export interface projectEditors {
-  project_id: number,
-  email: string,
-}
 
 
 function Home() {
@@ -43,7 +36,6 @@ function Home() {
   const [loading, setLoading] = useState(true);
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([] as Project[]);
- // const [projectTags, setProjectTags] = useState<ProjectTags[]>([] as ProjectTags[]);
   const [query, setQuery] = useState<string>('');
   const [sortBy, setSortBy] = useState('newest');
 
@@ -54,10 +46,10 @@ function Home() {
     }
     else {
       //display where the search equals the query or matches at least one of the tags
-      setFilteredProjects(projects.filter(project => project.name.toLowerCase().includes(query.trim()) || project.tags.some(tag => tag.tag.toLowerCase().includes(query.trim())) || (query.trim().length > 3 && project.editors.some(editor => editor.email?.toLowerCase().includes(query.trim())))));
+      setFilteredProjects(projects.filter(project => project.name.toLowerCase().includes(query.trim()) || project.tags.some(tag => tag.tag.toLowerCase().includes(query.trim())) || (query.trim().length > 3 && project.editors.some(editor => editor.email?.toLowerCase().includes(query.trim().toLowerCase())))));
     }
   }, [query]);
-  
+
   useEffect(() => {
     // Only runs if the user has logged in
     if (user) {
@@ -98,8 +90,7 @@ function Home() {
               const sortedResult = sortArray(result, { by: 'dateOfCreation', order: 'desc' })
               setProjects(sortedResult);
               setFilteredProjects(result);
-         //     setProjectTags(tagResult);
-              
+
               //assigns tags and editors to projects
               result.forEach((project: Project) => {
                 project.tags = tagResult?.filter((tag: ProjectTags) => tag.project_id === project.project_id) || [];
@@ -199,7 +190,7 @@ function Home() {
                 </button>
               </div>
               <label>Sort By:</label>
-              <select onChange={handleSortBy}>
+              <select onChange={handleSortBy} className='bg-slate-900 p-1 rounded-lg m-2'>
                 <option value="newest" >newest</option>
                 <option value="oldest" >oldest</option>
               </select>
@@ -212,21 +203,21 @@ function Home() {
                 ))
               ) : (
                 <>
-                <div className='space-y-4 ml-10'>
-                  {[...Array(4)].map((_, index) => (
-                    <div key={index} className="bg-slate-800 p-4 rounded-lg animate-pulse">
-                      <div className='flex justify-between items-center mb-4'>
-                        <div className='h-6 bg-slate-700 rounded-lg w-2/4'></div>
+                  <div className='space-y-4 ml-10'>
+                    {[...Array(4)].map((_, index) => (
+                      <div key={index} className="bg-slate-800 p-4 rounded-lg animate-pulse">
+                        <div className='flex justify-between items-center mb-4'>
+                          <div className='h-6 bg-slate-700 rounded-lg w-2/4'></div>
+                        </div>
+                        <div className='space-y-3'>
+                          <div className='h-4 bg-slate-700 rounded-lg w-1/4'></div>
+                        </div>
+                        <div className='flex gap-2 mt-4'>
+                          <div className='h-4 bg-slate-700 rounded-lg w-20'></div>
+                        </div>
                       </div>
-                      <div className='space-y-3'>
-                        <div className='h-4 bg-slate-700 rounded-lg w-1/4'></div>
-                      </div>
-                      <div className='flex gap-2 mt-4'>
-                        <div className='h-4 bg-slate-700 rounded-lg w-20'></div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
                 </>
               )}
             </div>
