@@ -299,7 +299,7 @@ function Home({ params }: ParamProps) {
 
               {/* Files */}
               <div id="files" className="mx-8 my-4">
-                <h1 className="my-4 text-3xl">Files</h1>
+                <h1 className="my-4 text-3xl">Files:</h1>
                 <FileList
                   files={filteredFiles}
                 />

@@ -27,6 +27,7 @@ import databaseRouter from "./routes/database.js";
 import tagsRouter from "./routes/tags.js";
 import editorsRouter from "./routes/editors.js";
 import invitesRouter from "./routes/invites.js";
+import ossRouter from "./routes/oss.js"
 
 dotenv.config();
 const app = express();
@@ -51,6 +52,7 @@ app.use("/database", databaseRouter)
 app.use("/tags", tagsRouter);
 app.use("/editors", editorsRouter);
 app.use("/invites", invitesRouter);
+app.use("/oss", ossRouter);
 
 // Error handling middleware.
 app.use((err, res) => {
