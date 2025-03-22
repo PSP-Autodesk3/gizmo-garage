@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import ThemeProvider from "@/app/shared/providers/themeProvider";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 //skeleton loading
 import 'react-loading-skeleton/dist/skeleton.css'
+import ThemeSwitcher from "./shared/components/themeSwitcher";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,9 +33,12 @@ export default function RootLayout({
         <link rel="stylesheet" href="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/style.min.css" type="text/css"></link>
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-gray-900`}
       >
-        {children}
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <ThemeSwitcher />
+          <main>{children}</main>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -153,10 +153,10 @@ function Home() {
 
   return (
     <>
-      <div className={`min-h-screen bg-slate-950 ${confirmModule ? 'blur-xl bg-opacity-40' : ''}`}>
+      <div className={`min-h-screen bg-white dark:bg-slate-950 ${confirmModule ? 'blur-xl bg-opacity-40' : ''}`}>
         <BackBtnBar/>
         {/* Header */}
-        <h1 className="text-4xl font-semibold text-slate-200 w-[40%] m-auto mb-2 mt-16">
+        <h1 className="text-4xl font-semibold text-slate-900 dark:text-slate-200 w-[40%] m-auto mb-2 mt-16">
           Admin Settings
         </h1>
         {/* Database Reset Popup */}
@@ -169,7 +169,7 @@ function Home() {
           <p className="mx-2">We have sent an email to {resetEmail}.</p>
         </div>
         {/* Database Management */}
-        <h2 className="text-2xl font-semibold text-slate-200 w-[40%] m-auto mb-2 mt-8">
+        <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-200 w-[40%] m-auto mb-2 mt-8">
           Database Management
         </h2>
         <div className="bg-slate-900 p-4 w-[40%] mx-auto rounded-lg shadow-lg mt-4">
@@ -181,10 +181,10 @@ function Home() {
           )}
         </div>
         {/* User Management */}
-        <h2 className="text-2xl font-semibold text-slate-200 w-[40%] mx-auto mb-2 mt-8">
+        <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-200 w-[40%] mx-auto mb-2 mt-8">
           User Management
         </h2>
-        <h3 className="text-l font-semibold text-slate-200 w-[40%] m-auto mb-2 mt-4">
+        <h3 className="text-l font-semibold text-slate-900 dark:text-slate-200 w-[40%] m-auto mb-2 mt-4">
           User Filter
         </h3>
         {/* User Filter */}
@@ -202,7 +202,7 @@ function Home() {
           </div>
         </div>
         {/* User List */}
-        <h3 className="text-l font-semibold text-slate-200 w-[40%] m-auto mb-2 mt-4">
+        <h3 className="text-l font-semibold text-slate-900 dark:text-slate-200 w-[40%] m-auto mb-2 mt-4">
           Users
         </h3>
         <div className="bg-slate-900 p-4 w-[40%] m-auto rounded-lg shadow-lg mt-4 mb-5">
