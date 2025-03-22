@@ -80,10 +80,14 @@ router.post("/upload", upload.single("file"), async (req, res, next) => {
         if (!upload.ok) {
             throw new Error("Failed to upload file");
         }
+        // Get URN
+        const objectId = `urn:adsk.objects:os.object:${bucketKey}/${file.originalname}`;
+        const urn = Buffer.from(objectId).toString("base64");
         res.json({
             message: "File uploaded successfully!",
             objectKey: file.originalname,
-            bucketKey: bucketKey
+            bucketKey: bucketKey,
+            urn: urn
         });
     }
     catch (error) {
