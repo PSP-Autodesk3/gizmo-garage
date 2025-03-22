@@ -8,7 +8,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import withAuth from "@/app/lib/withAuth";
 
 // Other
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 // Components
 import BackBtnBar from '@/app/shared/components/backBtnBar';
@@ -20,21 +20,25 @@ function Home() {
     const [user, loadingAuth] = useAuthState(auth);
     const [invites, setInvites] = useState<Invite[]>([]);
 
-    const fetchInvites = async () => {
-        const invites = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/invites/get`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email: user?.email })
-        });
-
-        setInvites(await invites.json());
-    }
+    const fetchInvites = useCallback(async () => {
+        try {
+            const invites = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/invites/get`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: user?.email })
+            });
+    
+            setInvites(await invites.json());
+        } catch (error) {
+            console.error("Error fetching invites:", error);
+        }
+    }, [user?.email])
 
     useEffect(() => {
         if (!loadingAuth) {
             fetchInvites();
         }
-    }, [loadingAuth]);
+    }, [loadingAuth, fetchInvites]);
 
     const acceptInvite = async (invite: Invite) => {
         declineInvite(invite);

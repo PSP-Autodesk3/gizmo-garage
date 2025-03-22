@@ -55,7 +55,12 @@ function Home({ params }: ParamProps) {
       // Resolves params
       setProject(resolved.slug[0].split('%2B').slice(1).join('%2B'));
       setProjectID(Number.parseInt(resolved.slug[0].split('%2B')[0]));
-      setRoutes(resolved.slug.slice(1));
+      setRoutes((prevRoutes) => {
+        const newRoutes = resolved.slug.slice(1);
+        return prevRoutes.length === newRoutes.length
+          && prevRoutes.every((route, index) => route === newRoutes[index])
+          ? prevRoutes : newRoutes;
+      });
 
       // Get and display tree structure
 
@@ -225,7 +230,7 @@ function Home({ params }: ParamProps) {
       setTags(tagResponse);
       setFilteredTags(tagResponse);
     }
-  }, [params, id, type]);
+  }, [params, id, type, router, project, projectID, routes]);
 
   useEffect(() => {
     getData();
@@ -240,7 +245,7 @@ function Home({ params }: ParamProps) {
       setFilteredFolders(folders.filter(folder => folder.name.toLowerCase().includes(query.trim()) || folder.tags.some(tag => tag.tag.toLowerCase().includes(query.trim()))));
       setFilteredFiles(files.filter(file => file.name.toLowerCase().includes(query.trim()) || file.tags.some(tag => tag.tag.toLowerCase().includes(query.trim()))));
     }
-  }, [query])
+  }, [query, files, folders])
 
   //handling sort by
   const handleFolderSortBy = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -368,6 +373,7 @@ function Home({ params }: ParamProps) {
                     </select>
                   </div>
                 </div>
+                <h1 className="my-4 text-3xl">Files:</h1>
                 <FileList
                   files={filteredFiles}
                 />

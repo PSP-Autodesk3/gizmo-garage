@@ -80,6 +80,7 @@ router.get("/create", async (_req, res, next) => {
           FOREIGN KEY (folder_id) REFERENCES Folder(folder_id),
           bucket_id INT DEFAULT NULL,
           dateOfCreation TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          bucket_id varchar(128) DEFAULT NULL
         );
       `);
 

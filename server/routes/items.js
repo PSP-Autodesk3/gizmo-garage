@@ -6,21 +6,20 @@ const router = express.Router();
 // Create item
 router.post("/create", async (req, res, next) => {
     try {
-        const { itemName, email, project, type, id, appliedTags } = req.body;
-        
+        const { itemName, email, project, type, id, bucketKey, appliedTags } = req.body;
         const params = [itemName, email, project];
         if (type !== 1) {
             params.push(id);
         } else {
             params.push(null);
         }
-
+        params.push(bucketKey || null); // Add bucketKey after folder check
         const [result] = await pool.execute(`
             INSERT INTO Object
-            (name, author, project_id, folder_id)
+            (name, author, project_id, folder_id, bucket_id)
             VALUES (?, 
             (SELECT user_id FROM Users WHERE email = ?),
-            ?, ?)
+            ?, ?, ?)
         `, params);
 
         // Get the ID of the item just created
@@ -71,6 +70,23 @@ router.post("/get", async (req, res, next) => {
             SELECT *
             FROM Object
             WHERE Object.folder_id ${type === 1 ? "IS NULL AND Object.project_id " : ""}= ?
+        `, [id]);
+        res.json(result);
+    }
+    catch (error) {
+        next(error);
+    }
+});
+
+// Retrieve info
+router.post("/info", async (req, res, next) => {
+    try {
+        const { id } = req.body;
+        const [result] = await pool.execute(`
+            SELECT *
+            FROM Object
+            INNER JOIN Users ON Object.author = Users.user_id
+            WHERE object_id = ?;
         `, [id]);
         res.json(result);
     }
