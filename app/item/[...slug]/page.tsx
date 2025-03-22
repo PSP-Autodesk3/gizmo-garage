@@ -151,49 +151,60 @@ function Home({ params }: PageProps) {
      return (
         <>
         <BackBtnBar />
-        <div className="lg:grid lg:grid-cols-3 w-full p-8">
-            {/*/ Row 1 */}
+        <div className="w-full">
+            <h1 className="text-2xl text-center pb-4">Object Details</h1>
+            <div className="lg:grid lg:grid-cols-2 w-full">
             <div>
-                <div className="bg-slate-800 rounded-lg p-4">
+                <div className="bg-slate-800/50 backdrop-blur mx-8 my-4 rounded-lg overflow-hidden shadow-xl border border-slate-700/50 p-4">
                     <h1 className="text-2xl text-center">
                         Item Details
                     </h1>
-                    <div className="flex flex-col items-center">
-                        <p>ID: {itemId}</p>
-                        <p>Name: {itemName}</p>
-                        <p>Author: {author}</p>
-                        <p>Bucket Key: {bucketKey}</p>
+                    <div className="flex flex-col w-full border px-2 border-slate-700/50 py-2 my-2 rounded-lg text-lg">
+                        <p><b>ID:</b> {itemId}</p>
+                    </div>
+                    <div className="flex flex-col w-full border px-2 border-slate-700/50 py-2 my-2 rounded-lg text-lg">
+                        <p><b>Name:</b> {itemName}</p>
+                    </div>
+                    <div className="flex flex-col w-full border px-2 border-slate-700/50 py-2 my-2 rounded-lg text-l">
+                        <p><b>Author:</b> {author}</p>
+                    </div>
+                    <div className="flex flex-col w-full border px-2 border-slate-700/50 py-2 my-2 rounded-lg text-lg">
+                        <p><b>Bucket Key:</b> {bucketKey}</p>
                     </div>
                 </div>
             </div>
-            {/*/ Row 2 */}
-            <div className="px-8">
-                <input type="file" onChange={handleFileChange} className="mb-4 bg-slate-800 rounded-lg p-4 text-lg" />
-                <br />
-                <button
-                    onClick={handleUpload}
-                    className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
-                    disabled={uploading}
-                >
-                    {uploading ? "Uploading..." : "Upload File"}
-                </button>
-                {message && <p className="mt-2 text-sm">{message}</p>}
-            </div>
-            {/*/ Row 3 */}
-            <div className="bg-slate-800 rounded-lg p-4">
+            <div className="bg-slate-800/50 backdrop-blur mx-8 my-4 rounded-lg overflow-hidden shadow-xl border border-slate-700/50 p-4">
                 <h1 className="text-2xl text-center">
                     Versions
                 </h1>
                 <div className="flex flex-col items-center">
                     {versions.map((version, index) => (
-                        <div key={index} className="flex flex-col items-center">
-                            <p>Version: {version.version}</p>
-                            <p>URN: {version.urn}</p>
+                        <div key={index} className="flex flex-col w-full border px-2 border-slate-700/50 py-2 my-2 rounded-lg text-lg">
+                            <p>Version: <b>{version.version}</b></p>
                         </div>
                     ))}
                 </div>
             </div>
-        </div>      
+            </div>
+            <h1 className="text-2xl text-center pb-4">Tag new version</h1>
+            <div className="bg-slate-800/50 backdrop-blur mx-8 my-4 rounded-lg overflow-hidden shadow-xl border border-slate-700/50 p-4">
+                <input type="file" onChange={handleFileChange} className="mb-4 rounded-lg p-4 text-lg" />
+                    <br />
+                    <button
+                        onClick={handleUpload}
+                        className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                        disabled={uploading}
+                    >
+                        {uploading ? "Uploading..." : "Upload File"}
+                    </button>
+                    {message && <p className="mt-2 text-sm">{message}</p>}
+            </div>
+        </div>
+            {/*/ Row 2
+            <div className="px-8">
+                
+            </div>
+           */}  
         </>
      )
 }
