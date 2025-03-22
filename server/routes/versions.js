@@ -46,4 +46,24 @@ router.post("/latestVersion", async (req, res, next) => {
     }
 });
 
+// Get all versions
+router.post("/allVersions", async (req, res, next) => {
+    try {
+        const { bucket_id } = req.body;
+        if (!bucket_id) {
+            throw new Error("Missing required fields");
+        }
+        const [result] = await pool.execute(`
+            SELECT version, urn, date_time
+            FROM Version
+            WHERE bucket_id = ?
+            ORDER BY version DESC
+        `, [bucket_id]);
+        res.json(result);
+    }
+    catch (error) {
+        next(error);
+    }
+});
+
 export default router;

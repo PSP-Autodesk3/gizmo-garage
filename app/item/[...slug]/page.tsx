@@ -22,7 +22,7 @@ function Home({ params }: PageProps) {
      const [file, setFile] = useState<File | null>(null);
      const [uploading, setUploading] = useState<boolean>(false);
      const [message, setMessage] = useState<string | null>(null);
-     const [version, setVersion] = useState<number | null>(null);
+     const [versions, setVersions] = useState<any[]>([]);
 
         const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
             if (event.target.files && event.target.files.length > 0) {
@@ -48,6 +48,19 @@ function Home({ params }: PageProps) {
             }
         }
 
+        const fetchVersions = async () => {
+            if (bucketKey) {
+                const getVersions = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/versions/allVersions`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ bucket_id: bucketKey }),
+                });
+                setVersions(await getVersions.json());
+            }
+        }
+
         const tagNewVersion = async (version: number, urn: string, bucketKey: string) => {
             try {
                 await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/versions/tag`, {
@@ -59,6 +72,7 @@ function Home({ params }: PageProps) {
             catch (error) {
                 console.log(error);
             }
+            fetchVersions();
         }
 
         const handleUpload = async () => {
@@ -129,6 +143,10 @@ function Home({ params }: PageProps) {
         }
         fetchInfo();
     }, [itemId]);
+
+    useEffect(() => {
+        fetchVersions();
+    }, [bucketKey]);
     
      return (
         <>
@@ -160,6 +178,20 @@ function Home({ params }: PageProps) {
                     {uploading ? "Uploading..." : "Upload File"}
                 </button>
                 {message && <p className="mt-2 text-sm">{message}</p>}
+            </div>
+            {/*/ Row 3 */}
+            <div className="bg-slate-800 rounded-lg p-4">
+                <h1 className="text-2xl text-center">
+                    Versions
+                </h1>
+                <div className="flex flex-col items-center">
+                    {versions.map((version, index) => (
+                        <div key={index} className="flex flex-col items-center">
+                            <p>Version: {version.version}</p>
+                            <p>URN: {version.urn}</p>
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>      
         </>
