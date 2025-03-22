@@ -191,8 +191,8 @@ function Home() {
               </div>
               <label>Sort By:</label>
               <select onChange={handleSortBy} className='bg-slate-900 p-1 rounded-lg m-2'>
-                <option value="newest" >newest</option>
-                <option value="oldest" >oldest</option>
+                <option value="newest" >Newest</option>
+                <option value="oldest" >Oldest</option>
               </select>
               {/* Loading */}
               {!loadingProjects ? (

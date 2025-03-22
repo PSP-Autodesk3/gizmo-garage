@@ -73,7 +73,6 @@ function Home({ params }: ParamProps) {
         body: JSON.stringify({ id: projectID })
       })
 
-
       const folders = await query.json() as Folder[];
 
       //get folder tags and add to folder
@@ -342,8 +341,8 @@ function Home({ params }: ParamProps) {
                   <div className="content-center">
                     <label>Sort By:</label>
                     <select onChange={handleFolderSortBy} className='bg-slate-900 p-1 rounded-lg m-2'>
-                      <option value="newest" >newest</option>
-                      <option value="oldest" >oldest</option>
+                      <option value="newest" >Newest</option>
+                      <option value="oldest" >Oldest</option>
                     </select>
                   </div>
                 </div>
@@ -368,8 +367,8 @@ function Home({ params }: ParamProps) {
                   <div className="content-center">
                     <label>Sort By:</label>
                     <select onChange={handleFileSortBy} className='bg-slate-900 p-1 rounded-lg m-2'>
-                      <option value="newest" >newest</option>
-                      <option value="oldest" >oldest</option>
+                      <option value="newest" >Newest</option>
+                      <option value="oldest" >Oldest</option>
                     </select>
                   </div>
                 </div>

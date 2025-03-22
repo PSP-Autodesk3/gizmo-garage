@@ -226,7 +226,7 @@ function Home() {
       //display where the search equals the query or matches at least one of the tags
       setFilteredTags(allTags.filter(allTags => allTags.tag.toLowerCase().includes(searchQuery.trim())));
     }
-  }, [searchQuery]);
+  }, [searchQuery, allTags]);
 
 
   //3 second timer for the errors
@@ -304,7 +304,20 @@ function Home() {
                 <div className='bg-slate-800 rounded-lg flex flex-wrap gap-2 p-3'>
                 {filteredTags.length > 0 ? (
                   filteredTags.map((tag: Tag) => (
-                    <button type="button" className="rounded-full bg-blue-600 text-white text-sm px-4 py-2 flex items-center text-center" onClick={() => handleDeleteTag(tag.tag_id)} key={tag.tag_id}><svg className="w-4 h-4 flex-shrink-0 text-blue-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24">
+                    <button
+                      type="button"
+                      className="rounded-full bg-blue-600 text-white text-sm px-4 py-2 flex items-center text-center"
+                      onClick={() => handleDeleteTag(tag.tag_id)} key={tag.tag_id}
+                    >
+                      <svg
+                        className="w-4 h-4 flex-shrink-0 text-blue-800 dark:text-white"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="15"
+                        height="15"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
                     <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18 17.94 6M18 18 6.06 6" />
                   </svg>{tag.tag}</button>
                   ))
