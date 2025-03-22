@@ -56,7 +56,11 @@ router.post("/upload", upload.single("file"), async (req, res, next) => {
         if (!file) {
             throw new Error("No file uploaded");
         }
-        const url = `https://developer.api.autodesk.com/oss/v2/buckets/${bucketKey}/objects/${file.originalname}/signeds3upload`;
+        const fileName = file.originalname;
+        const extension = fileName.substring(fileName.lastIndexOf("."));
+        const fileUUID = crypto.randomUUID();
+        const objectKey = `${fileUUID}${extension}`;
+        const url = `https://developer.api.autodesk.com/oss/v2/buckets/${bucketKey}/objects/${objectKey}/signeds3upload`;
         const result = await fetch(url, { // Get signed URL
             method: "GET",
             headers: {
@@ -85,7 +89,7 @@ router.post("/upload", upload.single("file"), async (req, res, next) => {
         const urn = Buffer.from(objectId).toString("base64");
         res.json({
             message: "File uploaded successfully!",
-            objectKey: file.originalname,
+            objectKey: objectKey,
             bucketKey: bucketKey,
             urn: urn
         });
