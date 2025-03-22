@@ -373,7 +373,6 @@ function Home({ params }: ParamProps) {
                     </select>
                   </div>
                 </div>
-                <h1 className="my-4 text-3xl">Files:</h1>
                 <FileList
                   files={filteredFiles}
                 />
