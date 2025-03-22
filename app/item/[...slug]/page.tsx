@@ -49,7 +49,7 @@ function Home({ params }: ParamProps) {
                 method: "POST",
                 body: formData,
             });
-            const data = await response.json();
+          //  const data = await response.json(); kept in as the response will used at some point 
             if (response.ok) {
                 setMessage("File uploaded successfully");
             } else {
