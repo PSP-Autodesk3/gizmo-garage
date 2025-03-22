@@ -2,7 +2,6 @@
 
 // Interfaces
 import { File } from "@/app/shared/interfaces/file";
-import { useRouter } from "next/navigation";
 
 // Skeleton Loading
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
@@ -10,7 +9,6 @@ import 'react-loading-skeleton/dist/skeleton.css'
 
 
 export default function FileList({ files }: { files: File[] }) {
-    const router = useRouter();
     return (
         <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
             {!files ? (
