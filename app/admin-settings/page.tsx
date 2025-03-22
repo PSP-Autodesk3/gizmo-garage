@@ -262,9 +262,15 @@ function Home() {
         <div className="bg-slate-900 p-4 w-[40%] mx-auto rounded-lg shadow-lg mt-4">
           <p className="mb-2">Reset the content of the database, to fix potential database related problems.</p>
           {(databaseExists == 1) ? (
-            <button className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50" onClick={() => setupDatabase()}>Reset Database Content</button>
+            <button className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+              onClick={() => setupDatabase()}>
+              Reset Database Content
+            </button>
           ) : (
-            <button className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50" onClick={() => setupDatabase()}>Initialise Database</button>
+            <button className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+              onClick={() => setupDatabase()}>
+              Initialise Database
+            </button>
           )}
         </div>
         {/* Create, delete and search tags */}
@@ -286,7 +292,10 @@ function Home() {
                     onChange={(e) => setTagName(e.target.value)}
                   />
                 </div>
-                <button type="submit" className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50" onClick={() => addTag(tagName)}>Create</button>
+                <button type="submit" className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                  onClick={() => addTag(tagName)}>
+                  Create
+                </button>
               </div>
               <div>
                 <div id="Search" className='p-4'>
@@ -301,7 +310,7 @@ function Home() {
                   />
                 </div>
               </div>
-                <div className='bg-slate-800 rounded-lg flex flex-wrap gap-2 p-3'>
+              <div className='bg-slate-800 rounded-lg flex flex-wrap gap-2 p-3'>
                 {filteredTags.length > 0 ? (
                   filteredTags.map((tag: Tag) => (
                     <button
@@ -318,8 +327,13 @@ function Home() {
                         fill="none"
                         viewBox="0 0 24 24"
                       >
-                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18 17.94 6M18 18 6.06 6" />
-                  </svg>{tag.tag}</button>
+                        <path 
+                        stroke="currentColor" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        strokeWidth="2" 
+                        d="M6 18 17.94 6M18 18 6.06 6" />
+                      </svg>{tag.tag}</button>
                   ))
                 ) : <p className='m-auto text-slate-400 text-sm'>No tags found</p>}
               </div>

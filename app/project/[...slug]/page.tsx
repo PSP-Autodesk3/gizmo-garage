@@ -7,7 +7,7 @@ import withAuth from "@/app/lib/withAuth";
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useCallback } from 'react';
 
-//sort by
+// Sort by
 import sortArray from 'sort-array';
 
 // Components
@@ -42,7 +42,7 @@ function Home({ params }: ParamProps) {
   const [folderSortBy, setFolderSortBy] = useState('newest');
   const [fileSortBy, setFileSortBy] = useState('newest');
 
-  //for tags
+  // For tags
   const [alltags, setTags] = useState<Tag[]>([]);
   const [filteredTags, setFilteredTags] = useState<Tag[]>([]);
   const [filteredFolders, setFilteredFolders] = useState<Folder[]>([]);
@@ -75,7 +75,7 @@ function Home({ params }: ParamProps) {
 
       const folders = await query.json() as Folder[];
 
-      //get folder tags and add to folder
+      // Get folder tags and add to folder
 
       // Adds tags to folders
       const folderTagsQuery = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/tags/getFolder`, {
@@ -90,7 +90,7 @@ function Home({ params }: ParamProps) {
         folder.tags = folderTags.filter((tag: FolderTags) => tag.folder_id === folder.folder_id);
       });
 
-      //defaults folders to newest first
+      // Defaults folders to newest first
       const sortedFolders = sortArray(folders, { by: 'dateOfCreation', order: 'desc' })
       setFolders(sortedFolders);
       setFilteredFolders(sortedFolders);
@@ -241,20 +241,23 @@ function Home({ params }: ParamProps) {
       setFilteredFiles(files);
     }
     else {
-      setFilteredFolders(folders.filter(folder => folder.name.toLowerCase().includes(query.trim()) || folder.tags.some(tag => tag.tag.toLowerCase().includes(query.trim()))));
-      setFilteredFiles(files.filter(file => file.name.toLowerCase().includes(query.trim()) || file.tags.some(tag => tag.tag.toLowerCase().includes(query.trim()))));
+      setFilteredFolders(folders.filter(folder => folder.name.toLowerCase().includes(query.trim())
+        || folder.tags.some(tag => tag.tag.toLowerCase().includes(query.trim()))));
+
+      setFilteredFiles(files.filter(file => file.name.toLowerCase().includes(query.trim())
+        || file.tags.some(tag => tag.tag.toLowerCase().includes(query.trim()))));
     }
   }, [query, files, folders])
 
-  //handling sort by
+  // Handling sort by
   const handleFolderSortBy = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setFolderSortBy(event.target.value);
     if (folderSortBy == "newest") {
-      //sort filteredfolders newest first
+      // Sort filteredfolders newest first
       setFilteredFolders(sortArray(filteredFolders, { by: 'dateOfCreation', order: 'asc' }))
     }
     else if (folderSortBy == "oldest") {
-      //sort filteredfolders oldest first
+      // Sort filteredfolders oldest first
       setFilteredFolders(sortArray(filteredFolders, { by: 'dateOfCreation', order: 'desc' }))
     }
   }
@@ -265,13 +268,13 @@ function Home({ params }: ParamProps) {
       setFilteredFiles(sortArray(filteredFiles, { by: 'dateOfCreation', order: 'asc' }))
     }
     else if (fileSortBy == "oldest") {
-      //sort filteredfolders oldest first
+      // Sort filteredfolders oldest first
       setFilteredFiles(sortArray(filteredFiles, { by: 'dateOfCreation', order: 'desc' }))
     }
   }
 
 
-  //goes through each UTC date from the database and updates it to display in the current systems timezone
+  // Goes through each UTC date from the database and updates it to display in the current systems timezone
   if (filteredFiles) {
     filteredFiles.forEach((file: File) => {
       const UTCDate = file.dateOfCreation
@@ -306,7 +309,10 @@ function Home({ params }: ParamProps) {
                 onClick={() => { router.push(`/project/${projectID}+${project.replace(/%2B/g, '+')}`); }}
               >
                 <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                  <path strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
                 </svg>
                 {project.replace(/%2B/g, ' ')}
               </button>
@@ -339,6 +345,7 @@ function Home({ params }: ParamProps) {
                 <div className="flex flex-row justify-between">
                   <h1 className="text-3xl my-4">Folders:</h1>
                   <div className="content-center">
+                    {/* Sort By */}
                     <label>Sort By:</label>
                     <select onChange={handleFolderSortBy} className='bg-slate-900 p-1 rounded-lg m-2'>
                       <option value="newest" >Newest</option>
@@ -350,7 +357,8 @@ function Home({ params }: ParamProps) {
                   folders={filteredFolders}
                 />
                 <button
-                  className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 flex justify-center"
+                  className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300
+                   hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 flex justify-center"
                   onClick={() => {
                     setModuleType(1);
                     setConfirmModule(true);
@@ -365,6 +373,7 @@ function Home({ params }: ParamProps) {
                 <div className='flex flex-row justify-between'>
                   <h1 className="my-4 text-3xl">Files:</h1>
                   <div className="content-center">
+                    {/* Sort By */}
                     <label>Sort By:</label>
                     <select onChange={handleFileSortBy} className='bg-slate-900 p-1 rounded-lg m-2'>
                       <option value="newest" >Newest</option>

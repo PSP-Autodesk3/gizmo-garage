@@ -50,7 +50,7 @@ function Home({ params }: ParamProps) {
                 body: formData,
             });
             const data = await response.json();
-            if (data.ok) {
+            if (response.ok) {
                 setMessage("File uploaded successfully");
             } else {
                 setMessage("Error uploading file");

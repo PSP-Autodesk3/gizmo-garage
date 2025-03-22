@@ -77,11 +77,11 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
     }
 
     useEffect(() => {
-      if (tagQuery != '') {
-        setFilteredTags(allTags.filter(tags => tags.tag.toLowerCase().includes(tagQuery.trim())));
-      } else {
-        setFilteredTags(allTags);
-      }
+        if (tagQuery != '') {
+            setFilteredTags(allTags.filter(tags => tags.tag.toLowerCase().includes(tagQuery.trim())));
+        } else {
+            setFilteredTags(allTags);
+        }
     }, [tagQuery, allTags, setFilteredTags]);
 
     // Create new folder
@@ -251,9 +251,26 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                     <div id='appliedTags' className='pt-5 rounded-lg my-3 flex-wrap flex p-2'>
                         {appliedTags.length > 0 ? (
                             appliedTags.map((tag: Tag) => (
-                                <button type='button' className='rounded-full overflow-hidden white-space-nowrap truncate m-1 bg-blue-600 text-white text-sm px-4 py-2 flex max-w-[100px] items-center text-center' onClick={() => removeTag(tag.tag_id)} key={tag.tag_id}><svg className="w-6 h-6 flex-shrink-0 text-blue-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24">
-                                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18 17.94 6M18 18 6.06 6" />
-                                </svg>{tag.tag}</button>
+                                <button type='button'
+                                    className='rounded-full overflow-hidden white-space-nowrap truncate m-1 bg-blue-600 text-white text-sm px-4 py-2 flex max-w-[100px] items-center text-center'
+                                    onClick={() => removeTag(tag.tag_id)}
+                                    key={tag.tag_id}
+                                >
+                                    <svg
+                                        className="w-6 h-6 flex-shrink-0 text-blue-800 dark:text-white"
+                                        aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="15"
+                                        height="15"
+                                        fill="none"
+                                        viewBox="0 0 24 24">
+                                        <path
+                                            stroke="currentColor"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="M6 18 17.94 6M18 18 6.06 6" />
+                                    </svg>{tag.tag}</button>
                             ))
                         ) : (
                             <span className='text-white'>No tags applied</span>
@@ -268,10 +285,10 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                 </div>
 
                 <div className="px-8">
-                <input type="file" onChange={handleFileChange} className="mb-4 bg-slate-800 rounded-lg p-4 text-lg" />
-                <br />
-                {message && <p className="mt-2 text-sm">{message}</p>}
-            </div>
+                    <input type="file" onChange={handleFileChange} className="mb-4 bg-slate-800 rounded-lg p-4 text-lg" />
+                    <br />
+                    {message && <p className="mt-2 text-sm">{message}</p>}
+                </div>
 
                 <div className="mt-4">
                     <button

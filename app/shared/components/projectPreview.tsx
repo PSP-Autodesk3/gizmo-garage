@@ -18,11 +18,13 @@ export default function ProjectPreview({ project, query }: { project: Project, q
                     <p>Date: {project.dateOfCreation.toLocaleDateString()} {project.dateOfCreation.toLocaleTimeString()} </p>
                 </div>
                 <div className="mt-1 mb-5">
-                    {query.trim() && project.editors.length > 0 && (query.trim().length > 3 && project.editors.some(editor => editor.email?.toLowerCase().includes(query.trim().toLowerCase()))) && (
-                        <p>Editor: {project.editors.map((editor, index) => (
-                            <span className='rounded-full m-2 p-2 bg-blue-600' key={index}>{editor.email}</span>
-                        ))}</p>
-                    )}
+                    {query.trim() && project.editors.length > 0 &&
+                        (query.trim().length > 3 &&
+                            project.editors.some(editor => editor.email?.toLowerCase().includes(query.trim().toLowerCase()))) && (
+                            <p>Editor: {project.editors.map((editor, index) => (
+                                <span className='rounded-full m-2 p-2 bg-blue-600' key={index}>{editor.email}</span>
+                            ))}</p>
+                        )}
                 </div>
                 {project.tags.length > 0 && (
                     <p>{project.tags.map((tag, index) => (
