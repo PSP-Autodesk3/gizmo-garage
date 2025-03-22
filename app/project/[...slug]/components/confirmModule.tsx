@@ -185,15 +185,15 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                                 <button type="button" className='m-2 rounded-full bg-blue-600 text-white text-sm px-4 py-2 flex items-center text-center' onClick={() => applyTag(tag.tag_id)} key={tag.tag_id}>{tag.tag}</button>
                             ))
                         ) : (
-                            <span className='text-white'>No tags found</span>
+                            <span className='text-white m-auto p-2'>No tags found</span>
                         )
                         }
                     </div>
 
-                    <div id='appliedTags' className='pt-5 rounded-lg  overflow-hidden my-3 flex-wrap flex p-2'>
+                    <div id='appliedTags' className='pt-5 rounded-lg my-3 flex-wrap flex p-2'>
                         {appliedTags.length > 0 ? (
                             appliedTags.map((tag: Tag) => (
-                                <button type='button' className='rounded-full m-1 bg-blue-600 text-white text-sm px-4 py-2 flex max-w-[100px] items-center text-center' onClick={() => removeTag(tag.tag_id)} key={tag.tag_id}><svg className="w-6 h-6 flex-shrink-0 text-blue-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24">
+                                <button type='button' className='rounded-full overflow-hidden white-space-nowrap truncate m-1 bg-blue-600 text-white text-sm px-4 py-2 flex max-w-[100px] items-center text-center' onClick={() => removeTag(tag.tag_id)} key={tag.tag_id}><svg className="w-6 h-6 flex-shrink-0 text-blue-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24">
                                     <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18 17.94 6M18 18 6.06 6" />
                                 </svg>{tag.tag}</button>
                             ))
