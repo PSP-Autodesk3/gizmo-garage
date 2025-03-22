@@ -7,6 +7,9 @@ import withAuth from "@/app/lib/withAuth";
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useCallback } from 'react';
 
+//sort by
+import sortArray from 'sort-array';
+
 // Components
 import Filters from "@/app/shared/components/filter"
 import FileList from "@/app/shared/components/fileList";
@@ -19,16 +22,8 @@ import { ParamProps } from "@/app/shared/interfaces/paramProps";
 import { Folder } from "@/app/shared/interfaces/folder";
 import { File } from "@/app/shared/interfaces/file";
 import { Tag } from "@/app/shared/interfaces/tag";
-
-interface ItemTags {
-  object_id: number,
-  name: string
-}
-
-interface FolderTags {
-  folder_id: number,
-  name: string
-}
+import { FolderTags } from "@/app/shared/interfaces/folderTags";
+import { ItemTags } from "@/app/shared/interfaces/itemTags";
 
 function Home({ params }: ParamProps) {
   const router = useRouter();
@@ -44,12 +39,15 @@ function Home({ params }: ParamProps) {
   const [type, setType] = useState(0);
   const [moduleType, setModuleType] = useState(0); // 1 = Folder, 2 = Item
   const [duplicate, setDuplicate] = useState(0); // 0 = off, 1 = folder, 2 = item
+  const [folderSortBy, setFolderSortBy] = useState('newest');
+  const [fileSortBy, setFileSortBy] = useState('newest');
 
   //for tags
   const [alltags, setTags] = useState<Tag[]>([]);
   const [filteredTags, setFilteredTags] = useState<Tag[]>([]);
   const [filteredFolders, setFilteredFolders] = useState<Folder[]>([]);
   const [filteredFiles, setFilteredFiles] = useState<File[]>([]);
+
 
   const getData = useCallback(async () => {
     const resolved = await params;
@@ -72,10 +70,31 @@ function Home({ params }: ParamProps) {
       const query = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/folders/get`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: projectID})
+        body: JSON.stringify({ id: projectID })
       })
 
-      const folders = await query.json();
+
+      const folders = await query.json() as Folder[];
+
+      //get folder tags and add to folder
+
+      // Adds tags to folders
+      const folderTagsQuery = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/tags/getFolder`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectid: projectID }),
+      })
+
+      const folderTags = await folderTagsQuery.json();
+
+      folders.forEach((folder: Folder) => {
+        folder.tags = folderTags.filter((tag: FolderTags) => tag.folder_id === folder.folder_id);
+      });
+
+      //defaults folders to newest first
+      const sortedFolders = sortArray(folders, { by: 'dateOfCreation', order: 'desc' })
+      setFolders(sortedFolders);
+      setFilteredFolders(sortedFolders);
 
       // Base information to be passed to outputFolder
       const baseFolders = folders.filter((folder: Folder) => folder.parent_folder_id === null);
@@ -120,13 +139,13 @@ function Home({ params }: ParamProps) {
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                     d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
             </svg>`; // Site I used for the SVG, https://heroicons.com/outline
-          
+
           // Create folder button
           const button = document.createElement("button");
-          button.className = `${newValid ? 'text-indigo-200 font-medium': 'text-slate-300'} 
+          button.className = `${newValid ? 'text-indigo-200 font-medium' : 'text-slate-300'} 
             hover:text-slate-100 transition-colors duration-200 flex-1 text-left`;
           button.textContent = folder.name;
-        
+
           summary.appendChild(icon);
           summary.appendChild(button);
 
@@ -182,9 +201,23 @@ function Home({ params }: ParamProps) {
         body: JSON.stringify({ id, type }),
       });
 
-      const objects = await objectQuery.json();
-      setFiles(objects);
-      setFilteredFiles(objects);
+      const objects = await objectQuery.json() as File[];
+
+      // Object Tags
+      const objectTagsQuery = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/tags/getObject`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
+      });
+      const objectTags = await objectTagsQuery.json();
+
+      // Adds tags to files
+      objects.forEach((file: File) => {
+        file.tags = objectTags.filter((tag: ItemTags) => tag.object_id === file.object_id);
+      });
+
+      const sortedObjects = sortArray(objects, { by: 'dateOfCreation', order: 'desc' })
+      setFiles(sortedObjects);
+      setFilteredFiles(sortedObjects);
 
       // Get Tags
 
@@ -196,31 +229,6 @@ function Home({ params }: ParamProps) {
       const tagResponse = await getTagsQuery.json();
       setTags(tagResponse);
       setFilteredTags(tagResponse);
-
-      // Object Tags
-      const objectTagsQuery = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/tags/getObject`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" }
-      });
-      const objectTags = await objectTagsQuery.json();
-
-      // Adds tags to folders
-      const folderTagsQuery = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/tags/getFolder`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ projectid: projectID}),
-      })
-
-      const folderTags = await folderTagsQuery.json();
-
-      folders.forEach((folder: Folder) => {
-        folder.tags = folderTags.filter((tag: FolderTags) => tag.folder_id === folder.folder_id);
-      });
-
-      // Adds tags to files
-      objects.forEach((file: File) => {
-        file.tags = objectTags.filter((tag: ItemTags) => tag.object_id === file.object_id);
-      });
     }
   }, [params, id, type, router, project, projectID, routes]);
 
@@ -238,6 +246,48 @@ function Home({ params }: ParamProps) {
       setFilteredFiles(files.filter(file => file.name.toLowerCase().includes(query.trim()) || file.tags.some(tag => tag.tag.toLowerCase().includes(query.trim()))));
     }
   }, [query, files, folders])
+
+  //handling sort by
+  const handleFolderSortBy = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setFolderSortBy(event.target.value);
+    if (folderSortBy == "newest") {
+      //sort filteredfolders newest first
+      setFilteredFolders(sortArray(filteredFolders, { by: 'dateOfCreation', order: 'asc' }))
+    }
+    else if (folderSortBy == "oldest") {
+      //sort filteredfolders oldest first
+      setFilteredFolders(sortArray(filteredFolders, { by: 'dateOfCreation', order: 'desc' }))
+    }
+  }
+
+  const handleFileSortBy = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setFileSortBy(event.target.value)
+    if (fileSortBy == "newest") {
+      setFilteredFiles(sortArray(filteredFiles, { by: 'dateOfCreation', order: 'asc' }))
+    }
+    else if (fileSortBy == "oldest") {
+      //sort filteredfolders oldest first
+      setFilteredFiles(sortArray(filteredFiles, { by: 'dateOfCreation', order: 'desc' }))
+    }
+  }
+
+
+  //goes through each UTC date from the database and updates it to display in the current systems timezone
+  if (filteredFiles) {
+    filteredFiles.forEach((file: File) => {
+      const UTCDate = file.dateOfCreation
+      const localTimeDate = new Date(UTCDate);
+      file.dateOfCreation = localTimeDate
+    });
+  }
+
+  if (filteredFolders) {
+    filteredFolders.forEach((Folder: Folder) => {
+      const UTCDate = Folder.dateOfCreation
+      const localTimeDate = new Date(UTCDate);
+      Folder.dateOfCreation = localTimeDate
+    });
+  }
 
   return (
     <>
@@ -287,7 +337,16 @@ function Home({ params }: ParamProps) {
 
               {/* Folders */}
               <div id="folders" className="mx-8 my-4">
-                <h1 className="text-3xl my-4">Folders:</h1>
+                <div className="flex flex-row justify-between">
+                  <h1 className="text-3xl my-4">Folders:</h1>
+                  <div className="content-center">
+                    <label>Sort By:</label>
+                    <select onChange={handleFolderSortBy} className='bg-slate-900 p-1 rounded-lg m-2'>
+                      <option value="newest" >newest</option>
+                      <option value="oldest" >oldest</option>
+                    </select>
+                  </div>
+                </div>
                 <FolderList
                   folders={filteredFolders}
                 />
@@ -304,7 +363,16 @@ function Home({ params }: ParamProps) {
 
               {/* Files */}
               <div id="files" className="mx-8 my-4">
-                <h1 className="my-4 text-3xl">Files:</h1>
+                <div className='flex flex-row justify-between'>
+                  <h1 className="my-4 text-3xl">Files:</h1>
+                  <div className="content-center">
+                    <label>Sort By:</label>
+                    <select onChange={handleFileSortBy} className='bg-slate-900 p-1 rounded-lg m-2'>
+                      <option value="newest" >newest</option>
+                      <option value="oldest" >oldest</option>
+                    </select>
+                  </div>
+                </div>
                 <FileList
                   files={filteredFiles}
                 />
@@ -323,7 +391,7 @@ function Home({ params }: ParamProps) {
 
           {/* Confirmation for creating new items */}
           {(confirmModule) && (
-            <div className="fixed inset-0 flex border-indigo-600 border-2 items-center justify-center bg-slate-900 p-4 w-[40%] h-[40%] m-auto rounded-lg shadow-lg mt-16">
+            <div className="fixed inset-0 overflow-auto flex border-indigo-600 border-2 items-center justify-center bg-slate-900 p-4 w-[40%] h-[60%] m-auto rounded-lg shadow-lg mt-16">
               <ConfirmModule
                 itemType={(moduleType === 1 ? "Folder" : "File")}
                 projectID={projectID}
