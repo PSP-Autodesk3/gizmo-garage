@@ -22,4 +22,28 @@ router.post("/tag", async (req, res, next) => {
     }
 });
 
+// Get latest version
+router.post("/latestVersion", async (req, res, next) => {
+    try {
+        const { bucket_id } = req.body;
+        if (!bucket_id) {
+            throw new Error("Missing required fields");
+        }
+        const [result] = await pool.execute(`
+            SELECT version
+            FROM Version
+            WHERE bucket_id = ?
+            ORDER BY version DESC
+            LIMIT 1
+        `, [bucket_id]);
+        if (result.length === 0) {
+            throw new Error("No versions found");
+        }
+        res.json({ version: result[0].version });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+
 export default router;

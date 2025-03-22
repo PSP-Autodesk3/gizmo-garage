@@ -22,12 +22,44 @@ function Home({ params }: PageProps) {
      const [file, setFile] = useState<File | null>(null);
      const [uploading, setUploading] = useState<boolean>(false);
      const [message, setMessage] = useState<string | null>(null);
+     const [version, setVersion] = useState<number | null>(null);
 
         const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
             if (event.target.files && event.target.files.length > 0) {
                 setFile(event.target.files[0]);
             }
         };
+
+        const generateLatestVersion = async (bucketKey: string) => {
+            try {
+                const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/versions/latestVersion`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ bucket_id: bucketKey }),
+                });
+                const data = await response.json();
+                const newVersion = data.version + 1;
+                return newVersion;
+            }
+            catch (error) {
+                console.log(error);
+            }
+        }
+
+        const tagNewVersion = async (version: number, urn: string, bucketKey: string) => {
+            try {
+                await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/versions/tag`, {
+                    method: "POST",
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ bucket_id: bucketKey, urn: urn, version: version }),
+                });
+            }
+            catch (error) {
+                console.log(error);
+            }
+        }
 
         const handleUpload = async () => {
             if (!file) {
@@ -46,15 +78,22 @@ function Home({ params }: PageProps) {
                 formData.append("bucketKey", bucketKey);
             }
             try {
-                const response = await fetch("http://localhost:3001/oss/upload", {
+                const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/oss/upload`, {
                     method: "POST",
                     body: formData,
                 });
                 const data = await response.json();
-                if (data.ok) {
+                const urn = data.urn;
+                if (data.message === "File uploaded successfully!") {
                     setMessage("File uploaded successfully");
                 } else {
                     setMessage("Error uploading file");
+                }
+                if (bucketKey) {
+                    const version = await generateLatestVersion(bucketKey);
+                    if (version && urn && bucketKey) {
+                        tagNewVersion(version, urn, bucketKey);
+                    }
                 }
             }
             catch (error) {
@@ -75,7 +114,7 @@ function Home({ params }: PageProps) {
      useEffect(() => {
         const fetchInfo = async () => {
             if (itemId !== null) {
-                const response = await fetch ("http://localhost:3001/items/info", {
+                const response = await fetch (`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/items/info`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

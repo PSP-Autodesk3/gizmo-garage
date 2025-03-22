@@ -59,7 +59,7 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
             formData.append("bucketKey", bucketKey);
         }
         try {
-            const response = await fetch("http://localhost:3001/oss/upload", {
+            const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/oss/upload`, {
                 method: "POST",
                 body: formData,
             });
@@ -80,13 +80,13 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
 
     const tagVersion = async (bucketKey: string, urn: string) => {
         try {
-            const response = await fetch(`http://localhost:3001/versions/tag`, {
+            const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/versions/tag`, {
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ bucket_id: bucketKey, urn: urn, version: 1 }),
             });
             const data = await response.json();
-            if (data.ok) {
+            if (data.message == "Version tagged successfully") {
                 console.log("Version tagged successfully");
             } else {
                 console.log("Error tagging version");
