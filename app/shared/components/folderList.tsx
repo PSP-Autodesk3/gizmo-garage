@@ -4,7 +4,6 @@
 import { Folder } from "@/app/shared/interfaces/folder";
 
 // Other
-import { useRouter } from 'next/navigation';
 import { usePathname } from 'next/navigation';
 import Link from "next/link";
 
@@ -14,7 +13,6 @@ import 'react-loading-skeleton/dist/skeleton.css'
 
 export default function FolderList({ folders }: { folders: Folder[] }) {
     const pathname = usePathname();
-    const router = useRouter();
         
     return (
         <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">

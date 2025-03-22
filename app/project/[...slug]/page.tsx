@@ -281,7 +281,7 @@ function Home({ params }: ParamProps) {
         });
       }
     }
-  }, [params, id, type, router, project, projectID, routes]);
+  }, [params, router, project, projectID, routes, id, type]);
 
   useEffect(() => {
     getData();
