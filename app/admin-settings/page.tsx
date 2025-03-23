@@ -198,7 +198,7 @@ function Home() {
   const addTag = async (event: string) => {
     // make api call to create a tag
     const tagName = event;
-    if (tagName.length > 0 && !allTags.some(tag => tag.tag.toLowerCase() === tagName.toLowerCase())) {
+    if (tagName.length > 0 && !allTags.some(tag => tag.tag.toLowerCase().trim() === tagName.toLowerCase().trim())) {
       await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/tags/create`, {
         method: "POST",
         headers: {
