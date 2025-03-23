@@ -18,7 +18,7 @@ import sortArray from 'sort-array';
 
 // Interfaces
 import { Project } from "@/app/shared/interfaces/project";
-import { projectEditors } from "@/app/shared/interfaces/projectEditors";
+import { ProjectEditors } from "@/app/shared/interfaces/projectEditors";
 import { ProjectTags } from "@/app/shared/interfaces/projectTags";
 
 // Components
@@ -97,7 +97,7 @@ function Home() {
               // Assigns tags and editors to projects
               result.forEach((project: Project) => {
                 project.tags = tagResult?.filter((tag: ProjectTags) => tag.project_id === project.project_id) || [];
-                project.editors = editorResult?.filter((user: projectEditors) => user.project_id === project.project_id) || [];
+                project.editors = editorResult?.filter((user: ProjectEditors) => user.project_id === project.project_id) || [];
               });
 
               // Assigns editors to project
