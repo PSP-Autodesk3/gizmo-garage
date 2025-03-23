@@ -153,18 +153,18 @@ function Home() {
 
   return (
     <>
-      <div className={`min-h-screen bg-white dark:bg-slate-950 ${confirmModule ? 'blur-xl bg-opacity-40' : ''}`}>
+      <div className={`min-h-screen bg-gray-100 dark:bg-slate-950 ${confirmModule ? 'blur-xl bg-opacity-40' : ''}`}>
         <BackBtnBar/>
         {/* Header */}
         <h1 className="text-4xl font-semibold text-slate-900 dark:text-slate-200 w-[40%] m-auto mb-2 mt-16">
           Admin Settings
         </h1>
         {/* Database Reset Popup */}
-        <div className="fixed bottom-0 left-50 right-0 m-4 rounded-lg bg-indigo-500 p-2 text-white text-center text-sm popup hidden">
+        <div className="fixed bottom-0 left-50 right-0 m-4 rounded-lg bg-indigo-500 dark:bg-indigo-600 p-2 text-white text-center text-sm popup hidden">
           {(databaseExists == 1) ? ( <h1 className="text-xl font-bold">Database Reset.</h1> ) : ( <h1 className="text-xl font-bold">Database Created.</h1> )}
         </div>
         {/* Password Reset Popup */}
-        <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 m-4 rounded-lg bg-indigo-500 p-2 text-white text-center text-sm password-reset-popup hidden">
+        <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 m-4 rounded-lg bg-indigo-500 p-2 text-gray-200 dark:text-white text-center text-sm password-reset-popup hidden">
           <h1 className="text-xl font-bold">Password Reset</h1>
           <p className="mx-2">We have sent an email to {resetEmail}.</p>
         </div>
@@ -172,12 +172,12 @@ function Home() {
         <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-200 w-[40%] m-auto mb-2 mt-8">
           Database Management
         </h2>
-        <div className="bg-slate-900 p-4 w-[40%] mx-auto rounded-lg shadow-lg mt-4">
-          <p className="mb-2">Reset the content of the database, to fix potential database related problems.</p>
+        <div className="bg-white dark:bg-slate-900 p-4 w-[40%] mx-auto rounded-lg shadow-lg border-gray-200 dark:border-slate-800 mt-4">
+          <p className="text-gray-600 dark:text-gray-300 mb-2">Reset the content of the database, to fix potential database related problems.</p>
           {(databaseExists == 1) ? (
-            <button className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50" onClick={() => setupDatabase()}>Reset Database Content</button>
+            <button className="px-6 py-3 text-lg font-medium bg-indigo-600 dark:bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50" onClick={() => setupDatabase()}>Reset Database Content</button>
           ) : (
-            <button className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50" onClick={() => setupDatabase()}>Initialise Database</button>
+            <button className="px-6 py-3 text-lg font-medium bg-indigo-600 dark:bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50" onClick={() => setupDatabase()}>Initialise Database</button>
           )}
         </div>
         {/* User Management */}
@@ -188,11 +188,12 @@ function Home() {
           User Filter
         </h3>
         {/* User Filter */}
-        <div className="bg-slate-900 p-4 w-[40%] mx-auto rounded-lg shadow-lg mt-2">
-          <p>Filter through user emails here.</p>
+        <div className="bg-white dark:bg-slate-900 p-4 w-[40%] mx-auto rounded-lg shadow-lg mt-2">
+          <p className="text-gray-600 dark:text-gray-300">Filter through user emails here.</p>
           <div id="search" className='p-1'>
             <input
-              className='text-white w-full p-2 my-2 rounded-lg bg-slate-800'
+              className='w-full p-2 my-2 rounded-lg bg-gray-200 border border-gray-200 text-gray-800 
+                dark:bg-slate-800 dark:border-slate-700 dark:text-white'
               type="text"
               placeholder="Filter by email"
               name="search"
@@ -205,21 +206,21 @@ function Home() {
         <h3 className="text-l font-semibold text-slate-900 dark:text-slate-200 w-[40%] m-auto mb-2 mt-4">
           Users
         </h3>
-        <div className="bg-slate-900 p-4 w-[40%] m-auto rounded-lg shadow-lg mt-4 mb-5">
+        <div className="bg-white dark:bg-slate-900 p-4 w-[40%] m-auto rounded-lg shadow-lg mt-4 mb-5">
           <div id="users" className="space-y-4">
             {isLoading ? (
               // Skeleton loading while data is fetching
               [...Array(3)].map((_, index) => (
-                <div key={index} className="bg-slate-800 p-4 rounded-lg animate-pulse">
+                <div key={index} className="bg-gray-300 dark:bg-slate-800 p-4 rounded-lg animate-pulse">
                   <div className="flex flex-col">
-                    <div className="h-4 bg-slate-700 rounded-lg w-3/4 mb-2"></div>
-                    <div className="h-3 bg-slate-700 rounded-lg w-1/2"></div>
+                    <div className="h-4 bg-gray-400 dark:bg-slate-700 rounded-lg w-3/4 mb-2"></div>
+                    <div className="h-3 bg-gray-400 dark:bg-slate-700 rounded-lg w-1/2"></div>
                   </div>
                   <div className="flex justify-between items-center mt-3">
-                    <div className="h-4 bg-slate-700 rounded-lg w-24"></div>
+                    <div className="h-4 bg-gray-500 dark:bg-slate-700 rounded-lg w-24"></div>
                     <div className="flex items-center space-x-3">
-                      <div className="w-11 h-6 bg-slate-700 rounded-full"></div>
-                      <div className="h-4 bg-slate-700 rounded-lg w-16"></div>
+                      <div className="w-11 h-6 bg-gray-500 dark:bg-slate-700 rounded-full"></div>
+                      <div className="h-4 bg-gray-500 dark:bg-slate-700 rounded-lg w-16"></div>
                     </div>
                   </div>
                 </div>
@@ -227,10 +228,10 @@ function Home() {
             ) : filteredUsers.length > 0 ? (
               // Display users when data is loaded
               filteredUsers.map((user: User) => (
-                <div key={user.uid} className="bg-slate-800 p-4 rounded-lg">
+                <div key={user.uid} className="bg-gray-300 dark:bg-slate-800 p-4 rounded-lg">
                   <div className="flex flex-col">
-                    <p className="text-slate-400 text-sm">{user.email}</p>
-                    <p className="text-slate-500 text-xs">{user.uid}</p>
+                    <p className="text-gray-700 dark:text-slate-400 text-m">{user.email}</p>
+                    <p className="text-gray-600 dark:text-slate-500 text-xs">{user.uid}</p>
                   </div>
                   <div className="flex justify-between items-center">
                     <p 
@@ -246,7 +247,7 @@ function Home() {
                         checked={!user.disabled} 
                         onChange={() => handleDisableUser(user.uid)}
                       />
-                      <div className="relative w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-600 dark:peer-checked:bg-green-600"></div>
+                      <div className="relative w-11 h-6 bg-red-600 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:red-900 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-600 dark:peer-checked:bg-green-600"></div>
                       <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
                         {user.disabled ? 'Disabled' : 'Enabled'}
                       </span>
