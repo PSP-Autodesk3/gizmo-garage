@@ -65,11 +65,11 @@ router.post("/exists", async (req, res, next) => {
 // Get items
 router.post("/get", async (req, res, next) => {
     try {
-        const { id, type } = req.body;
+        const { id } = req.body;
         const [result] = await pool.execute(`
             SELECT *
             FROM Object
-            WHERE Object.folder_id ${type === 1 ? "IS NULL AND Object.project_id " : ""}= ?
+            WHERE Object.project_id = ?
         `, [id]);
         res.json(result);
     }
