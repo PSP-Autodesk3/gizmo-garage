@@ -33,14 +33,56 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
     const [tagQuery, setTagQuery] = useState<string>('');
     const [alreadyApplied, setAlreadyApplied] = useState(0);
     const [appliedTags, setAppliedTags] = useState<Tag[]>([]);
+    // File uploads
+    const [file, setFile] = useState<File | null>(null);
+    const [message, setMessage] = useState<string | null>(null);
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files.length > 0) {
+            setFile(event.target.files[0]);
+        }
+    };
+
+    const handleUpload = async (bucketKey: string) => {
+        if (!file) {
+            setMessage("No file selected");
+            return;
+        }
+        setMessage("");
+        const formData = new FormData();
+        formData.append("file", file);
+        const token = sessionStorage.getItem("token");
+        if (token) {
+            formData.append("token", token);
+        }
+        if (bucketKey) {
+            formData.append("bucketKey", bucketKey);
+        }
+        try {
+            const response = await fetch("http://localhost:3001/oss/upload", {
+                method: "POST",
+                body: formData,
+            });
+            const data = await response.json();
+            if (data.ok) {
+                setMessage("File uploaded successfully");
+            } else {
+                setMessage("Error uploading file");
+            }
+        }
+        catch (error) {
+            setMessage("Error uploading file");
+            console.log(error);
+        }
+    }
 
     useEffect(() => {
-      if (tagQuery != '') {
-        setFilteredTags(allTags.filter(tags => tags.tag.toLowerCase().includes(tagQuery.trim())));
-      } else {
-        setFilteredTags(allTags);
-      }
-    }, [tagQuery]);
+        if (tagQuery != '') {
+            setFilteredTags(allTags.filter(tags => tags.tag.toLowerCase().includes(tagQuery.trim())));
+        } else {
+            setFilteredTags(allTags);
+        }
+    }, [tagQuery, allTags, setFilteredTags]);
 
     // Create new folder
     const newFolder = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -66,7 +108,6 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: folderName.trim(), projectid: projectID, folder_id: id, type }),
             });
-
             // Gets the updated list
             getData();
         }
@@ -96,12 +137,29 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                 setDuplicate(0);
             }, 3000);
         } else if (user) { // If no duplicates -> create file
+            // Create bucket
+            const token = await sessionStorage.getItem("token"); // Get token
+            const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/oss/create`, {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: token }),
+            });
+            const data = await response.json();
+            const bucketKey = data.bucketKey;
+            // Create item in DB and pass through created bucket key
             await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/items/create`, {
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ itemName: itemName.trim(), email: user.email, project: projectID, id, type }),
+                body: JSON.stringify({ itemName: itemName.trim(), email: user.email, project: projectID, id, type, bucketKey, appliedTags }),
             });
-
+            // Upload file to bucket
+            handleUpload(bucketKey);
+            // Check bucket created
+            await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/oss/getBuckets`, {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: token }),
+            });
             // Gets the updated list
             getData();
         }
@@ -167,11 +225,11 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                     className="w-full mt-4 p-2 rounded-lg bg-slate-800"
                     placeholder="Enter Item name"
                 />
-                <div >
+                <div className='bg-slate-800 mt-4 rounded-lg max-w-[350px] flex flex-col items-center ' >
                     <div id="search" className='p-4'>
                         <label htmlFor="search=bar">Search</label>
                         <input
-                            className='text-white w-full p-2 my-2 rounded-lg bg-slate-800'
+                            className='text-white w-full p-2 my-2 rounded-lg bg-slate-900'
                             type="text"
                             placeholder="Search"
                             name="search"
@@ -179,33 +237,57 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                             onChange={(e) => setTagQuery(e.target.value)}
                         />
                     </div>
-                    <div>
-                        {
+                    <div className='bg-slate-900 rounded-lg overflow-hidden flex flex-wrap w-[90%]'>
+                        {filteredTags.length > 0 ? (
                             filteredTags.map((tag: Tag) => (
-                                <>
-                                    <button type="button" className='rounded-full m-2 p-3 bg-blue-600' onClick={() => applyTag(tag.tag_id)} key={tag.tag_id}>{tag.tag}</button>
-                                </>
+                                <button type="button" className='m-2 rounded-full bg-blue-600 text-white text-sm px-4 py-2 flex items-center text-center' onClick={() => applyTag(tag.tag_id)} key={tag.tag_id}>{tag.tag}</button>
                             ))
+                        ) : (
+                            <span className='text-white m-auto p-2'>No tags found</span>
+                        )
                         }
                     </div>
 
-                    <div id='appliedTags'>
-                        {
+                    <div id='appliedTags' className='pt-5 rounded-lg my-3 flex-wrap flex p-2'>
+                        {appliedTags.length > 0 ? (
                             appliedTags.map((tag: Tag) => (
-                                <>
-                                    <button type='button' className='rounded-full m-2 p-3 bg-blue-600 flex' onClick={() => removeTag(tag.tag_id)} key={tag.tag_id}><svg className="w-6 h-6 text-blue-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24">
-                                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18 17.94 6M18 18 6.06 6" />
+                                <button type='button'
+                                    className='rounded-full overflow-hidden white-space-nowrap truncate m-1 bg-blue-600 text-white text-sm px-4 py-2 flex max-w-[100px] items-center text-center'
+                                    onClick={() => removeTag(tag.tag_id)}
+                                    key={tag.tag_id}
+                                >
+                                    <svg
+                                        className="w-6 h-6 flex-shrink-0 text-blue-800 dark:text-white"
+                                        aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="15"
+                                        height="15"
+                                        fill="none"
+                                        viewBox="0 0 24 24">
+                                        <path
+                                            stroke="currentColor"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="M6 18 17.94 6M18 18 6.06 6" />
                                     </svg>{tag.tag}</button>
-                                </>
                             ))
+                        ) : (
+                            <span className='text-white'>No tags applied</span>
+                        )
                         }
-
-                        <div>
-                            {alreadyApplied === 1 && (
-                                <span className='text-red-500'>Already Applied</span>
-                            )}
-                        </div>
                     </div>
+                    <div>
+                        {alreadyApplied === 1 && (
+                            <span className='text-red-500'>Already Applied</span>
+                        )}
+                    </div>
+                </div>
+
+                <div className="px-8">
+                    <input type="file" onChange={handleFileChange} className="mb-4 bg-slate-800 rounded-lg p-4 text-lg" />
+                    <br />
+                    {message && <p className="mt-2 text-sm">{message}</p>}
                 </div>
 
                 <div className="mt-4">

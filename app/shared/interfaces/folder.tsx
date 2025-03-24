@@ -5,4 +5,5 @@ export interface Folder {
   name: string;
   parent_folder_id: number | null;
   tags: Tag[];
+  dateOfCreation: Date;
 }

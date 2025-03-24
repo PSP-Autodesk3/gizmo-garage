@@ -42,13 +42,14 @@ function Home() {
         if (!loadingAuth && !user) {
           router.replace('/landing');
         }
-      }, [loadingAuth, router]);
+      }, [user, loadingAuth, router]);
 
     useEffect(() => {
+        // Redirects if the user is already authenticated
         if (sessionStorage.getItem("token")) {
             router.push("/");
         }
-    }, [user])
+    }, [user, router])
 
     if (!user && !loadingAuth) {
         router.push("/landing");
