@@ -1,24 +1,22 @@
 "use client";
 // Here is the general ref I used for implementing the theme switcher: https://staticmania.com/blog/guide-to-creating-a-darklight-mode-toggle-in-next-js
 
-
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 const ThemeSwitcher = () => {
     const [mount, setMount] = useState(false);
-    const { systemTheme, theme, setTheme }= useTheme();
-    const currentTheme = theme === "system" ? systemTheme : theme;
+    const {theme, setTheme }= useTheme();
 
     useEffect(() =>{
         setMount(true);
     }, []);
 
     if (!mount) return null;
-    console.log(currentTheme);
     
-    return mount ? (
-        <div className="fixed right-5 z-[1000000] max-lg:bottom-2.5 lg:top-1/3">
+    return (
+        <div className="fixed bottom-5 right-5 z-[1000000]">
             <button
+                aria-label="Toggle theme"
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
                 type="button"
                 className="flex h-10 w-10 p-2 items-center justify-center rounded-md border border-gray-800 text-gray-800 focus:outline-none focus:ring-0 focus:ring-gray-200 dark:border-slate-300 dark:text-white"
@@ -45,7 +43,7 @@ const ThemeSwitcher = () => {
                 </svg>
             </button>
         </div>
-    ) : null;
+    );
 };
 
 export default ThemeSwitcher;

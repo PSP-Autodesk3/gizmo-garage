@@ -269,7 +269,7 @@ function Home({ params }: ParamProps) {
             routes={routes}
           />
           {(!confirmModule) && (
-            <div className="bg-slate-800 mx-8 my-4 rounded-lg p-4">
+            <div className="bg-gray-300 dark:bg-slate-800 p-4 w-[90%] mx-auto rounded-lg shadow-lg border-gray-200 dark:border-slate-800 mt-4">
 
               {/* Error message for duplicates */}
               <p className="text-red-600">
@@ -282,7 +282,7 @@ function Home({ params }: ParamProps) {
 
               {/* Folders */}
               <div id="folders" className="mx-8 my-4">
-                <h1 className="text-3xl my-4">Folders:</h1>
+                <h1 className="text-3xl my-4 text-slate-900 dark:text-slate-200">Folders:</h1>
                 <FolderList
                   folders={filteredFolders}
                 />
@@ -299,7 +299,7 @@ function Home({ params }: ParamProps) {
 
               {/* Files */}
               <div id="files" className="mx-8 my-4">
-                <h1 className="my-4 text-3xl">Files</h1>
+                <h1 className="my-4 text-3xl text-slate-900 dark:text-slate-200">Files</h1>
                 <FileList
                   files={filteredFiles}
                 />

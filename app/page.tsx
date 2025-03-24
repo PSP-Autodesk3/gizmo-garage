@@ -36,7 +36,7 @@ function Home() {
   const [loading, setLoading] = useState(true);
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([] as Project[]);
-  const [projectTags, setProjectTags] = useState<ProjectTags[]>([] as ProjectTags[]);
+  // const [projectTags, setProjectTags] = useState<ProjectTags[]>([] as ProjectTags[]);
   const [query, setQuery] = useState<string>('');
 
   useEffect(() => {
@@ -81,7 +81,7 @@ function Home() {
 
               setProjects(result);
               setFilteredProjects(result);
-              setProjectTags(tagResult);
+              // setProjectTags(tagResult);
 
               //assigns tags to projects
               console.log("Tagresult: " + tagResult);
@@ -152,7 +152,7 @@ function Home() {
           <div id="projects">
             <div className="w-[50%] py-8 m-auto gap-4 lg:absolute rounded-lg left-1/2 transform -translate-x-1/2">
               <div className="pr-8 flex flex-row justify-between">
-                <h1 className='p-10 text-4xl text-white transition-colors duration-300 hover:text-gray-400 pb-10'>Projects</h1>
+                <h1 className='p-10 text-4xl text-slate-900 dark:text-slate-200 pb-10'>Projects</h1>
                 <button
                   className="self-center flex justify-end px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
                   onClick={() => router.push("/new-project")}
@@ -171,15 +171,15 @@ function Home() {
               ) : (
                 <div className='space-y-4 ml-10'>
                   {[...Array(4)].map((_, index) => (
-                    <div key={index} className="bg-slate-800 p-4 rounded-lg animate-pulse">
+                    <div key={index} className="bg-gray-300 dark:bg-slate-800 p-4 rounded-lg animate-pulse">
                       <div className='flex justify-between items-center mb-4'>
-                        <div className='h-6 bg-slate-700 rounded-lg w-2/4'></div>
+                        <div className='h-6 bg-gray-400 dark:bg-slate-700 rounded-lg w-2/4'></div>
                       </div>
                       <div className='space-y-3'>
-                        <div className='h-4 bg-slate-700 rounded-lg w-1/4'></div>
+                        <div className='h-4 bg-gray-400 dark:bg-slate-700 rounded-lg w-1/4'></div>
                       </div>
                       <div className='flex gap-2 mt-4'>
-                        <div className='h-4 bg-slate-700 rounded-lg w-20'></div>
+                        <div className='h-4 bg-gray-400 dark:bg-slate-700 rounded-lg w-20'></div>
                       </div>
                     </div>
                   ))}

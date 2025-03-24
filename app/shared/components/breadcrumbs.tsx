@@ -18,24 +18,27 @@ export default function Breadcrumbs({projectID, project, routes}: BreadcrumbsPro
     }
 
     return (
-        <div id="breadcrumbs" className="flex flex-row text-2xl p-4 rounded-lg mx-8 my-4">
+        <div id="breadcrumbs" className="text-slate-900 dark:text-slate-200 flex flex-row text-2xl p-4 rounded-lg mx-8 my-4 ">
             <button
                 onClick={() => { router.push(`/`); }}
+                className="transition-colors duration-300 hover:text-gray-400"
             >
                 Home
             </button>
             <h1>&nbsp;&nbsp;&gt;&nbsp;&nbsp;</h1>
             <button
+                className="transition-colors duration-300 hover:text-gray-400"
                 onClick={() => { router.push(`/project/${projectID}+${project.replace(/%2B/g, '+')}`); }}
             >
                 {project.replace(/%2B/g, ' ')}
             </button>
             {Array.isArray(routes) && routes.length > 0 && (
                 routes.map((route, index) => (
-                    <div key={index} className="flex flex-row">
+                    <div key={index} className="flex flex-row ">
                         <h1>&nbsp;&nbsp;&gt;&nbsp;&nbsp;</h1>
                         <button
                             onClick={() => goneBack(index)}
+                            className="transition-colors duration-300 hover:text-gray-400"
                         >
                             {route.replace(/%2B/g, ' ')}
                         </button>

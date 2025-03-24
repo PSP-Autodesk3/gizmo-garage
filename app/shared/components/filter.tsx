@@ -28,7 +28,7 @@ export default function Filters({ query, onQueryChange, values, onValuesChange }
   }
   return (
     <>
-      <div id="side-bar" className='bg-slate-900 p-6 rounded-lg shadow-lg h-screen flex flex-col justify-between'>
+      <div id="side-bar" className='bg-gray-500 dark:bg-slate-900 p-6 shadow-lg h-screen flex flex-col justify-between max-w-fit'>
         <div>
           <Link href="/">
             <div className='flex flex-row justify-between pb-4' >
@@ -38,7 +38,7 @@ export default function Filters({ query, onQueryChange, values, onValuesChange }
                 width={75}
                 height={75}
               />
-              <div className='flex text-3xl items-center'>Gizmo Garage</div>
+              <div className='flex text-3xl items-center pr-6'>Gizmo Garage</div>
             </div>
           </Link>
           {values && onValuesChange && (
@@ -87,10 +87,11 @@ export default function Filters({ query, onQueryChange, values, onValuesChange }
             </div>
           )}
           {onQueryChange && (
-            <div id="search" className='p-4'>
-              <label htmlFor="search=bar">Search</label>
+            <div id="search" className='p-0 '>
+              <label htmlFor="search=bar">Search Projects</label>
               <input
-                className='text-white w-full p-2 my-2 rounded-lg bg-slate-800'
+                className='w-full p-2 my-2 rounded-lg bg-gray-200 border border-gray-200 text-gray-800 
+                  dark:bg-slate-800 dark:border-slate-700 dark:text-white'
                 type="text"
                 placeholder="Search"
                 name="search"
@@ -134,5 +135,5 @@ export default function Filters({ query, onQueryChange, values, onValuesChange }
         </div>
       </div>
     </>
-  )
+  );
 }
