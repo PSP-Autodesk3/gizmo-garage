@@ -204,11 +204,10 @@ function Home({ params }: PageProps) {
         <>
         <BackBtnBar />
         <div className="w-full">
-            <h1 className="text-2xl text-center pb-4">Object Details</h1>
             <div className="lg:grid lg:grid-cols-2 w-full">
             <div>
                 <div className="bg-slate-800/50 backdrop-blur mx-8 my-4 rounded-lg overflow-hidden shadow-xl border border-slate-700/50 p-4">
-                    <h1 className="text-2xl text-center">
+                    <h1 className="text-2xl text-center pb-4">
                         Item Details
                     </h1>
                     <div className="flex flex-col w-full border px-2 border-slate-700/50 py-2 my-2 rounded-lg text-lg">
@@ -226,30 +225,7 @@ function Home({ params }: PageProps) {
                 </div>
             </div>
             <div className="bg-slate-800/50 backdrop-blur mx-8 my-4 rounded-lg overflow-hidden shadow-xl border border-slate-700/50 p-4">
-                <h1 className="text-2xl text-center">
-                    Versions
-                </h1>
-                <div className="flex flex-col items-center">
-                    {versions.map((version, index) => (
-                        <div key={index} className="flex flex-col w-full border px-2 border-slate-700/50 py-2 my-2 rounded-lg text-lg">
-                            <p>Version: <b>{version.version}</b></p>
-                            <button
-                                onClick={() => downloadFile(version.urn, version.object_key)}
-                            >
-                                Download
-                            </button>
-                            <button
-                                onClick={() => bucketKey && rollbackVersion(version.version, bucketKey)}
-                            >
-                                Rollback
-                            </button>
-                        </div>
-                    ))}
-                </div>
-            </div>
-            </div>
             <h1 className="text-2xl text-center pb-4">Tag new version</h1>
-            <div className="bg-slate-800/50 backdrop-blur mx-8 my-4 rounded-lg overflow-hidden shadow-xl border border-slate-700/50 p-4">
                 <input type="file" onChange={handleFileChange} className="mb-4 rounded-lg p-4 text-lg" />
                     <br />
                     <button
@@ -261,6 +237,34 @@ function Home({ params }: PageProps) {
                     </button>
                     {message && <p className="mt-2 text-sm">{message}</p>}
             </div>
+            </div>
+            <div className="bg-slate-800/50 backdrop-blur mx-8 my-4 rounded-lg overflow-hidden shadow-xl border border-slate-700/50 p-4">
+                <h1 className="text-2xl text-center pb-4">
+                    Versions
+                </h1>
+                <div className="flex flex-col items-center">
+                    {versions.map((version, index) => (
+                        <div key={index} className="flex justify-between w-full border px-2 border-slate-700/50 py-2 my-2 rounded-lg text-lg">
+                            <p className="text-2xl p-4">Version: <b>{version.version}</b></p>
+                            <div className="flex justify-center">
+                                <button
+                                    onClick={() => downloadFile(version.urn, version.object_key)}
+                                    className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                                >
+                                    Download
+                                </button>
+                                <button
+                                    onClick={() => bucketKey && rollbackVersion(version.version, bucketKey)}
+                                    className="px-6 m-1 py-3 text-lg font-medium bg-red-500 rounded-lg transition-all duration-300 hover:bg-red-400 hover:scale-105 shadow-lg hover:shadow-red-400/50"
+                                >
+                                    Rollback
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+            
         </div>
             {/*/ Row 2
             <div className="px-8">
