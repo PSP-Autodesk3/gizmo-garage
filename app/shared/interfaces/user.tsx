@@ -1,5 +1,6 @@
 export interface User {
-  uid: string;
+  user_id: string;
   email: string;
-  disabled: boolean;
+  fname: string;
+  lname: string;
 }

@@ -3,26 +3,24 @@
 // Firebase
 import { auth } from '@/app/firebase/config';
 import { sendPasswordResetEmail } from 'firebase/auth';
+import { useAuthState } from "react-firebase-hooks/auth";
 
 // Middleware
 import withAuth from "@/app/lib/withAuth";
 
 // Components
-import BackBtnBar from '@/app/shared/components/backBtnBar';;
+import BackBtnBar from '@/app/shared/components/backBtnBar';
+
+// Interfaces
+import { User } from '@/app/shared/interfaces/user';
 
 // Other
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 function Home() {
+  const [user, loading] = useAuthState(auth);
   const [email, setEmail] = useState('');
-
-  // Replace with actual user data from Firebase/Auth context
-  const userData = {
-    firstName: "John",
-    lastName: "Doe",
-    username: "johndoe123",
-    email: "johndoe@example.com"
-  };
+  const [details, setDetails] = useState<User>();
 
   // Reset password function
   function resetPassword(email: string) {
@@ -41,22 +39,34 @@ function Home() {
       });
   }
 
+  useEffect(() => {
+    const getDetails = async () => {
+      const query = await fetch(`http://localhost:3001/users/details`, {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: user?.email })
+      })
+      const response = await query.json();
+      setDetails(response[0]);
+    }
+    if (user) {
+      getDetails();
+    }
+  }, [user])
+
   return (
     <>
       <BackBtnBar />
       <div className="max-w-2xl mx-auto p-6">
         <h1 className="text-4xl font-bold mb-4">Account Settings</h1>
-        <p className="font-bold text-2xl mb-4">Autodesk</p>
-        <div className="bg-gray-800 p-6 rounded-lg shadow-lg text-white mb-6">
-          <p className="text-lg mb-2"><span className="font-bold">First Name:</span> {userData.firstName}</p>
-          <p className="text-lg mb-2"><span className="font-bold">Last Name:</span> {userData.lastName}</p>
-          <p className="text-lg mb-2"><span className="font-bold">Username:</span> {userData.username}</p>
-          <p className="text-lg"><span className="font-bold">Email:</span> {userData.email}</p>
-        </div>
-
-
-        <p className="font-bold text-2xl mb-4">Gizmo Garage</p>
-
+        <p className="font-bold text-2xl mb-4">Gizemo Garage</p>
+        {details && (
+          <div className="bg-gray-800 p-6 rounded-lg shadow-lg text-white mb-6">
+            <p className="text-lg mb-2"><span className="font-bold">First Name:</span> {details.fname}</p>
+            <p className="text-lg mb-2"><span className="font-bold">Last Name:</span> {details.lname}</p>
+            <p className="text-lg"><span className="font-bold">Email:</span> {details.email}</p>
+          </div>
+        )}
 
         <div className="bg-gray-800 p-6 rounded-lg shadow-lg text-white">
           <form className="flex items-center gap-2">
