@@ -1,4 +1,5 @@
 import { Tag } from '@/app/shared/interfaces/tag';
+import { User } from 'firebase/auth';
 
 export interface Project {
     project_id: number;
@@ -6,4 +7,6 @@ export interface Project {
     ownsProject: number;
     error: string;
     tags: Tag[];
+    dateOfCreation: Date;
+    editors: User[];
 }

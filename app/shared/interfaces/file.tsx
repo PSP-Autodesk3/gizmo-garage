@@ -5,4 +5,5 @@ export interface File {
   name: string;
   tags: Tag[];
   folder_id: number;
+  dateOfCreation: Date;
 }
