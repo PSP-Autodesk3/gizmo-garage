@@ -2,23 +2,17 @@
 
 // Middleware
 import withAuth from "@/app/lib/withAuth";
- 
+
 // Other
 import { useState, useEffect } from "react";
 
 //Filter component
 import BackBtnBar from "@/app/shared/components/backBtnBar";
 
-// Firebase
-import { auth } from "@/app/firebase/config";
-import { reauthenticateWithCredential } from "firebase/auth";
-import { EmailAuthProvider } from "firebase/auth/web-extension";
+// Interfaces
+import { ParamProps } from "@/app/shared/interfaces/paramProps";
 
-interface PageProps {
-  params: { slug: string[] };
-}
-
-function Home({ params }: PageProps) {
+function Home({ params }: ParamProps) {
      const [itemId, setItemId] = useState<number | null>(null);
      const [itemName, setItemName] = useState<string | null>(null);
      const [author, setAuthor] = useState<string | null>(null);
@@ -33,12 +27,11 @@ function Home({ params }: PageProps) {
      const [password, setPassword] = useState<string>('');
      const [rollbackVer, setRollbackVer] = useState<number | null>(null);
 
-        const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-            if (event.target.files && event.target.files.length > 0) {
-                setFile(event.target.files[0]);
-            }
-        };
-
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files.length > 0) {
+            setFile(event.target.files[0]);
+        }
+    };
         const generateLatestVersion = async (bucketKey: string) => {
             try {
                 const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/versions/latestVersion`, {
@@ -124,11 +117,15 @@ function Home({ params }: PageProps) {
             }
             catch (error) {
                 setMessage("Error uploading file");
-                console.log(error);
-            } finally {
-                setUploading(false);
             }
         }
+        catch (error) {
+            setMessage("Error uploading file");
+            console.log(error);
+        } finally {
+            setUploading(false);
+        }
+    }
 
         const downloadFile = async (urn: string, objectKey: string) => {
             try {
@@ -210,8 +207,9 @@ function Home({ params }: PageProps) {
             setItemId(Number(resp.slug[0]));
         }
         resolveParams();
-     }, [])
-     useEffect(() => {
+    }, [params])
+
+    useEffect(() => {
         const fetchInfo = async () => {
             if (itemId !== null) {
                 const response = await fetch (`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/items/info`, {
@@ -257,6 +255,19 @@ function Home({ params }: PageProps) {
                     <div className="flex flex-col w-full border px-2 border-slate-700/50 py-2 my-2 rounded-lg text-lg">
                         <p><b>Bucket Key:</b> {bucketKey}</p>
                     </div>
+                </div>
+                {/*/ Row 2 */}
+                <div className="px-8">
+                    <input type="file" onChange={handleFileChange} className="mb-4 bg-slate-800 rounded-lg p-4 text-lg" />
+                    <br />
+                    <button
+                        onClick={handleUpload}
+                        className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                        disabled={uploading}
+                    >
+                        {uploading ? "Uploading..." : "Upload File"}
+                    </button>
+                    {message && <p className="mt-2 text-sm">{message}</p>}
                 </div>
             </div>
             <div className="bg-slate-800/50 backdrop-blur mx-8 my-4 rounded-lg overflow-hidden shadow-xl border border-slate-700/50 p-4">
@@ -355,7 +366,7 @@ function Home({ params }: PageProps) {
             </>   
         )}
         </>
-     )
+    )
 }
 
 export default withAuth(Home);
