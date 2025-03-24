@@ -12,6 +12,11 @@ import BackBtnBar from "@/app/shared/components/backBtnBar";
 // Interfaces
 import { ParamProps } from "@/app/shared/interfaces/paramProps";
 
+// Firebase
+import { auth } from "@/app/firebase/config";
+import { reauthenticateWithCredential } from "firebase/auth";
+import { EmailAuthProvider } from "firebase/auth/web-extension";
+
 function Home({ params }: ParamProps) {
      const [itemId, setItemId] = useState<number | null>(null);
      const [itemName, setItemName] = useState<string | null>(null);
@@ -26,6 +31,7 @@ function Home({ params }: ParamProps) {
      const [confirmModule, setConfirmModule] = useState<boolean>(false);
      const [password, setPassword] = useState<string>('');
      const [rollbackVer, setRollbackVer] = useState<number | null>(null);
+     
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files.length > 0) {
@@ -80,6 +86,7 @@ function Home({ params }: ParamProps) {
         }
 
         const handleUpload = async () => {
+        try { 
             if (!file) {
                 setMessage("No file selected");
                 return;
@@ -255,19 +262,6 @@ function Home({ params }: ParamProps) {
                     <div className="flex flex-col w-full border px-2 border-slate-700/50 py-2 my-2 rounded-lg text-lg">
                         <p><b>Bucket Key:</b> {bucketKey}</p>
                     </div>
-                </div>
-                {/*/ Row 2 */}
-                <div className="px-8">
-                    <input type="file" onChange={handleFileChange} className="mb-4 bg-slate-800 rounded-lg p-4 text-lg" />
-                    <br />
-                    <button
-                        onClick={handleUpload}
-                        className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
-                        disabled={uploading}
-                    >
-                        {uploading ? "Uploading..." : "Upload File"}
-                    </button>
-                    {message && <p className="mt-2 text-sm">{message}</p>}
                 </div>
             </div>
             <div className="bg-slate-800/50 backdrop-blur mx-8 my-4 rounded-lg overflow-hidden shadow-xl border border-slate-700/50 p-4">
