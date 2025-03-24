@@ -95,4 +95,28 @@ router.post("/info", async (req, res, next) => {
     }
 });
 
+router.post("/archive", async (req, res, next) => {
+    try {
+        const { id, action } = req.body;
+        if (action === "archive") {
+            await pool.execute(`
+                UPDATE Object
+                SET archived = 1
+                WHERE object_id = ?
+            `, [id]);
+            res.json({ message: "Item archived" });
+        } else if (action === "unarchive") {
+            await pool.execute(`
+                UPDATE Object
+                SET archived = 0
+                WHERE object_id = ?
+            `, [id]);
+            res.json({ message: "Item unarchived" });
+        }
+    }
+    catch (error) {
+        next(error);
+    }
+});
+
 export default router;

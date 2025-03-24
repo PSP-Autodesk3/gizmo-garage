@@ -22,6 +22,7 @@ function Home({ params }: ParamProps) {
      const [itemName, setItemName] = useState<string | null>(null);
      const [author, setAuthor] = useState<string | null>(null);
      const [bucketKey, setBucketKey] = useState<string | null>(null);
+     const [archiveStatus, setArchiveStatus] = useState<boolean>(false);
      // File uploads
      const [file, setFile] = useState<File | null>(null);
      const [uploading, setUploading] = useState<boolean>(false);
@@ -207,6 +208,41 @@ function Home({ params }: ParamProps) {
               alert('Incorrect password');
             }
           }
+        
+        
+        const archiveItem = async (action: string) => {
+            try {
+                if (action === "archive") {
+                    const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/items/archive`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ id: itemId, action: "archive" })
+                    });
+                    const data = await response.json();
+                    if (data.message === "Item archived") {
+                        setArchiveStatus(true);
+                    }
+                } else if (action === "unarchive") {
+                    const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/items/archive`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ id: itemId, action: "unarchive" })
+                    });
+                    const data = await response.json();
+                    if (data.message === "Item unarchived") {
+                        setArchiveStatus(false);
+                    }
+                }
+                
+            }
+            catch (error) {
+                console.log(error);
+            }
+        }
 
      useEffect(() => {
         const resolveParams = async () => {
@@ -230,6 +266,11 @@ function Home({ params }: ParamProps) {
                 setItemName(itemData[0]?.name);
                 setAuthor(itemData[0]?.fname + " " + itemData[0]?.lname);
                 setBucketKey(itemData[0]?.bucket_id);
+                if (itemData[0]?.archived === 1) {
+                    setArchiveStatus(true);
+                } else {
+                    setArchiveStatus(false);
+                }
             }
         }
         fetchInfo();
@@ -244,6 +285,11 @@ function Home({ params }: ParamProps) {
         
         <BackBtnBar />
         <div className={`w-full ${confirmModule ? 'blur-xl bg-opacity-40' : ''}`}>
+            {archiveStatus && (
+                <div className="bg-amber-400 text-black border border-amber-600/50 font-bold text-2xl rounded-lg text-center p-4 mx-8">
+                    <p>This item has been archived.</p>
+                </div>
+            )}
             <div className="lg:grid lg:grid-cols-2 w-full">
             <div>
                 <div className="bg-slate-800/50 backdrop-blur mx-8 my-4 rounded-lg overflow-hidden shadow-xl border border-slate-700/50 p-4">
@@ -262,9 +308,16 @@ function Home({ params }: ParamProps) {
                     <div className="flex flex-col w-full border px-2 border-slate-700/50 py-2 my-2 rounded-lg text-lg">
                         <p><b>Bucket Key:</b> {bucketKey}</p>
                     </div>
+                    <button
+                        onClick={async () => await archiveItem(archiveStatus ? "unarchive" : "archive")}
+                        className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                        disabled={uploading}
+                    >
+                        {archiveStatus ? "Unarchive" : "Archive"}
+                    </button>
                 </div>
             </div>
-            <div className="bg-slate-800/50 backdrop-blur mx-8 my-4 rounded-lg overflow-hidden shadow-xl border border-slate-700/50 p-4">
+            <div className={`bg-slate-800/50 backdrop-blur mx-8 my-4 transition-all duration-300 rounded-lg overflow-hidden shadow-xl border border-slate-700/50 p-4 ${archiveStatus ? 'opacity-40 pointer-events-none' : ''}`}>
             <h1 className="text-2xl text-center pb-4">Tag new version</h1>
                 <input type="file" onChange={handleFileChange} className="mb-4 rounded-lg p-4 text-lg" />
                     <br />
@@ -300,7 +353,7 @@ function Home({ params }: ParamProps) {
                                             setConfirmModule(true);
                                         }
                                     }}
-                                    className="px-6 m-1 py-3 text-lg font-medium bg-red-500 rounded-lg transition-all duration-300 hover:bg-red-400 hover:scale-105 shadow-lg hover:shadow-red-400/50"
+                                    className={`px-6 m-1 py-3 text-lg font-medium bg-red-500 rounded-lg transition-all duration-300 hover:bg-red-400 hover:scale-105 shadow-lg hover:shadow-red-400/50 ${archiveStatus ? 'opacity-30 pointer-events-none' : ''}`}
                                 >
                                     Rollback
                                 </button>
