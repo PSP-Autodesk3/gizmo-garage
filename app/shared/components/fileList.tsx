@@ -7,7 +7,12 @@ import { File } from "@/app/shared/interfaces/file";
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 
+// Other
+import { useRouter } from "next/navigation";
+
 export default function FileList({ files }: { files: File[] }) {
+    const router = useRouter();
+
     return (
         <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
             {!files ? (
@@ -24,17 +29,22 @@ export default function FileList({ files }: { files: File[] }) {
                         <div key={file.object_id}>
                             <button
                                 className="text-slate-900 dark:text-slate-200 bg-gray-400 dark:bg-slate-900 rounded-lg text-xl my-4 px-4 py-2"
-                                onClick={() => { }}
+                                onClick={() => {router.push(`/item/${file.object_id}`);}}
                             >
-                                {file.name}
+                                <div className="flex flex-col">
+                                    <span className="font-bold">{file.name}</span>
+                                    <span className="text-sm">{file.dateOfCreation.toLocaleDateString()}</span>
+                                    <div className='flex flex-wrap max-w-full'>
+                                        {Array.isArray(file.tags) && file.tags.length > 0 && (
+                                            file.tags.map((tag, index) => (
+                                                <span key={index} className='rounded-full m-1 p-1 text-xs bg-blue-600 self-center'>
+                                                    {tag.tag}
+                                                </span>
+                                            ))
+                                        )}
+                                    </div>
+                                </div>
                             </button>
-                            {Array.isArray(file.tags) && file.tags.length > 0 && (
-                                file.tags.map((tag) => (
-                                  <span className='rounded-full m-2 p-2 bg-blue-600 self-center' key={tag.tag_id}>
-                                    {tag.tag}
-                                  </span>
-                                ))
-                              )}
                         </div>
                     ))
                 ))}

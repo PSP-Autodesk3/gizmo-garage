@@ -17,7 +17,6 @@ try {
   console.error('Firebase Admin initialisation error:', error);
 }
 
-
 // Router imports
 import projectsRouter from "./routes/projects.js";
 import usersRouter from "./routes/users.js"
@@ -27,12 +26,19 @@ import databaseRouter from "./routes/database.js";
 import tagsRouter from "./routes/tags.js";
 import editorsRouter from "./routes/editors.js";
 import invitesRouter from "./routes/invites.js";
+import ossRouter from "./routes/oss.js"
+import versionRouter from "./routes/versions.js";
 
 dotenv.config();
 const app = express();
 app.use(express.json());
-app.use(cors({ origin: "http://localhost:3000" }));
-
+app.use(cors({
+  origin: "http://localhost:3000",
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  exposedHeaders: ["Content-Disposition"],
+  credentials: true 
+}));
 const startDatabase = async () => {
   const exists = await fetch("http://localhost:3001/database/exists");
   const response = await exists.json();
@@ -51,6 +57,8 @@ app.use("/database", databaseRouter)
 app.use("/tags", tagsRouter);
 app.use("/editors", editorsRouter);
 app.use("/invites", invitesRouter);
+app.use("/oss", ossRouter);
+app.use("/versions", versionRouter);
 
 // Error handling middleware.
 app.use((err, res) => {
