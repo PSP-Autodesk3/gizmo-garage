@@ -12,7 +12,7 @@ export default function ProjectPreview({ project, query }: { project: Project, q
     return (
         <div className="bg-gray-300 dark:bg-slate-800 p-4 m-auto rounded-lg shadow-lg mx-8 my-4 flex flex-row justify-between">
             <div className='p-2 pr-10'>
-                <div className="mb-2 text-slate-900 dark:text-slate-200"">
+                <div className="mb-2 text-slate-900 dark:text-slate-200">
                     <p className="text-xl font-bold">Name: {project.name} </p>
                     <p>Version: </p>
                     <p>Date: {project.dateOfCreation.toLocaleDateString()} {project.dateOfCreation.toLocaleTimeString()} </p>
