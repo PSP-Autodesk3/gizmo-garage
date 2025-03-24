@@ -41,7 +41,7 @@ function Home() {
 
   useEffect(() => {
     const getDetails = async () => {
-      const query = await fetch(`http://localhost:3001/users/details`, {
+      const query = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/users/details`, {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: user?.email })
