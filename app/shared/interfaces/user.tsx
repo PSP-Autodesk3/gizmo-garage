@@ -3,4 +3,5 @@ export interface User {
   email: string;
   fname: string;
   lname: string;
+  disabled: boolean;
 }

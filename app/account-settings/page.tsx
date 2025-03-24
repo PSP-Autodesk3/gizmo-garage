@@ -18,7 +18,7 @@ import { User } from '@/app/shared/interfaces/user';
 import { useEffect, useState } from 'react';
 
 function Home() {
-  const [user, loading] = useAuthState(auth);
+  const [user] = useAuthState(auth);
   const [email, setEmail] = useState('');
   const [details, setDetails] = useState<User>();
 
