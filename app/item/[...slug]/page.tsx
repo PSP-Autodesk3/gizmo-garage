@@ -156,6 +156,20 @@ function Home({ params }: PageProps) {
             }
         };
 
+        const rollbackVersion = async (version: number, bucketKey: string) => {
+            try {
+                await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/versions/rollback`, {
+                    method: "POST",
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ bucket_id: bucketKey, version: version }),
+                });
+            }
+            catch (error) {
+                console.log(error);
+            }
+            fetchVersions();
+        }
+
      useEffect(() => {
         const resolveParams = async () => {
             const resp = await params;
@@ -220,8 +234,15 @@ function Home({ params }: PageProps) {
                         <div key={index} className="flex flex-col w-full border px-2 border-slate-700/50 py-2 my-2 rounded-lg text-lg">
                             <p>Version: <b>{version.version}</b></p>
                             <button
-                            onClick={() => downloadFile(version.urn, version.object_key)}
-                            >Download</button>
+                                onClick={() => downloadFile(version.urn, version.object_key)}
+                            >
+                                Download
+                            </button>
+                            <button
+                                onClick={() => bucketKey && rollbackVersion(version.version, bucketKey)}
+                            >
+                                Rollback
+                            </button>
                         </div>
                     ))}
                 </div>

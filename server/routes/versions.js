@@ -66,4 +66,22 @@ router.post("/allVersions", async (req, res, next) => {
     }
 });
 
+// Rollback to previous version
+router.post("/rollback", async (req, res, next) => {
+    try {
+        const { bucket_id, version } = req.body;
+        if (!bucket_id || !version) {
+            throw new Error("Missing required fields");
+        }
+        const [result] = await pool.execute(`
+            DELETE FROM Version
+            WHERE bucket_id = ? AND version > ?
+        `, [bucket_id, version]);
+        res.json({ message: "Version rolled back successfully", affectedRows: result.affectedRows });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+
 export default router;
