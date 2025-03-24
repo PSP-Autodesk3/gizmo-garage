@@ -266,13 +266,14 @@ function Home() {
       {/* Pop up message for db reset*/}
       {(confirmModule) && (
         <>
-          <div className="fixed inset-0 flex items-center justify-center bg-opacity-95 bg-slate-900 w-[40%] h-[40%] m-auto rounded-3xl shadow-lg p-8">
-            <div className="text-center">
+          <div className="fixed inset-0 flex items-center justify-center bg-opacity-95 bg-gray-300 dark:bg-slate-900 w-[40%] h-[40%] m-auto rounded-3xl shadow-lg p-8">
+            <div className="text-center text-slate-900 dark:text-slate-200">
               <h1 className='text-3xl'>This will clear all data.</h1> 
               <strong>This action is irreversible.</strong> <p> Your password is needed to complete this action.</p>
               <form onSubmit={(e) => e.preventDefault()} autoComplete="off">
                 <input 
-                  className="text-white w-full bg-slate-800 p-2 my-2 rounded-lg" 
+                  className="w-full p-2 my-2 rounded-lg bg-gray-200 border border-gray-200 text-gray-800
+                    dark:bg-slate-800 dark:border-slate-700 dark:text-white"  
                   type="password" 
                   placeholder="Password"
                   value={password}
@@ -287,13 +288,13 @@ function Home() {
               {/* Buttons */}
               <div className="mt-4">
                 <button 
-                  className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                  className="px-6 m-1 py-3 text-lg font-medium text-white bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
                   onClick={validatePasswordAndReset}
                 >
                   Reset
                 </button>
                 <button 
-                  className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50" 
+                  className="px-6 m-1 py-3 text-lg font-medium text-white bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50" 
                   onClick={() => {
                     setConfirmModule(false);
                     setPassword('');
