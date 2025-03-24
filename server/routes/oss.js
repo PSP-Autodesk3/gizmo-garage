@@ -1,8 +1,10 @@
 import express from "express";
 import multer from "multer";
+import { OssClient } from "@aps_sdk/oss";
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
+const ossClient = new OssClient();
 
 // Create bucket on Object Creation.
 router.post("/create", async (req, res, next) => {
@@ -48,7 +50,7 @@ router.post("/getBuckets", async (req, res, next) => {
     }
 });
 
-// Upload file to bucket
+// Upload file to OSS bucket
 router.post("/upload", upload.single("file"), async (req, res, next) => {
     try {
         const {token, bucketKey} = req.body;
@@ -56,38 +58,55 @@ router.post("/upload", upload.single("file"), async (req, res, next) => {
         if (!file) {
             throw new Error("No file uploaded");
         }
-        const url = `https://developer.api.autodesk.com/oss/v2/buckets/${bucketKey}/objects/${file.originalname}/signeds3upload`;
-        const result = await fetch(url, { // Get signed URL
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${token}`,
-                "Content-Type": "application/json",
-                "region": "US"
-            },
-        });
-        const data = await result.json();
-        const { urls } = data;
-        if (!urls || urls.length === 0) {
-            throw new Error("No signed URL returned");
-        }
-        const upload = await fetch(urls[0], {
-            method: "PUT",
-            headers: {
-                "Content-Type": file.mimetype
-            },
-            body: file.buffer
-        });
-        if (!upload.ok) {
-            throw new Error("Failed to upload file");
-        }
+        const fileName = file.originalname;
+        const extension = fileName.substring(fileName.lastIndexOf("."));
+        const fileUUID = crypto.randomUUID();
+        const objectKey = `${fileUUID}${extension}`;
+        const ObjectDetails = await ossClient.uploadObject(bucketKey, objectKey, file.buffer, { accessToken: token}); // Upload file to OSS: https://aps.autodesk.com/en/docs/data/v2/reference/typescript-sdk-oss/ - Adam
         res.json({
             message: "File uploaded successfully!",
-            objectKey: file.originalname,
-            bucketKey: bucketKey
+            objectKey: objectKey,
+            bucketKey: bucketKey,
+            urn: ObjectDetails.objectId
         });
     }
     catch (error) {
         next(error);
+    }
+});
+
+// Download from bucket
+router.post('/download', async (req, res) => {
+    try {
+        const { token, urn } = req.body;
+        if (!token || !urn) {
+            throw new Error('Missing required fields');
+        }
+        const match = urn.match(/^urn:adsk\.objects:os\.object:([^\/]+)\/(.+)$/);
+        if (!match) {
+            throw new Error('Invalid URN format');
+        }
+        const [_, bucketKey, objectKey] = match;
+        const filename = objectKey.split('/').pop(); // Get filename
+        // Get signed URL
+        const signedResource = await ossClient.createSignedResource(bucketKey, objectKey, {
+            accessToken: token,
+            headers: {
+                // Force the original filename in download
+                'response-content-disposition': `attachment; filename="${encodeURIComponent(filename)}"`
+            }
+        });
+        const downloadUrl = signedResource.signedUrl;
+        return res.redirect(303, downloadUrl);
+    } 
+    catch (error) {
+        console.error('[ERROR]', error);
+        if (!res.headersSent) {
+            res.status(500).json({ 
+                error: 'Download failed',
+                details: error.message 
+            });
+        }
     }
 });
 
