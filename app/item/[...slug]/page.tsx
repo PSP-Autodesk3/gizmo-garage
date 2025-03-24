@@ -54,6 +54,8 @@ function Home({ params }: PageProps) {
             }
             catch (error) {
                 console.log(error);
+                const newVersion = 1;
+                return newVersion;
             }
         }
 
