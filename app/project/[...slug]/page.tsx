@@ -318,7 +318,7 @@ function Home({ params }: ParamProps) {
 
           {/* Confirmation for creating new items */}
           {(confirmModule) && (
-            <div className="fixed inset-0 flex border-indigo-600 border-2 items-center justify-center bg-slate-900 p-4 w-[40%] h-[40%] m-auto rounded-lg shadow-lg mt-16">
+            <div className="fixed inset-0 flex border-indigo-600 border-2 items-center justify-center bg-gray-300 dark:bg-slate-900 text-slate-900 dark:text-slate-200 p-4 w-[40%] h-[40%] m-auto rounded-lg shadow-lg mt-16">
               <ConfirmModule
                 itemType={(moduleType === 1 ? "Folder" : "File")}
                 projectID={projectID}

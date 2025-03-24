@@ -135,18 +135,19 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                     type="text"
                     value={folderName}
                     onChange={(e) => setFolderName(e.target.value)}
-                    className="w-full mt-4 p-2 rounded-lg bg-slate-800"
+                    className="w-full p-2 my-2 rounded-lg bg-gray-200 border border-gray-200 text-gray-800
+                        dark:bg-slate-800 dark:border-slate-700 dark:text-white"
                     placeholder="Enter folder name"
                     id="dir-name-input"
                 />
                 <div className="mt-4">
                     <button
-                        className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                        className="text-white px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
                     >
                         Create
                     </button>
                     <button
-                        className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                        className="text-white px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
                         onClick={() => setConfirmModule(false)}
                     >
                         Cancel
@@ -164,14 +165,16 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                     type="text"
                     value={itemName}
                     onChange={(e) => setItemName(e.target.value)}
-                    className="w-full mt-4 p-2 rounded-lg bg-slate-800"
+                    className="w-full p-2 my-2 rounded-lg bg-gray-200 border border-gray-200 text-gray-800
+                        dark:bg-slate-800 dark:border-slate-700 dark:text-white"
                     placeholder="Enter Item name"
                 />
                 <div >
                     <div id="search" className='p-4'>
                         <label htmlFor="search=bar">Search</label>
                         <input
-                            className='text-white w-full p-2 my-2 rounded-lg bg-slate-800'
+                            className='w-full p-2 my-2 rounded-lg bg-gray-200 border border-gray-200 text-gray-800
+                                dark:bg-slate-800 dark:border-slate-700 dark:text-white'
                             type="text"
                             placeholder="Search"
                             name="search"
