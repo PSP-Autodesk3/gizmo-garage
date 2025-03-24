@@ -86,6 +86,7 @@ router.get("/create", async (_req, res, next) => {
           bucket_id varchar(128) NOT NULL,
           version INT NOT NULL,
           urn varchar(255) NOT NULL,
+          object_key varchar(255) NOT NULL,
           date_time DATETIME NOT NULL
         );
       `);

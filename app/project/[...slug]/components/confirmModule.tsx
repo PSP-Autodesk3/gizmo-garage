@@ -65,12 +65,13 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
             });
             const data = await response.json();
             const urn = data.urn;
+            const objectKey = data.objectKey;
             if (data.ok) {
                 setMessage("File uploaded successfully");
             } else {
                 setMessage("Error uploading file");
             }
-            tagVersion(bucketKey, urn);
+            tagVersion(bucketKey, urn, objectKey);
         }
         catch (error) {
             setMessage("Error uploading file");
@@ -78,12 +79,12 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
         }
     }
 
-    const tagVersion = async (bucketKey: string, urn: string) => {
+    const tagVersion = async (bucketKey: string, urn: string, objectKey: string) => {
         try {
             const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/versions/tag`, {
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ bucket_id: bucketKey, urn: urn, version: 1 }),
+                body: JSON.stringify({ bucket_id: bucketKey, urn: urn, version: 1, object_key: objectKey }),
             });
             const data = await response.json();
             if (data.message == "Version tagged successfully") {

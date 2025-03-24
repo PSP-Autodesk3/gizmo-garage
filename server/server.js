@@ -17,7 +17,6 @@ try {
   console.error('Firebase Admin initialisation error:', error);
 }
 
-
 // Router imports
 import projectsRouter from "./routes/projects.js";
 import usersRouter from "./routes/users.js"
@@ -33,8 +32,13 @@ import versionRouter from "./routes/versions.js";
 dotenv.config();
 const app = express();
 app.use(express.json());
-app.use(cors({ origin: "http://localhost:3000" }));
-
+app.use(cors({
+  origin: "http://localhost:3000",
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  exposedHeaders: ["Content-Disposition"],
+  credentials: true 
+}));
 const startDatabase = async () => {
   const exists = await fetch("http://localhost:3001/database/exists");
   const response = await exists.json();

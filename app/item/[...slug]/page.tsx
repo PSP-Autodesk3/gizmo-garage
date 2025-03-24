@@ -61,12 +61,12 @@ function Home({ params }: PageProps) {
             }
         }
 
-        const tagNewVersion = async (version: number, urn: string, bucketKey: string) => {
+        const tagNewVersion = async (version: number, urn: string, bucketKey: string, objectKey: string) => {
             try {
                 await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/versions/tag`, {
                     method: "POST",
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ bucket_id: bucketKey, urn: urn, version: version }),
+                    body: JSON.stringify({ bucket_id: bucketKey, urn: urn, version: version, object_key: objectKey }),
                 });
             }
             catch (error) {
@@ -98,6 +98,7 @@ function Home({ params }: PageProps) {
                 });
                 const data = await response.json();
                 const urn = data.urn;
+                const objectKey = data.objectKey;
                 if (data.message === "File uploaded successfully!") {
                     setMessage("File uploaded successfully");
                 } else {
@@ -106,7 +107,7 @@ function Home({ params }: PageProps) {
                 if (bucketKey) {
                     const version = await generateLatestVersion(bucketKey);
                     if (version && urn && bucketKey) {
-                        tagNewVersion(version, urn, bucketKey);
+                        tagNewVersion(version, urn, bucketKey, objectKey);
                     }
                 }
             }
@@ -117,6 +118,43 @@ function Home({ params }: PageProps) {
                 setUploading(false);
             }
         }
+
+        const downloadFile = async (urn: string, objectKey: string) => {
+            try {
+                const token = sessionStorage.getItem('token');
+                if (!token) {
+                    throw new Error('Authentication required');
+                }
+                const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/oss/download`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ token, urn }),
+                });
+                if (!response.ok) {
+                    const error = await response.text();
+                    throw new Error(error || 'Download failed');
+                }
+                let filename = objectKey;        
+                // Create download link
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                
+                // Cleanup
+                setTimeout(() => {
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                }, 100);
+            } catch (error) {
+                console.error('[Download] Error:', error);
+            }
+        };
 
      useEffect(() => {
         const resolveParams = async () => {
@@ -181,6 +219,9 @@ function Home({ params }: PageProps) {
                     {versions.map((version, index) => (
                         <div key={index} className="flex flex-col w-full border px-2 border-slate-700/50 py-2 my-2 rounded-lg text-lg">
                             <p>Version: <b>{version.version}</b></p>
+                            <button
+                            onClick={() => downloadFile(version.urn, version.object_key)}
+                            >Download</button>
                         </div>
                     ))}
                 </div>

@@ -50,6 +50,7 @@ router.post("/getBuckets", async (req, res, next) => {
     }
 });
 
+// Upload file to OSS bucket
 router.post("/upload", upload.single("file"), async (req, res, next) => {
     try {
         const {token, bucketKey} = req.body;
@@ -62,7 +63,6 @@ router.post("/upload", upload.single("file"), async (req, res, next) => {
         const fileUUID = crypto.randomUUID();
         const objectKey = `${fileUUID}${extension}`;
         const ObjectDetails = await ossClient.uploadObject(bucketKey, objectKey, file.buffer, { accessToken: token}); // Upload file to OSS: https://aps.autodesk.com/en/docs/data/v2/reference/typescript-sdk-oss/ - Adam
-        console.log(ObjectDetails);
         res.json({
             message: "File uploaded successfully!",
             objectKey: objectKey,
@@ -72,6 +72,41 @@ router.post("/upload", upload.single("file"), async (req, res, next) => {
     }
     catch (error) {
         next(error);
+    }
+});
+
+// Download from bucket
+router.post('/download', async (req, res) => {
+    try {
+        const { token, urn } = req.body;
+        if (!token || !urn) {
+            throw new Error('Missing required fields');
+        }
+        const match = urn.match(/^urn:adsk\.objects:os\.object:([^\/]+)\/(.+)$/);
+        if (!match) {
+            throw new Error('Invalid URN format');
+        }
+        const [_, bucketKey, objectKey] = match;
+        const filename = objectKey.split('/').pop(); // Get filename
+        // Get signed URL
+        const signedResource = await ossClient.createSignedResource(bucketKey, objectKey, {
+            accessToken: token,
+            headers: {
+                // Force the original filename in download
+                'response-content-disposition': `attachment; filename="${encodeURIComponent(filename)}"`
+            }
+        });
+        const downloadUrl = signedResource.signedUrl;
+        return res.redirect(303, downloadUrl);
+    } 
+    catch (error) {
+        console.error('[ERROR]', error);
+        if (!res.headersSent) {
+            res.status(500).json({ 
+                error: 'Download failed',
+                details: error.message 
+            });
+        }
     }
 });
 
