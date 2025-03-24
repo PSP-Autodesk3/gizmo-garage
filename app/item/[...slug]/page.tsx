@@ -9,6 +9,11 @@ import { useState, useEffect } from "react";
 //Filter component
 import BackBtnBar from "@/app/shared/components/backBtnBar";
 
+// Firebase
+import { auth } from "@/app/firebase/config";
+import { reauthenticateWithCredential } from "firebase/auth";
+import { EmailAuthProvider } from "firebase/auth/web-extension";
+
 interface PageProps {
   params: { slug: string[] };
 }
@@ -23,6 +28,10 @@ function Home({ params }: PageProps) {
      const [uploading, setUploading] = useState<boolean>(false);
      const [message, setMessage] = useState<string | null>(null);
      const [versions, setVersions] = useState<any[]>([]);
+     // Password confirmation
+     const [confirmModule, setConfirmModule] = useState<boolean>(false);
+     const [password, setPassword] = useState<string>('');
+     const [rollbackVer, setRollbackVer] = useState<number | null>(null);
 
         const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
             if (event.target.files && event.target.files.length > 0) {
@@ -170,6 +179,29 @@ function Home({ params }: PageProps) {
             fetchVersions();
         }
 
+        const validatePassword = async () => { // Reused felix's code
+            const currentUser = auth.currentUser;
+            if (!currentUser?.email || !password){
+              alert('Please enter your password');
+              return;
+            }
+            try {
+              const credential = EmailAuthProvider.credential(
+                currentUser.email,
+                password
+              );
+              await reauthenticateWithCredential(currentUser, credential);
+              if (rollbackVer && bucketKey) {
+                rollbackVersion(rollbackVer, bucketKey);
+              }
+              setPassword('');
+              setConfirmModule(false);
+            }
+            catch{
+              alert('Incorrect password');
+            }
+          }
+
      useEffect(() => {
         const resolveParams = async () => {
             const resp = await params;
@@ -202,8 +234,9 @@ function Home({ params }: PageProps) {
     
      return (
         <>
+        
         <BackBtnBar />
-        <div className="w-full">
+        <div className={`w-full ${confirmModule ? 'blur-xl bg-opacity-40' : ''}`}>
             <div className="lg:grid lg:grid-cols-2 w-full">
             <div>
                 <div className="bg-slate-800/50 backdrop-blur mx-8 my-4 rounded-lg overflow-hidden shadow-xl border border-slate-700/50 p-4">
@@ -254,7 +287,12 @@ function Home({ params }: PageProps) {
                                     Download
                                 </button>
                                 <button
-                                    onClick={() => bucketKey && rollbackVersion(version.version, bucketKey)}
+                                    onClick={() => {
+                                        if (bucketKey) {
+                                            setRollbackVer(version.version);
+                                            setConfirmModule(true);
+                                        }
+                                    }}
                                     className="px-6 m-1 py-3 text-lg font-medium bg-red-500 rounded-lg transition-all duration-300 hover:bg-red-400 hover:scale-105 shadow-lg hover:shadow-red-400/50"
                                 >
                                     Rollback
@@ -271,6 +309,49 @@ function Home({ params }: PageProps) {
                 
             </div>
            */}  
+
+        {(confirmModule) && (
+            <>
+            <div className="fixed inset-0 flex items-center justify-center bg-opacity-95 bg-slate-900 w-[40%] h-[40%] m-auto rounded-3xl shadow-lg p-8">
+            <div className="text-center">
+              <h1 className='text-3xl'>This will clear all data.</h1> 
+              <strong>This action is irreversible.</strong> <p> Your password is needed to complete this action.</p>
+              <form onSubmit={(e) => e.preventDefault()} autoComplete="off">
+                <input 
+                  className="text-white w-full bg-slate-800 p-2 my-2 rounded-lg" 
+                  type="password" 
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoCapitalize="off"
+                  autoCorrect="off"
+                  spellCheck="false"
+                  data-form-type="other"
+                  aria-autocomplete="none"
+                />
+              </form>
+              {/* Buttons */}
+              <div className="mt-4">
+                <button 
+                  className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                  onClick={() => validatePassword()}
+                >
+                  Rollback
+                </button>
+                <button 
+                  className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50" 
+                  onClick={() => {
+                    setConfirmModule(false);
+                    setPassword('');
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+            </>   
+        )}
         </>
      )
 }
