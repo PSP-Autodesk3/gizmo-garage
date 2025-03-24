@@ -62,20 +62,187 @@ function Home({ params }: ParamProps) {
           ? prevRoutes : newRoutes;
       });
 
-      // Get and display tree structure
+      async function getFolders(): Promise<Folder[]> {
+        const query = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/folders/get`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: projectID })
+        });
+
+        return await query.json();
+      }
+      async function getFiles(): Promise<File[]>  {
+        const query = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/items/get`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: projectID })
+        });
+
+        return await query.json();
+      }
+
+      const checkboxOpen = sessionStorage.getItem('checkboxOpen') || 'false';
 
       let currentFolder: Folder | null = null as Folder | null;
 
-      // Get folders in the project
-      const query = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/folders/get`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: projectID })
-      })
+      async function displayTree(folders: Folder[], files: File[]) {
+        const tree = document.getElementById("trees");
+        if (tree) {
+          while (tree.firstChild) {
+            tree.removeChild(tree.firstChild);
+          }
+        }
 
-      const folders = await query.json() as Folder[];
+        const outputFolder = async (folderID: number | null, parentObject: HTMLElement, valid: boolean, depth: number, history: string[]) => {
+          const baseFiles = files.filter((file: File) => file.folder_id === folderID);
 
-      // Get folder tags and add to folder
+          baseFiles.forEach((file: File) => {
+            const button = document.createElement("button");
+            button.className = `pl-4 flex items-center gap-2 py-2 px-3 text-slate-300 hover:text-slate-100 transition-colors duration-200 flex-1 text-left tree-file
+                              ${checkboxOpen === 'false' && 'hidden'}`;
+                              button.innerHTML = `
+              <svg class="ml-2 w-5 h-5 text-slate-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+              </svg>
+              ${file.name}`;
+              button.onclick = () => {
+                const route = `/item/${file.object_id}`;
+                router.push(route);
+              }
+            parentObject.appendChild(button);
+          })
+
+          const baseFolders = folders.filter((folder: Folder) => folder.parent_folder_id === folderID);
+
+          baseFolders.forEach((folder: Folder) => {
+            let newValid = false;
+            if (valid) {
+              if (routes[depth] === folder.name) {
+                newValid = true;
+                currentFolder = folder;
+              }
+            }
+
+            // Creates a details tag, which by default is collapsible
+            const details = document.createElement("details");
+            details.className = "pl-4 mb-1 relative";
+            if (newValid) details.open = true;
+
+            // Creates a summary tag, which is the preview text
+            const summary = document.createElement("summary");
+            summary.className = `flex items-center gap-2 py-2 px-3 rounded-md cursor-pointer mt-1
+              ${newValid ? "bg-indigo-500/20 hover:bg-indigo-500/30" : "hover:bg-slate-700/50"}
+              transition-all duration-200 relative`; // Using tailwindcss conditional styling, basically if newValid is true, use the first set of classes, otherwise use the second set 
+
+            // Create folder icon and changing its colour dependending on if it is open or not
+            const icon = document.createElement("span");
+            icon.innerHTML = details.open ? "▼" : "►";
+
+            // Create folder button
+            const button = document.createElement("button");
+            button.className = `${newValid ? 'text-indigo-200 font-medium' : 'text-slate-300'} 
+              hover:text-slate-100 transition-colors duration-200 flex-1 text-left`;
+            button.textContent = folder.name;
+
+            const newHistory = [...history, `/${folder.name.replace(/ /g, "+")}`];
+            const newDepth = depth + 1;
+
+            // Clicking routes to the folder
+            button.onclick = () => {
+              const route = `/project/${projectID}+${project}${newHistory.join('/')}`;
+              router.push(route);
+            }
+
+            details.addEventListener("toggle", () => {
+              icon.textContent = details.open ? "▼" : "►";
+            })
+
+            summary.appendChild(icon);
+            summary.appendChild(button);
+            details.appendChild(summary);
+            parentObject.appendChild(details);
+            
+            outputFolder(folder.folder_id, details, newValid, newDepth, newHistory);
+          })
+        }
+
+        if (tree)
+          outputFolder(null, tree, true, 0, []);
+      }
+
+      // Get stored data
+      const storedFolders = sessionStorage.getItem(`folders_${projectID}`);
+      const storedFiles = sessionStorage.getItem(`files_${projectID}`);
+      
+      // Load stored folders
+      let folders: Folder[];
+      if (storedFolders) {
+        folders = JSON.parse(storedFolders);
+      } else {
+        folders = await getFolders();
+        sessionStorage.setItem(`folders_${projectID}`, JSON.stringify(folders));
+      }
+
+      // Load stored files
+      let files: File[];
+      if (storedFiles) {
+        files = JSON.parse(storedFiles);
+      } else {
+        files = await getFiles();
+        sessionStorage.setItem(`files_${projectID}`, JSON.stringify(files));
+      }
+
+      displayTree(folders, files);
+
+      let newFolders = folders;
+      if (storedFolders) {
+        newFolders = await getFolders();
+        sessionStorage.setItem(`folders_${projectID}`, JSON.stringify(newFolders));
+      }
+      let newFiles = files;
+      if (storedFiles) {
+        newFiles = await getFiles();
+        sessionStorage.setItem(`files_${projectID}`, JSON.stringify(files));
+      }
+      if (folders != newFolders || files != newFiles) {
+        displayTree(newFolders, newFiles);
+      }
+
+      if (currentFolder) {
+        setFiles(newFiles.filter((file: File) => file.folder_id === currentFolder?.folder_id))
+        setFilteredFiles(newFiles.filter((file: File) => file.folder_id === currentFolder?.folder_id))
+      } else {
+        setFiles(newFiles.filter((file: File) => file.folder_id === null))
+        setFilteredFiles(newFiles.filter((file: File) => file.folder_id === null))
+      }
+
+      setID(currentFolder ? (currentFolder.folder_id) : (projectID));
+      setType(currentFolder ? (0) : (1));
+
+      if (currentFolder) {
+        setFolders(newFolders.filter((folder: Folder) => folder.parent_folder_id === currentFolder?.folder_id));
+        setFilteredFolders(newFolders.filter((folder: Folder) => folder.parent_folder_id === currentFolder?.folder_id));
+      } else {
+        setFolders(newFolders.filter((folder: Folder) => folder.parent_folder_id === null));
+        setFilteredFolders(newFolders.filter((folder: Folder) => folder.parent_folder_id === null));
+      }
+      // Get Tags
+
+      // All Tags
+      const getTagsQuery = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/tags/getAll`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
+      });
+      const tagResponse = await getTagsQuery.json();
+      setTags(tagResponse);
+      setFilteredTags(tagResponse);
+
+      // Object Tags
+      const objectTagsQuery = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/tags/getObject`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
+      });
+      const objectTags = await objectTagsQuery.json();
 
       // Adds tags to folders
       const folderTagsQuery = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/tags/getFolder`, {
@@ -90,146 +257,31 @@ function Home({ params }: ParamProps) {
         folder.tags = folderTags.filter((tag: FolderTags) => tag.folder_id === folder.folder_id);
       });
 
-      // Defaults folders to newest first
-      const sortedFolders = sortArray(folders, { by: 'dateOfCreation', order: 'desc' })
-      setFolders(sortedFolders);
-      setFilteredFolders(sortedFolders);
-
-      // Base information to be passed to outputFolder
-      const baseFolders = folders.filter((folder: Folder) => folder.parent_folder_id === null);
-      const tree = document.getElementById("trees");
-      if (tree) {
-        while (tree.firstChild) {
-          tree.removeChild(tree.firstChild);
-        }
-      }
-
-      const outputFolder = (parentFolders: Folder[], parentDetails: HTMLElement, history: string[], depth: number, valid: boolean) => {
-
-        // Iterates foreach child in the folder
-        parentFolders.forEach((folder: Folder) => {
-
-          // Tests if the folder is opened
-          let newValid = false;
-          if (valid) {
-            if (routes[depth] === folder.name) {
-              newValid = true;
-              currentFolder = folder;
-            }
-          }
-
-          // Creates a details tag, which by default is collapsible
-          const details = document.createElement("details");
-          details.className = "pl-4 mb-1 relative";
-          if (newValid) details.open = true;
-
-          // Creates a summary tag, which is the preview text
-          const summary = document.createElement("summary");
-          summary.className = `flex items-center gap-2 py-2 px-3 rounded-md cursor-pointer mt-1
-            ${newValid ? "bg-indigo-500/20 hover:bg-indigo-500/30" : "hover:bg-slate-700/50"}
-            transition-all duration-200 relative`; // Using tailwindcss conditional styling, basically if newValid is true, use the first set of classes, otherwise use the second set 
-
-          // Create folder icon and changing its colour dependending on if it is open or not
-          const icon = document.createElement("span");
-          icon.innerHTML = `
-            <svg class="w-4 h-4 ${newValid ? 'text-indigo-400' : 'text-slate-400'} 
-              transition-colors duration-200" 
-                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                    d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-            </svg>`; // Site I used for the SVG, https://heroicons.com/outline
-
-          // Create folder button
-          const button = document.createElement("button");
-          button.className = `${newValid ? 'text-indigo-200 font-medium' : 'text-slate-300'} 
-            hover:text-slate-100 transition-colors duration-200 flex-1 text-left`;
-          button.textContent = folder.name;
-
-          summary.appendChild(icon);
-          summary.appendChild(button);
-
-          // Styling for open folders, commented this out for now, as it was causing svg of open folders to push the text onto a new line
-          // if (newValid) summary.innerHTML = "<strong>" + summary.innerHTML + "</strong>"; 
-
-          // Assigns the route function
-          const newHistory = [...history, `/${folder.name.replace(/ /g, "+")}`];
-          const newDepth = depth + 1;
-
-          // Double clicking routes to the folder
-          summary.ondblclick = () => {
-            const route = `/project/${projectID}+${project}${newHistory.join('/')}`;
-            router.push(route);
-          }
-
-          // Adds the new elements to each other and the DOM
-          details.appendChild(summary);
-          parentDetails.appendChild(details);
-
-          // Gets folders that are a child of the current folder
-          const childFolders = folders.filter((childFolder: Folder) => childFolder.parent_folder_id === folder.folder_id);
-
-          // Does this again for each child folder iteratively
-          if (childFolders.length > 0) {
-            outputFolder(childFolders, details, newHistory, newDepth, newValid);
-          }
-        })
-      }
-
-      if (baseFolders && tree) {
-        await outputFolder(baseFolders, tree, [], 0, true);
-      }
-
-      // Get Folders
-
-      setID(currentFolder ? (currentFolder.folder_id) : (projectID));
-      setType(currentFolder ? (0) : (1));
-
-      if (currentFolder) {
-        setFolders(folders.filter((folder: Folder) => folder.parent_folder_id === currentFolder?.folder_id));
-        setFilteredFolders(folders.filter((folder: Folder) => folder.parent_folder_id === currentFolder?.folder_id));
-      } else {
-        setFolders(folders.filter((folder: Folder) => folder.parent_folder_id === null));
-        setFilteredFolders(folders.filter((folder: Folder) => folder.parent_folder_id === null));
-      }
-
-      // Get Files
-
-      const objectQuery = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/items/get`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, type }),
-      });
-
-      const objects = await objectQuery.json() as File[];
-
-      // Object Tags
-      const objectTagsQuery = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/tags/getObject`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" }
-      });
-      const objectTags = await objectTagsQuery.json();
-
       // Adds tags to files
-      objects.forEach((file: File) => {
+      files.forEach((file: File) => {
         file.tags = objectTags.filter((tag: ItemTags) => tag.object_id === file.object_id);
       });
 
-      const sortedObjects = sortArray(objects, { by: 'dateOfCreation', order: 'desc' })
-      setFiles(sortedObjects);
-      setFilteredFiles(sortedObjects);
-
-      // Get Tags
-
-      // All Tags
-      const getTagsQuery = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/tags/getAll`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" }
-      });
-      const tagResponse = await getTagsQuery.json();
-      setTags(tagResponse);
-      setFilteredTags(tagResponse);
+      const checkbox = document.getElementById('file-checkbox'); 
+      if (checkbox) {
+        (checkbox as HTMLInputElement).checked = checkboxOpen === 'true'; // Docs on HTMLInputElement https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement#instance_properties_that_apply_only_to_elements_of_type_checkbox_or_radio
+        checkbox.addEventListener('change', () => {
+          const treeFiles = document.getElementsByClassName("tree-file");
+          if ((checkbox as HTMLInputElement).checked) {
+            Array.from(treeFiles).forEach((file) => {
+              file.classList.remove('hidden');
+            });
+            sessionStorage.setItem('checkboxOpen', 'true');
+          } else {
+            Array.from(treeFiles).forEach((file) => {
+              file.classList.add('hidden');
+            });
+            sessionStorage.setItem('checkboxOpen', 'false');
+          }
+        });
+      }
     }
-  }, [params, id, type, router, project, projectID, routes]);
+  }, [params, router, project, projectID, routes, id, type]);
 
   useEffect(() => {
     getData();
@@ -300,12 +352,12 @@ function Home({ params }: ParamProps) {
         </div>
 
         {/* Folder tree */}
-        <div id="tree-folders" className="min-w-[280px] flex-shrink-0">
+        <div id="tree-folders" className="min-w-[280px] flex-shrink-0 mt-[80px]">
           <div className="bg-slate-800/50 backdrop-blur mx-8 my-4 rounded-lg overflow-hidden shadow-xl border border-slate-700/50">
             <div className="p-4 border-b border-slate-700/50">
               <button
                 className="w-full text-left px-3 py-2 rounded-md bg-slate-700/30 hover:bg-slate-700/50 
-                          transition-all duration-200 text-slate-200 font-medium flex items-center gap-2 shadow-sm hover:shadow"
+                                  transition-all duration-200 text-slate-200 font-medium flex items-center gap-2 shadow-sm hover:shadow"
                 onClick={() => { router.push(`/project/${projectID}+${project.replace(/%2B/g, '+')}`); }}
               >
                 <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -316,6 +368,15 @@ function Home({ params }: ParamProps) {
                 </svg>
                 {project.replace(/%2B/g, ' ')}
               </button>
+              <div className="flex flex-row mt-[20px] gap-[7.5px]">
+              <input
+                id="file-checkbox"
+                type="checkbox"
+                defaultChecked={sessionStorage.getItem('checkboxOpen') === 'true'}
+                className={`m-1 w-4 h-4 checked:bg-green-600 checked:border-green-600 bg-red-600 border-red-600 border-2 appearance-none rounded transition-colors duration-200`}
+              />
+                <p>Show files</p>
+              </div>
             </div>
             <div id="trees" className="p-3 space-y-0.5"></div>
           </div>
