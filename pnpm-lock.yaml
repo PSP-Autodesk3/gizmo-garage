@@ -47,6 +47,9 @@ importers:
       react-range:
         specifier: ^1.10.0
         version: 1.10.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      sort-array:
+        specifier: ^5.0.0
+        version: 5.0.0
     devDependencies:
       '@eslint/eslintrc':
         specifier: ^3
@@ -60,6 +63,9 @@ importers:
       '@types/react-dom':
         specifier: ^19
         version: 19.0.3(@types/react@19.0.8)
+      '@types/sort-array':
+        specifier: ^4.1.2
+        version: 4.1.2
       eslint:
         specifier: ^9
         version: 9.18.0(jiti@1.21.7)
@@ -720,6 +726,9 @@ packages:
   '@types/serve-static@1.15.7':
     resolution: {integrity: sha512-W8Ym+h8nhuRwaKPaDw34QUkwsGi6Rc4yYqvKFo5rm2FUEhCFbzVWrxXUxuKK8TASjWsysJY0nsmNCGhCOIsrOw==}
 
+  '@types/sort-array@4.1.2':
+    resolution: {integrity: sha512-3HGt90YX0/YvNgTOs8fff33YkyOq4tOqNZ1/dMJBpi4dlzD3nxjeRKecpaB3M3gLSwNB1kocuSGMD8cCtLe7vQ==}
+
   '@types/tough-cookie@4.0.5':
     resolution: {integrity: sha512-/Ad8+nIOV7Rl++6f1BdKxFSMgmoqEoYbHRpPcx3JEfv8VRsQe9Z4mCXeJBzxs7mbHY/XOZZuXlRNfhpVPbs6ZA==}
 
@@ -830,6 +839,10 @@ packages:
   aria-query@5.3.2:
     resolution: {integrity: sha512-COROpnaoap1E2F000S62r6A60uHZnmlvomhfyT2DlTcrY1OrBKn2UhH7qn5wTC9zMvD0AY7csdPSNwKP+7WiQw==}
     engines: {node: '>= 0.4'}
+
+  array-back@6.2.2:
+    resolution: {integrity: sha512-gUAZ7HPyb4SJczXAMUXMGAvI976JoK3qEx9v1FTmeYuJj0IBiaKttG1ydtGKdkfqWkIkouke7nG8ufGy77+Cvw==}
+    engines: {node: '>=12.17'}
 
   array-buffer-byte-length@1.0.2:
     resolution: {integrity: sha512-LHE+8BuR7RYGDKvnrmcuSq3tDcKv9OFEXQt/HpbZhY7V6h0zlUXutnAD82GiFx9rdieCMjkvtcsPqBwgUl1Iiw==}
@@ -2369,6 +2382,15 @@ packages:
   simple-swizzle@0.2.2:
     resolution: {integrity: sha512-JA//kQgZtbuY83m+xT+tXJkmJncGMTFT+C+g2h2R9uxkYIrE2yy9sgmcLhCnw57/WSD+Eh3J97FPEDFnbXnDUg==}
 
+  sort-array@5.0.0:
+    resolution: {integrity: sha512-Sg9MzajSGprcSrMIxsXyNT0e0JB47RJRfJspC+7co4Z5BdNsNl8FmWI+lXEpyKq+vkMG6pHgAhqyCO+bkDTfFQ==}
+    engines: {node: '>=12.17'}
+    peerDependencies:
+      '@75lb/nature': ^0.1.1
+    peerDependenciesMeta:
+      '@75lb/nature':
+        optional: true
+
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
     engines: {node: '>=0.10.0'}
@@ -2548,6 +2570,10 @@ packages:
     resolution: {integrity: sha512-84MVSjMEHP+FQRPy3pX9sTVV/INIex71s9TL2Gm5FG/WG1SqXeKyZ0k7/blY/4FdOzI12CBy1vGc4og/eus0fw==}
     engines: {node: '>=14.17'}
     hasBin: true
+
+  typical@7.3.0:
+    resolution: {integrity: sha512-ya4mg/30vm+DOWfBg4YK3j2WD6TWtRkCbasOJr40CseYENzCUby/7rIvXA99JGsQHeNxLbnXdyLLxKSv3tauFw==}
+    engines: {node: '>=12.17'}
 
   unbox-primitive@1.1.0:
     resolution: {integrity: sha512-nWJ91DjeOkej/TA8pXQ3myruKpKEYgqvpw9lz4OPHj/NWFNluYrjbz9j01CJ8yKQd2g4jFoOkINCTW2I5LEEyw==}
@@ -3405,6 +3431,8 @@ snapshots:
       '@types/node': 20.17.16
       '@types/send': 0.17.4
 
+  '@types/sort-array@4.1.2': {}
+
   '@types/tough-cookie@4.0.5':
     optional: true
 
@@ -3536,6 +3564,8 @@ snapshots:
   argparse@2.0.1: {}
 
   aria-query@5.3.2: {}
+
+  array-back@6.2.2: {}
 
   array-buffer-byte-length@1.0.2:
     dependencies:
@@ -5518,6 +5548,11 @@ snapshots:
     dependencies:
       is-arrayish: 0.3.2
 
+  sort-array@5.0.0:
+    dependencies:
+      array-back: 6.2.2
+      typical: 7.3.0
+
   source-map-js@1.2.1: {}
 
   sqlstring@2.3.3: {}
@@ -5753,6 +5788,8 @@ snapshots:
       reflect.getprototypeof: 1.0.10
 
   typescript@5.7.3: {}
+
+  typical@7.3.0: {}
 
   unbox-primitive@1.1.0:
     dependencies:

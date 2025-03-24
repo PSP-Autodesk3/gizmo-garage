@@ -43,7 +43,26 @@ router.post("/get", async (req, res, next) => {
     try {
         const {email} = req.body;
         const [result] = await pool.execute(`
-            SELECT Projects.project_id, Projects.name, 
+            SELECT Projects.project_id, Projects.name, Projects.dateOfCreation,
+            CASE WHEN Projects.owner = Users.user_id THEN 1 ELSE 0 END AS ownsProject
+            FROM Projects
+            INNER JOIN Users ON Users.email = ?
+            LEFT JOIN Editor ON Editor.project_id = Projects.project_id AND Editor.user_id = Users.user_id
+            WHERE Projects.owner = Users.user_id OR Editor.user_id IS NOT NULL;
+        `, [email]);
+        res.json(result);
+    }
+    catch (error) {
+        next(error);
+    }
+});
+
+// Get project editors
+router.post("/getProjectEditors", async (req, res, next) => {
+    try {
+        const {email} = req.body;
+        const [result] = await pool.execute(`
+            SELECT Projects.project_id, Projects.name, Projects.dateOfCreation,
             CASE WHEN Projects.owner = Users.user_id THEN 1 ELSE 0 END AS ownsProject
             FROM Projects
             INNER JOIN Users ON Users.email = ?
@@ -138,7 +157,7 @@ router.post("/tags", async (req, res, next) => {
             FROM Object_Tag
             INNER JOIN Tag ON Object_Tag.tag_id = Tag.tag_id
             INNER JOIN Object ON Object_Tag.object_id = Object.object_id
-            WHERE Object.Project_id IN (SELECT Projects.project_id
+            WHERE Object.project_id IN (SELECT Projects.project_id
             FROM Projects
             INNER JOIN Users ON Users.email = ?
             LEFT JOIN Editor ON Editor.project_id = Projects.project_id AND Editor.user_id = Users.user_id

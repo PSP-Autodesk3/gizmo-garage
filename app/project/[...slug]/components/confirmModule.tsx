@@ -59,16 +59,19 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
             formData.append("bucketKey", bucketKey);
         }
         try {
-            const response = await fetch("http://localhost:3001/oss/upload", {
+            const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/oss/upload`, {
                 method: "POST",
                 body: formData,
             });
             const data = await response.json();
+            const urn = data.urn;
+            const objectKey = data.objectKey;
             if (data.ok) {
                 setMessage("File uploaded successfully");
             } else {
                 setMessage("Error uploading file");
             }
+            tagVersion(bucketKey, urn, objectKey);
         }
         catch (error) {
             setMessage("Error uploading file");
@@ -76,12 +79,31 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
         }
     }
 
+    const tagVersion = async (bucketKey: string, urn: string, objectKey: string) => {
+        try {
+            const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/versions/tag`, {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ bucket_id: bucketKey, urn: urn, version: 1, object_key: objectKey }),
+            });
+            const data = await response.json();
+            if (data.message == "Version tagged successfully") {
+                console.log("Version tagged successfully");
+            } else {
+                console.log("Error tagging version");
+            }
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
+
     useEffect(() => {
-      if (tagQuery != '') {
-        setFilteredTags(allTags.filter(tags => tags.tag.toLowerCase().includes(tagQuery.trim())));
-      } else {
-        setFilteredTags(allTags);
-      }
+        if (tagQuery != '') {
+            setFilteredTags(allTags.filter(tags => tags.tag.toLowerCase().includes(tagQuery.trim())));
+        } else {
+            setFilteredTags(allTags);
+        }
     }, [tagQuery, allTags, setFilteredTags]);
 
     // Create new folder
@@ -150,7 +172,7 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
             await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/items/create`, {
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ itemName: itemName.trim(), email: user.email, project: projectID, id, type, bucketKey }),
+                body: JSON.stringify({ itemName: itemName.trim(), email: user.email, project: projectID, id, type, bucketKey, appliedTags }),
             });
             // Upload file to bucket
             handleUpload(bucketKey);
@@ -225,11 +247,11 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                     className="w-full mt-4 p-2 rounded-lg bg-slate-800"
                     placeholder="Enter Item name"
                 />
-                <div >
+                <div className='bg-slate-800 mt-4 rounded-lg max-w-[350px] flex flex-col items-center ' >
                     <div id="search" className='p-4'>
                         <label htmlFor="search=bar">Search</label>
                         <input
-                            className='text-white w-full p-2 my-2 rounded-lg bg-slate-800'
+                            className='text-white w-full p-2 my-2 rounded-lg bg-slate-900'
                             type="text"
                             placeholder="Search"
                             name="search"
@@ -237,40 +259,58 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                             onChange={(e) => setTagQuery(e.target.value)}
                         />
                     </div>
-                    <div>
-                        {
+                    <div className='bg-slate-900 rounded-lg overflow-hidden flex flex-wrap w-[90%]'>
+                        {filteredTags.length > 0 ? (
                             filteredTags.map((tag: Tag) => (
-                                <>
-                                    <button type="button" className='rounded-full m-2 p-3 bg-blue-600' onClick={() => applyTag(tag.tag_id)} key={tag.tag_id}>{tag.tag}</button>
-                                </>
+                                <button type="button" className='m-2 rounded-full bg-blue-600 text-white text-sm px-4 py-2 flex items-center text-center' onClick={() => applyTag(tag.tag_id)} key={tag.tag_id}>{tag.tag}</button>
                             ))
+                        ) : (
+                            <span className='text-white m-auto p-2'>No tags found</span>
+                        )
                         }
                     </div>
 
-                    <div id='appliedTags'>
-                        {
+                    <div id='appliedTags' className='pt-5 rounded-lg my-3 flex-wrap flex p-2'>
+                        {appliedTags.length > 0 ? (
                             appliedTags.map((tag: Tag) => (
-                                <>
-                                    <button type='button' className='rounded-full m-2 p-3 bg-blue-600 flex' onClick={() => removeTag(tag.tag_id)} key={tag.tag_id}><svg className="w-6 h-6 text-blue-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24">
-                                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18 17.94 6M18 18 6.06 6" />
+                                <button type='button'
+                                    className='rounded-full overflow-hidden white-space-nowrap truncate m-1 bg-blue-600 text-white text-sm px-4 py-2 flex max-w-[100px] items-center text-center'
+                                    onClick={() => removeTag(tag.tag_id)}
+                                    key={tag.tag_id}
+                                >
+                                    <svg
+                                        className="w-6 h-6 flex-shrink-0 text-blue-800 dark:text-white"
+                                        aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="15"
+                                        height="15"
+                                        fill="none"
+                                        viewBox="0 0 24 24">
+                                        <path
+                                            stroke="currentColor"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="M6 18 17.94 6M18 18 6.06 6" />
                                     </svg>{tag.tag}</button>
-                                </>
                             ))
+                        ) : (
+                            <span className='text-white'>No tags applied</span>
+                        )
                         }
-
-                        <div>
-                            {alreadyApplied === 1 && (
-                                <span className='text-red-500'>Already Applied</span>
-                            )}
-                        </div>
+                    </div>
+                    <div>
+                        {alreadyApplied === 1 && (
+                            <span className='text-red-500'>Already Applied</span>
+                        )}
                     </div>
                 </div>
 
                 <div className="px-8">
-                <input type="file" onChange={handleFileChange} className="mb-4 bg-slate-800 rounded-lg p-4 text-lg" />
-                <br />
-                {message && <p className="mt-2 text-sm">{message}</p>}
-            </div>
+                    <input type="file" onChange={handleFileChange} className="mb-4 bg-slate-800 rounded-lg p-4 text-lg" />
+                    <br />
+                    {message && <p className="mt-2 text-sm">{message}</p>}
+                </div>
 
                 <div className="mt-4">
                     <button

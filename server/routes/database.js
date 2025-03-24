@@ -33,7 +33,8 @@ router.get("/create", async (_req, res, next) => {
           project_id INT PRIMARY KEY AUTO_INCREMENT,
           name VARCHAR(255) NOT NULL,
           owner INT NOT NULL,
-          FOREIGN KEY (owner) REFERENCES Users(user_id)
+          FOREIGN KEY (owner) REFERENCES Users(user_id),
+          dateOfCreation TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
       `);
 
@@ -62,7 +63,8 @@ router.get("/create", async (_req, res, next) => {
           project_id INT NOT NULL,
           FOREIGN KEY (project_id) REFERENCES Projects(project_id),
           parent_folder_id INT,
-          FOREIGN KEY (parent_folder_id) REFERENCES Folder(folder_id)
+          FOREIGN KEY (parent_folder_id) REFERENCES Folder(folder_id),
+          dateOfCreation TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
       `);
 
@@ -76,16 +78,18 @@ router.get("/create", async (_req, res, next) => {
           FOREIGN KEY (project_id) REFERENCES Projects(project_id),
           folder_id INT,
           FOREIGN KEY (folder_id) REFERENCES Folder(folder_id),
-          bucket_id varchar(128) DEFAULT NULL
+          bucket_id varchar(128) DEFAULT NULL,
+          dateOfCreation TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
       `);
 
     await pool.execute(`
         CREATE TABLE IF NOT EXISTS Version (
           version_id INT PRIMARY KEY AUTO_INCREMENT,
-          object_id INT NOT NULL,
-          FOREIGN KEY (object_id) REFERENCES Object(object_id),
+          bucket_id varchar(128) NOT NULL,
           version INT NOT NULL,
+          urn varchar(255) NOT NULL,
+          object_key varchar(255) NOT NULL,
           date_time DATETIME NOT NULL
         );
       `);
@@ -100,12 +104,12 @@ router.get("/create", async (_req, res, next) => {
     await pool.execute(`
         CREATE TABLE IF NOT EXISTS Object_Tag (
           object_id INT NOT NULL,
-          FOREIGN KEY (object_id) REFERENCES Object(object_id),
+          FOREIGN KEY (object_id) REFERENCES Object(object_id) ON DELETE CASCADE,
           tag_id INT NOT NULL,
-          FOREIGN KEY (tag_id) REFERENCES Tag(tag_id)
+          FOREIGN KEY (tag_id) REFERENCES Tag(tag_id) ON DELETE CASCADE
         );
       `);
-    
+
     res.json({ message: "Database created successfully" });
   }
   catch (error) {
