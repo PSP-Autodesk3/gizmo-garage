@@ -4,7 +4,7 @@
 import withAuth from "@/app/lib/withAuth";
 
 // Other
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from 'next/navigation';
 
 //Filter component
@@ -12,12 +12,14 @@ import BackBtnBar from "@/app/shared/components/backBtnBar";
 
 // Interfaces
 import { ParamProps } from "@/app/shared/interfaces/paramProps";
+import { Version } from "@/app/shared/interfaces/version";
+import { Folder } from "@/app/shared/interfaces/folder";
 
 // Firebase
 import { auth } from "@/app/firebase/config";
 import { reauthenticateWithCredential } from "firebase/auth";
 import { EmailAuthProvider } from "firebase/auth/web-extension";
-import { Folder } from "@/app/shared/interfaces/folder";
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 function Home({ params }: ParamProps) {
     const router = useRouter();
@@ -25,6 +27,7 @@ function Home({ params }: ParamProps) {
      const [itemName, setItemName] = useState<string | null>(null);
      const [author, setAuthor] = useState<string | null>(null);
      const [bucketKey, setBucketKey] = useState<string | null>(null);
+     const [archiveStatus, setArchiveStatus] = useState<boolean>(false);
      const [projectID, setProjectID] = useState<string | null>(null);
      const [folderID, setFolderID] = useState<number | null>(null);
      const [projectName, setProjectName] = useState<string | null>(null);
@@ -32,11 +35,14 @@ function Home({ params }: ParamProps) {
      const [file, setFile] = useState<File | null>(null);
      const [uploading, setUploading] = useState<boolean>(false);
      const [message, setMessage] = useState<string | null>(null);
-     const [versions, setVersions] = useState<any[]>([]);
+     const [versions, setVersions] = useState<Version[]>([]);
      // Password confirmation
      const [confirmModule, setConfirmModule] = useState<boolean>(false);
      const [password, setPassword] = useState<string>('');
      const [rollbackVer, setRollbackVer] = useState<number | null>(null);
+    // Get project owner
+    const [projectOwner, setProjectOwner] = useState<string | null>(null);
+    const [user, loadingAuth] = useAuthState(auth);
      
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,7 +70,7 @@ function Home({ params }: ParamProps) {
             }
         }
 
-        const fetchVersions = async () => {
+        const fetchVersions = useCallback(async () => {
             if (bucketKey) {
                 const getVersions = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/versions/allVersions`, {
                     method: "POST",
@@ -75,7 +81,7 @@ function Home({ params }: ParamProps) {
                 });
                 setVersions(await getVersions.json());
             }
-        }
+        }, [bucketKey])
 
         const tagNewVersion = async (version: number, urn: string, bucketKey: string, objectKey: string) => {
             try {
@@ -130,6 +136,7 @@ function Home({ params }: ParamProps) {
             }
             catch (error) {
                 setMessage("Error uploading file");
+                console.log(error);
             }
         }
         catch (error) {
@@ -157,7 +164,7 @@ function Home({ params }: ParamProps) {
                     const error = await response.text();
                     throw new Error(error || 'Download failed');
                 }
-                let filename = objectKey;        
+                const filename = objectKey;        
                 // Create download link
                 const blob = await response.blob();
                 const url = window.URL.createObjectURL(blob);
@@ -213,6 +220,41 @@ function Home({ params }: ParamProps) {
               alert('Incorrect password');
             }
           }
+        
+        
+        const archiveItem = async (action: string) => {
+            try {
+                if (action === "archive") {
+                    const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/items/archive`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ id: itemId, action: "archive" })
+                    });
+                    const data = await response.json();
+                    if (data.message === "Item archived") {
+                        setArchiveStatus(true);
+                    }
+                } else if (action === "unarchive") {
+                    const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/items/archive`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ id: itemId, action: "unarchive" })
+                    });
+                    const data = await response.json();
+                    if (data.message === "Item unarchived") {
+                        setArchiveStatus(false);
+                    }
+                }
+                
+            }
+            catch (error) {
+                console.log(error);
+            }
+        }
 
      useEffect(() => {
         const resolveParams = async () => {
@@ -224,7 +266,7 @@ function Home({ params }: ParamProps) {
 
     useEffect(() => {
         const fetchInfo = async () => {
-            if (itemId !== null) {
+            if (itemId !== null && !loadingAuth) {
                 const response = await fetch (`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/items/info`, {
                     method: "POST",
                     headers: {
@@ -233,20 +275,27 @@ function Home({ params }: ParamProps) {
                     body: JSON.stringify({ id: itemId }),
                 });
                 const itemData = await response.json();
+                console.log("Data:", itemData);
                 setItemName(itemData[0]?.name);
                 setAuthor(itemData[0]?.fname + " " + itemData[0]?.lname);
                 setBucketKey(itemData[0]?.bucket_id);
                 setProjectID(itemData[0]?.project_id);
                 setProjectName(itemData[0]?.project_name);
                 setFolderID(itemData[0]?.folder_id);
+                setProjectOwner(itemData[0]?.owner.toLowerCase());
+                if (itemData[0]?.archived === 1) {
+                    setArchiveStatus(true);
+                } else {
+                    setArchiveStatus(false);
+                }
             }
         }
         fetchInfo();
-    }, [itemId]);
+    }, [itemId, loadingAuth]);
 
     useEffect(() => {
         fetchVersions();
-    }, [bucketKey]);
+    }, [bucketKey, fetchVersions]);
 
     const backButton = async () => {
         const details = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/folders/get`, {
@@ -311,6 +360,11 @@ function Home({ params }: ParamProps) {
             </button>
         </div>
         <div className={`w-full ${confirmModule ? 'blur-xl bg-opacity-40' : ''}`}>
+            {archiveStatus && (
+                <div className="bg-amber-400 text-black border border-amber-600/50 font-bold text-2xl rounded-lg text-center p-4 mx-8">
+                    <p>This item has been archived.</p>
+                </div>
+            )}
             <div className="lg:grid lg:grid-cols-2 w-full">
             <div>
                 <div className="bg-slate-800/50 backdrop-blur mx-8 my-4 rounded-lg overflow-hidden shadow-xl border border-slate-700/50 p-4">
@@ -329,9 +383,20 @@ function Home({ params }: ParamProps) {
                     <div className="flex flex-col w-full border px-2 border-slate-700/50 py-2 my-2 rounded-lg text-lg">
                         <p><b>Bucket Key:</b> {bucketKey}</p>
                     </div>
+                    {projectOwner === user?.email?.toLowerCase() && (
+                     <>
+                        <button
+                        onClick={async () => await archiveItem(archiveStatus ? "unarchive" : "archive")}
+                        className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                        disabled={uploading}
+                    >
+                        {archiveStatus ? "Unarchive" : "Archive"}
+                    </button>
+                     </>   
+                    )}
                 </div>
             </div>
-            <div className="bg-slate-800/50 backdrop-blur mx-8 my-4 rounded-lg overflow-hidden shadow-xl border border-slate-700/50 p-4">
+            <div className={`bg-slate-800/50 backdrop-blur mx-8 my-4 transition-all duration-300 rounded-lg overflow-hidden shadow-xl border border-slate-700/50 p-4 ${archiveStatus ? 'opacity-40 pointer-events-none' : ''}`}>
             <h1 className="text-2xl text-center pb-4">Tag new version</h1>
                 <input type="file" onChange={handleFileChange} className="mb-4 rounded-lg p-4 text-lg" />
                     <br />
@@ -367,7 +432,7 @@ function Home({ params }: ParamProps) {
                                             setConfirmModule(true);
                                         }
                                     }}
-                                    className="px-6 m-1 py-3 text-lg font-medium bg-red-500 rounded-lg transition-all duration-300 hover:bg-red-400 hover:scale-105 shadow-lg hover:shadow-red-400/50"
+                                    className={`px-6 m-1 py-3 text-lg font-medium bg-red-500 rounded-lg transition-all duration-300 hover:bg-red-400 hover:scale-105 shadow-lg hover:shadow-red-400/50 ${archiveStatus ? 'opacity-30 pointer-events-none' : ''}`}
                                 >
                                     Rollback
                                 </button>
