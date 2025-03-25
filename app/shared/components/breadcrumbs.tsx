@@ -18,7 +18,7 @@ export default function Breadcrumbs({projectID, project, routes}: BreadcrumbsPro
     }
 
     return (
-        <div id="breadcrumbs" className="text-slate-900 dark:text-slate-200 flex flex-row text-2xl p-4 rounded-lg mx-8 my-4 ">
+        <div id="breadcrumbs" className="text-slate-900 dark:text-slate-200 font-semibold flex flex-row text-2xl p-4 rounded-lg mx-8 my-4 ">
             <button
                 onClick={() => { router.push(`/`); }}
                 className="transition-colors duration-300 hover:text-gray-400"

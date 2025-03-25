@@ -98,10 +98,10 @@ function Home({ params }: ParamProps) {
 
           baseFiles.forEach((file: File) => {
             const button = document.createElement("button");
-            button.className = `pl-4 flex items-center gap-2 py-2 px-3 text-slate-300 hover:text-slate-100 transition-colors duration-200 flex-1 text-left tree-file
+            button.className = `pl-4 flex items-center gap-2 py-2 px-3 text-slate-900 dark:text-slate-300 hover:text-slate-300 dark:hover:text-slate-50 transition-colors duration-200 flex-1 text-left tree-file
                               ${checkboxOpen === 'false' && 'hidden'}`;
                               button.innerHTML = `
-              <svg class="ml-2 w-5 h-5 text-slate-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+              <svg class="ml-2 w-5 h-5 text-slate-900 dark:text-slate-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
               </svg>
               ${file.name}`;
@@ -140,8 +140,8 @@ function Home({ params }: ParamProps) {
 
             // Create folder button
             const button = document.createElement("button");
-            button.className = `${newValid ? 'text-indigo-200 font-medium' : 'text-slate-300'} 
-              hover:text-slate-100 transition-colors duration-200 flex-1 text-left`;
+            button.className = `${newValid ? 'text-indigo-800 dark:text-indigo-200 font-medium' : 'text-slate-900 dark:text-slate-400'} 
+              hover:text-slate-700 dark:hover:text-slate-400 transition-colors duration-200 flex-1 text-left`;
             button.textContent = folder.name;
 
             const newHistory = [...history, `/${folder.name.replace(/ /g, "+")}`];
@@ -353,14 +353,14 @@ function Home({ params }: ParamProps) {
 
         {/* Folder tree */}
         <div id="tree-folders" className="min-w-[280px] flex-shrink-0 mt-[80px]">
-          <div className="bg-slate-800/50 backdrop-blur mx-8 my-4 rounded-lg overflow-hidden shadow-xl border border-slate-700/50">
+          <div className="bg-gray-300 dark:bg-slate-800/50 backdrop-blur mx-8 my-4 rounded-lg overflow-hidden shadow-xl border border-slate-700/50 text-slate-900 dark:text-slate-200">
             <div className="p-4 border-b border-slate-700/50">
               <button
                 className="w-full text-left px-3 py-2 rounded-md bg-slate-700/30 hover:bg-slate-700/50 
-                                  transition-all duration-200 text-slate-200 font-medium flex items-center gap-2 shadow-sm hover:shadow"
+                                  transition-all duration-200 text-slate-900 dark:text-slate-200 font-medium flex items-center gap-2 shadow-sm hover:shadow"
                 onClick={() => { router.push(`/project/${projectID}+${project.replace(/%2B/g, '+')}`); }}
               >
-                <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
@@ -390,7 +390,7 @@ function Home({ params }: ParamProps) {
             routes={routes}
           />
           {(!confirmModule) && (
-            <div className="bg-gray-300 dark:bg-slate-800 p-4 w-[90%] mx-auto rounded-lg shadow-lg border-gray-200 dark:border-slate-800 mt-4">
+            <div className="bg-gray-300 dark:bg-slate-800/50 p-4 w-[90%] mx-auto rounded-lg shadow-xl border border-slate-700/50 mt-4">
 
               {/* Error message for duplicates */}
               <p className="text-red-600">
@@ -404,13 +404,13 @@ function Home({ params }: ParamProps) {
               {/* Folders */}
               <div id="folders" className="mx-8 my-4">
                 <div className="flex flex-row justify-between">
-                  <h1 className="text-3xl my-4 text-slate-900 dark:text-slate-200">Folders:</h1>
+                  <h1 className="text-3xl my-4 text-slate-900 dark:text-slate-200 font-semibold">Folders:</h1>
                   <div className="content-center">
                     {/* Sort By */}
-                    <label>Sort By:</label>
-                    <select onChange={handleFolderSortBy} className='bg-slate-900 p-1 rounded-lg m-2'>
-                      <option value="newest" >Newest</option>
-                      <option value="oldest" >Oldest</option>
+                    <label className="pl-8 text-slate-900 dark:text-slate-200 font-semibold">Sort By:</label>
+                    <select onChange={handleFolderSortBy} className='bg-gray-400 dark:bg-slate-900 text-slate-900 dark:text-slate-200 p-1 rounded-lg m-2'>
+                      <option value="newest" className='text-slate-900 dark:text-slate-200'>Newest</option>
+                      <option value="oldest" className='text-slate-900 dark:text-slate-200'>Oldest</option>
                     </select>
                   </div>
                 </div>
@@ -429,16 +429,18 @@ function Home({ params }: ParamProps) {
                 </button>
               </div>
 
+              <div className="p border-b border-slate-700/50"></div>
+
               {/* Files */}
               <div id="files" className="mx-8 my-4">
                 <div className='flex flex-row justify-between'>
-                  <h1 className="my-4 text-3xl text-slate-900 dark:text-slate-200">Files:</h1>
+                  <h1 className="my-4 text-3xl text-slate-900 dark:text-slate-200 font-semibold">Files:</h1>
                   <div className="content-center">
                     {/* Sort By */}
-                    <label>Sort By:</label>
-                    <select onChange={handleFileSortBy} className='bg-slate-900 p-1 rounded-lg m-2'>
-                      <option value="newest" >Newest</option>
-                      <option value="oldest" >Oldest</option>
+                    <label className="pl-8 text-slate-900 dark:text-slate-200 font-semibold">Sort By:</label>
+                    <select onChange={handleFileSortBy} className='bg-gray-400 dark:bg-slate-900 text-slate-900 dark:text-slate-200 p-1 rounded-lg m-2'>
+                      <option value="newest" className='text-slate-900 dark:text-slate-200'>Newest</option>
+                      <option value="oldest" className='text-slate-900 dark:text-slate-200'>Oldest</option>
                     </select>
                   </div>
                 </div>
@@ -460,7 +462,7 @@ function Home({ params }: ParamProps) {
 
           {/* Confirmation for creating new items */}
           {(confirmModule) && (
-            <div className="fixed inset-0 flex border-indigo-600 border-2 items-center justify-center bg-gray-300 dark:bg-slate-900 text-slate-900 dark:text-slate-200 p-4 w-[40%] h-[40%] m-auto rounded-lg shadow-lg mt-16">
+            <div className="fixed inset-0 flex border-indigo-600 border-2 items-center justify-center bg-gray-300 dark:bg-slate-900 text-slate-900 dark:text-slate-200 w-[40%] h-[40%] m-auto rounded-lg shadow-lg mt-16">
               <ConfirmModule
                 itemType={(moduleType === 1 ? "Folder" : "File")}
                 projectID={projectID}
