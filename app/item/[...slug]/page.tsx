@@ -288,7 +288,7 @@ function Home({ params }: ParamProps) {
             <button
                 className="px-4 py-2 text-sm font-medium bg-indigo-600 rounded-lg 
                            transition-all duration-300 hover:bg-indigo-500 
-                           hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                           hover:scale-105 shadow-lg hover:shadow-indigo-500/50 ml-8"
                 onClick={backButton}
             >
                 <svg className="w-6 h-6 text-gray-800 dark:text-white inline-block mr-2"
