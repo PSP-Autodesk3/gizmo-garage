@@ -45,9 +45,67 @@ export default function withAuth<T extends object>(
           }
         }
       };
-
       checkRedirect();
     }, [loading, user, sessionToken, sessionLoading, pathname, router]);
+
+    // Editor middleware
+    useEffect(() => {
+        if (user) {
+          // List of routes this middleware applies to
+        const editorRoutes:string[] = ["/item", "/project"];
+        if (editorRoutes.some(route => pathname.includes(route))) {
+          if (pathname.includes("/item")) {
+            const itemId = parseInt(pathname.split("/")[2], 10);
+            const checkRedirect = async () => {
+              const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/items/info`, { 
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ id: itemId }),
+              });
+              const data = await response.json();
+              const projectID = data[0]?.project_id;
+              const email = user?.email;
+              const checkDetails = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/projects/get`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email }),
+              });
+              const details = await checkDetails.json();
+              const ids = details.map((project: { project_id: number }) => project.project_id);
+              if (!ids.includes(projectID)) {
+                console.log("Redirecting");
+                router.push("/");
+              }
+            }
+            checkRedirect();
+          } else if (pathname.includes("/project")) {
+            const checkRedirect = async () => {
+              // Extract the project ID from the URL
+              const projectID:number = parseInt(pathname.split("/")[2].split("+")[0], 10);
+              // Get User ID from firebase
+              const email = user?.email;
+              const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/projects/get`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email }),
+              });
+              const data = await response.json();
+              const ids = data.map((project: { project_id: number }) => project.project_id);
+              if (!ids.includes(projectID)) {
+                router.push("/");
+              }
+            }
+            checkRedirect();
+          }
+        }
+        }
+    }, [user]);
 
     return <WrappedComponent {...props} />;
   };

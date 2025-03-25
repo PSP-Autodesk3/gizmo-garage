@@ -321,7 +321,8 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
 
                 <div className="mt-4">
                     <button
-                        className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 text-white"
+                        className={`px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50` + (itemName.trim() ? "" : " opacity-50 cursor-not-allowed")}
+                        disabled={!itemName.trim()}
                     >
                         Create
                     </button>

@@ -5,7 +5,6 @@ import withAuth from "@/app/lib/withAuth";
 
 // Other
 import { useState, useEffect, useCallback } from "react";
-import { useRouter } from 'next/navigation';
 
 //Filter component
 import BackBtnBar from "@/app/shared/components/backBtnBar";
@@ -13,7 +12,6 @@ import BackBtnBar from "@/app/shared/components/backBtnBar";
 // Interfaces
 import { ParamProps } from "@/app/shared/interfaces/paramProps";
 import { Version } from "@/app/shared/interfaces/version";
-import { Folder } from "@/app/shared/interfaces/folder";
 
 // Firebase
 import { auth } from "@/app/firebase/config";
@@ -22,7 +20,6 @@ import { EmailAuthProvider } from "firebase/auth/web-extension";
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 function Home({ params }: ParamProps) {
-    const router = useRouter();
      const [itemId, setItemId] = useState<number | null>(null);
      const [itemName, setItemName] = useState<string | null>(null);
      const [author, setAuthor] = useState<string | null>(null);
@@ -296,69 +293,10 @@ function Home({ params }: ParamProps) {
     useEffect(() => {
         fetchVersions();
     }, [bucketKey, fetchVersions]);
-
-    const backButton = async () => {
-        const details = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/folders/get`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id: projectID })
-        });
-        const results = await details.json();
-        const currentFolder = results.find((folder: Folder) => folder.folder_id === folderID);
-
-        const folders: Folder[] = [];
-        if (currentFolder) {
-            folders.push(currentFolder);
-            let con = false;
-
-            while (!con) {
-                const currentFolder = results.find((folder: Folder) => folder.folder_id === folders[folders.length - 1].parent_folder_id);
-
-                if (currentFolder) {
-                    folders.push(currentFolder);
-                } else {
-                    con = true;
-                }
-            }
-        }
-        let route = '';
-        folders.slice().reverse().map((folder: Folder) => route += `/${folder.name}`);
-        if (route === '')
-            route = '/'
-        
-        router.push(`../project/${projectID}+${projectName?.replace(/ /g, '+')}/${route}`);
-    }
     
      return (
         <>
-        
-        <BackBtnBar />
-        <div>
-            <button
-                className="px-4 py-2 text-sm font-medium bg-indigo-600 rounded-lg 
-                           transition-all duration-300 hover:bg-indigo-500 
-                           hover:scale-105 shadow-lg hover:shadow-indigo-500/50 ml-8 mb-4"
-                onClick={backButton}
-            >
-                <svg className="w-6 h-6 text-white inline-block mr-2"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                >
-                    <path
-                        stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 12h14M5 12l4-4m-4 4 4 4"
-                    />
-                </svg>
-                Back
-            </button>
-        </div>
+        <BackBtnBar back={true} projectID={projectID} folderID={folderID} projectName={projectName} />
         <div className={`w-full ${confirmModule ? 'blur-xl bg-opacity-40' : ''}`}>
             {archiveStatus && (
                 <div className="bg-amber-400 text-black border border-amber-600/50 font-bold text-2xl rounded-lg text-center p-4 mx-8">
