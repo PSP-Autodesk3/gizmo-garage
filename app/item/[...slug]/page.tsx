@@ -257,7 +257,7 @@ function Home({ params }: ParamProps) {
         const results = await details.json();
         const currentFolder = results.find((folder: Folder) => folder.folder_id === folderID);
 
-        let folders: Folder[] = [];
+        const folders: Folder[] = [];
         if (currentFolder) {
             folders.push(currentFolder);
             let con = false;
