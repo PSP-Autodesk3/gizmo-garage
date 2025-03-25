@@ -5,6 +5,7 @@ import withAuth from "@/app/lib/withAuth";
 
 // Other
 import { useState, useEffect } from "react";
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 //Filter component
 import BackBtnBar from "@/app/shared/components/backBtnBar";
@@ -32,6 +33,9 @@ function Home({ params }: ParamProps) {
      const [confirmModule, setConfirmModule] = useState<boolean>(false);
      const [password, setPassword] = useState<string>('');
      const [rollbackVer, setRollbackVer] = useState<number | null>(null);
+    // Get project owner
+    const [projectOwner, setProjectOwner] = useState<string | null>(null);
+    const [user, loadingAuth] = useAuthState(auth);
      
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -254,7 +258,7 @@ function Home({ params }: ParamProps) {
 
     useEffect(() => {
         const fetchInfo = async () => {
-            if (itemId !== null) {
+            if (itemId !== null && !loadingAuth) {
                 const response = await fetch (`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/items/info`, {
                     method: "POST",
                     headers: {
@@ -266,6 +270,7 @@ function Home({ params }: ParamProps) {
                 setItemName(itemData[0]?.name);
                 setAuthor(itemData[0]?.fname + " " + itemData[0]?.lname);
                 setBucketKey(itemData[0]?.bucket_id);
+                setProjectOwner(itemData[0]?.email.toLowerCase());
                 if (itemData[0]?.archived === 1) {
                     setArchiveStatus(true);
                 } else {
@@ -274,7 +279,7 @@ function Home({ params }: ParamProps) {
             }
         }
         fetchInfo();
-    }, [itemId]);
+    }, [itemId, loadingAuth]);
 
     useEffect(() => {
         fetchVersions();
@@ -308,13 +313,17 @@ function Home({ params }: ParamProps) {
                     <div className="flex flex-col w-full border px-2 border-slate-700/50 py-2 my-2 rounded-lg text-lg">
                         <p><b>Bucket Key:</b> {bucketKey}</p>
                     </div>
-                    <button
+                    {projectOwner === user?.email?.toLowerCase() && (
+                     <>
+                        <button
                         onClick={async () => await archiveItem(archiveStatus ? "unarchive" : "archive")}
                         className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
                         disabled={uploading}
                     >
                         {archiveStatus ? "Unarchive" : "Archive"}
                     </button>
+                     </>   
+                    )}
                 </div>
             </div>
             <div className={`bg-slate-800/50 backdrop-blur mx-8 my-4 transition-all duration-300 rounded-lg overflow-hidden shadow-xl border border-slate-700/50 p-4 ${archiveStatus ? 'opacity-40 pointer-events-none' : ''}`}>

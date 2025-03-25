@@ -86,6 +86,7 @@ router.post("/info", async (req, res, next) => {
             SELECT *
             FROM Object
             INNER JOIN Users ON Object.author = Users.user_id
+            INNER JOIN Projects ON Object.project_id = Projects.project_id
             WHERE object_id = ?;
         `, [id]);
         res.json(result);
