@@ -79,6 +79,7 @@ router.get("/create", async (_req, res, next) => {
           folder_id INT,
           FOREIGN KEY (folder_id) REFERENCES Folder(folder_id),
           bucket_id varchar(128) DEFAULT NULL,
+          archived TINYINT(1) DEFAULT 0,
           dateOfCreation TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
       `);

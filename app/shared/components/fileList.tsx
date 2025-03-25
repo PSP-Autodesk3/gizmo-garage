@@ -34,6 +34,9 @@ export default function FileList({ files }: { files: File[] }) {
                                   </svg>
                                   {file.name}
                                 </div>
+                                {file.archived ? (
+                                    <span className="text-sm text-red-500">Archived</span>
+                                ) : (<></>)}
                                 <span className="text-sm">{file.dateOfCreation.toLocaleDateString()}</span>
                                 <div className='flex flex-wrap max-w-full'>
                                     {Array.isArray(file.tags) && file.tags.length > 0 && (
