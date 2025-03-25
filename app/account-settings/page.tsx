@@ -59,7 +59,7 @@ function Home() {
       <BackBtnBar />
       <div className="max-w-2xl mx-auto p-6">
         <h1 className="text-4xl font-bold mb-4">Account Settings</h1>
-        <p className="font-bold text-2xl mb-4">Gizemo Garage</p>
+        <p className="font-bold text-2xl mb-4">Gizmo Garage</p>
         {details && (
           <div className="bg-gray-800 p-6 rounded-lg shadow-lg text-white mb-6">
             <p className="text-lg mb-2"><span className="font-bold">First Name:</span> {details.fname}</p>
