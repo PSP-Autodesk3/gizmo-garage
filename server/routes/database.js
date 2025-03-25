@@ -86,9 +86,10 @@ router.get("/create", async (_req, res, next) => {
     await pool.execute(`
         CREATE TABLE IF NOT EXISTS Version (
           version_id INT PRIMARY KEY AUTO_INCREMENT,
-          object_id INT NOT NULL,
-          FOREIGN KEY (object_id) REFERENCES Object(object_id),
+          bucket_id varchar(128) NOT NULL,
           version INT NOT NULL,
+          urn varchar(255) NOT NULL,
+          object_key varchar(255) NOT NULL,
           date_time DATETIME NOT NULL
         );
       `);

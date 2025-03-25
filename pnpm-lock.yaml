@@ -63,6 +63,9 @@ importers:
       '@types/react-dom':
         specifier: ^19
         version: 19.0.3(@types/react@19.0.8)
+      '@types/sort-array':
+        specifier: ^4.1.2
+        version: 4.1.2
       eslint:
         specifier: ^9
         version: 9.18.0(jiti@1.21.7)
@@ -722,6 +725,9 @@ packages:
 
   '@types/serve-static@1.15.7':
     resolution: {integrity: sha512-W8Ym+h8nhuRwaKPaDw34QUkwsGi6Rc4yYqvKFo5rm2FUEhCFbzVWrxXUxuKK8TASjWsysJY0nsmNCGhCOIsrOw==}
+
+  '@types/sort-array@4.1.2':
+    resolution: {integrity: sha512-3HGt90YX0/YvNgTOs8fff33YkyOq4tOqNZ1/dMJBpi4dlzD3nxjeRKecpaB3M3gLSwNB1kocuSGMD8cCtLe7vQ==}
 
   '@types/tough-cookie@4.0.5':
     resolution: {integrity: sha512-/Ad8+nIOV7Rl++6f1BdKxFSMgmoqEoYbHRpPcx3JEfv8VRsQe9Z4mCXeJBzxs7mbHY/XOZZuXlRNfhpVPbs6ZA==}
@@ -3425,6 +3431,8 @@ snapshots:
       '@types/node': 20.17.16
       '@types/send': 0.17.4
 
+  '@types/sort-array@4.1.2': {}
+
   '@types/tough-cookie@4.0.5':
     optional: true
 
@@ -5202,7 +5210,6 @@ snapshots:
   pirates@4.0.6: {}
 
   pnpm@10.6.4: {}
-
 
   possible-typed-array-names@1.0.0: {}
 
