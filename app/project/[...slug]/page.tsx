@@ -56,11 +56,12 @@ function Home({ params }: ParamProps) {
       setProject(resolved.slug[0].split('%2B').slice(1).join('%2B'));
       setProjectID(Number.parseInt(resolved.slug[0].split('%2B')[0]));
       setRoutes((prevRoutes) => {
-        const newRoutes = resolved.slug.slice(1);
+        const newRoutes = resolved.slug.slice(1).map(decodeURIComponent);
         return prevRoutes.length === newRoutes.length
           && prevRoutes.every((route, index) => route === newRoutes[index])
           ? prevRoutes : newRoutes;
       });
+      
 
       async function getFolders(): Promise<Folder[]> {
         const query = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/folders/get`, {
@@ -144,7 +145,7 @@ function Home({ params }: ParamProps) {
               hover:text-slate-900 dark:hover:text-slate-300 transition-colors duration-200 flex-1 text-left`;
             button.textContent = folder.name;
 
-            const newHistory = [...history, `/${folder.name.replace(/ /g, "+")}`];
+            const newHistory = [...history, `/${encodeURIComponent(folder.name)}`];
             const newDepth = depth + 1;
 
             // Clicking routes to the folder
