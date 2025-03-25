@@ -88,7 +88,7 @@ export default function Home() {
             <div className="flex min-h-screen">
                 {/* Create Project */}
                 <div className="flex-1 flex justify-center items-start mt-16">
-                    <div className="bg-gray-300 dark:bg-slate-900 py-8 px-12 rounded-lg shadow-lg border-gray-200 dark:border-slate-800 w-auto mx-8 my-4">
+                    <div className="bg-indigo-200/50 dark:bg-slate-900 border border-slate-700/50 py-8 px-12 rounded-lg w-auto mx-8 my-4">
                         <form onSubmit={(e) => newProjectSubmitted(e)} className='flex flex-col items-center'>
                             <div className='flex items-center justify-between w-full mb-8'>
                                 <label htmlFor="name" className="text-2xl font-semibold text-slate-200 text-slate-900 dark:text-slate-200 whitespace-nowrap">New Project Name:</label>
@@ -97,7 +97,7 @@ export default function Home() {
                                     value={name}
                                     placeholder='Enter project name'
                                     onChange={(e) => setName(e.target.value)}
-                                    className="rounded-lg p-2 text-2xl ml-4 w-[300px] rounded-lg bg-gray-200 border border-gray-200 text-gray-800 
+                                    className="rounded-lg p-2 text-2xl ml-4 w-[300px] rounded-lg bg-indigo-100 border border-slate-700/50 text-slate-900 
                                         dark:bg-slate-800 dark:border-slate-700 dark:text-white"
                                 />
                             </div>
@@ -109,7 +109,7 @@ export default function Home() {
                 </div>
                 {/* Right Side Permissions */}
                 <div className="w-[400px] pr-4 mr-16 mt-16">
-                    <div className="bg-gray-300 dark:bg-slate-900 p-4 rounded-lg shadow-lg mt-4">
+                    <div className="bg-indigo-200/50 dark:bg-slate-900 border border-slate-700/50 p-4 rounded-lg mt-4">
                         <Permissions editors={editors} setEditors={setEditors}/>
                     </div>
                 </div>

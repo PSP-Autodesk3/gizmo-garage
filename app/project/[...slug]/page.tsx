@@ -131,7 +131,7 @@ function Home({ params }: ParamProps) {
             // Creates a summary tag, which is the preview text
             const summary = document.createElement("summary");
             summary.className = `flex items-center gap-2 py-2 px-3 rounded-md cursor-pointer mt-1
-              ${newValid ? "dark:bg-indigo-600/50 hover:bg-indigo-500/30 hover:dark:bg-indigo-400/50" : "hover:bg-indigo-400/50 hover:dark:bg-indigo-400/50"}
+              ${newValid ? "bg-indigo-400/50 hover:bg-indigo-500/50 dark:bg-indigo-600/50 hover:dark:bg-indigo-400/50" : "hover:bg-indigo-400/50 hover:dark:bg-indigo-400/50"}
               transition-all duration-200 relative`; // Using tailwindcss conditional styling, basically if newValid is true, use the first set of classes, otherwise use the second set 
 
             // Create folder icon and changing its colour dependending on if it is open or not
@@ -353,7 +353,7 @@ function Home({ params }: ParamProps) {
 
         {/* Folder tree */}
         <div id="tree-folders" className="min-w-[280px] flex-shrink-0 mt-[80px]">
-          <div className="bg-indigo-200/50 dark:bg-slate-800/50 backdrop-blur mx-8 my-4 rounded-lg overflow-hidden shadow-xl border border-slate-700/50 text-slate-900 dark:text-slate-200">
+          <div className="bg-indigo-200/50 dark:bg-slate-800/50 backdrop-blur mx-8 my-4 rounded-lg overflow-hidden border border-slate-700/50 text-slate-900 dark:text-slate-200">
             <div className="p-4 border-b border-slate-700/50">
               <button
                 className="w-full text-left px-3 py-2 bg-indigo-400/50 dark:bg-indigo-600/50 hover:bg-indigo-400/50 hover:dark:bg-indigo-400/50 
@@ -390,7 +390,7 @@ function Home({ params }: ParamProps) {
             routes={routes}
           />
           {(!confirmModule) && (
-            <div className="bg-indigo-200/50 dark:bg-slate-800/50 w-[90%] mx-auto rounded-lg shadow-xl border border-slate-700/50 mt-4">
+            <div className="bg-indigo-200/50 dark:bg-slate-800/50 w-[90%] mx-auto rounded-lg border border-slate-700/50 mt-4">
 
               {/* Error message for duplicates */}
               <p className="text-red-600">
@@ -462,7 +462,7 @@ function Home({ params }: ParamProps) {
 
           {/* Confirmation for creating new items */}
           {(confirmModule) && (
-            <div className="fixed inset-0 flex border-slate-700/50 border items-center justify-center bg-indigo-200 dark:bg-slate-900 text-slate-900 dark:text-slate-200 w-[40%] h-[50%] m-auto rounded-lg shadow-lg mt-16">
+            <div className="fixed inset-0 flex border-slate-700/50 border items-center justify-center bg-indigo-200 dark:bg-slate-900 text-slate-900 dark:text-slate-200 w-[40%] h-[50%] m-auto rounded-lg mt-16">
               <ConfirmModule
                 itemType={(moduleType === 1 ? "Folder" : "File")}
                 projectID={projectID}

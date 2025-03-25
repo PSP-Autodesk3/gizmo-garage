@@ -56,13 +56,13 @@ function Home() {
 
   return (
     <>
-        <div className="bg-slate-900 p-4 w-[40%] m-auto rounded-lg shadow-lg mt-16">
+        <div className="bg-indigo-200/50 dark:bg-slate-900 p-4 w-[40%] text-slate-900 dark:text-gray-300 mb-2 border border-slate-700/50 m-auto rounded-lg mt-16">
             <h1 className="text-3xl text-center p-2 font-semibold">Sign up</h1>
             <form onSubmit={(handleSignUp)}>
                 <div className="py-2">
                     <label className="text-xl" htmlFor="email">Email:</label>
                     <input
-                        className="text-white w-full p-2 my-2 rounded-lg bg-slate-800"
+                        className="text-slate-900 dark:text-slate-200 w-full p-2 my-2 rounded-lg bg-indigo-100 dark:bg-slate-800 border border-slate-700/50"
                         type="email"
                         placeholder="Email Address"
                         name="email"
@@ -74,7 +74,7 @@ function Home() {
                 <div className="py-2">
                     <label className="text-xl" htmlFor="fName">First Name:</label>
                     <input
-                        className="text-white w-full p-2 my-2 rounded-lg bg-slate-800"
+                        className="text-slate-900 dark:text-slate-200 w-full p-2 my-2 rounded-lg bg-indigo-100 dark:bg-slate-800 border border-slate-700/50"
                         type="text"
                         placeholder="First Name"
                         name="fName"
@@ -86,7 +86,7 @@ function Home() {
                 <div className="py-2">
                     <label className="text-xl" htmlFor="lName">Last Name:</label>
                     <input
-                        className="text-white w-full p-2 my-2 rounded-lg bg-slate-800"
+                        className="text-slate-900 dark:text-slate-200 w-full p-2 my-2 rounded-lg bg-indigo-100 dark:bg-slate-800 border border-slate-700/50"
                         type="text"
                         placeholder="Last Name"
                         name="lName"
@@ -98,7 +98,7 @@ function Home() {
                 <div className="py-2">
                     <label htmlFor="password1" className="text-xl">Password:</label>
                     <input
-                        className="text-white w-full bg-slate-800 p-2 my-2 rounded-lg"
+                        className="text-slate-900 dark:text-slate-200 w-full p-2 my-2 rounded-lg bg-indigo-100 dark:bg-slate-800 border border-slate-700/50"
                         type="password"
                         placeholder="Password"
                         name="password1"
@@ -110,7 +110,7 @@ function Home() {
                 <div className="py-2">
                     <label htmlFor="password2" className="text-xl">Confirm Password:</label>
                     <input
-                        className="text-white w-full bg-slate-800 p-2 my-2 rounded-lg"
+                        className="text-slate-900 dark:text-slate-200 w-full p-2 my-2 rounded-lg bg-indigo-100 dark:bg-slate-800 border border-slate-700/50"
                         type="password"
                         placeholder="Confirm Password"
                         name="password2"
@@ -119,10 +119,12 @@ function Home() {
                         required
                     />
                 </div>
-                <button type="submit" className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">Sign up</button>
-                {error && <p>{error}</p>}
+                <div className='flex flex-row justify-between px-2 font-semibold text-l'>
+                    <button type="submit" className="text-white px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">Sign up</button>
+                    {error && <p>{error}</p>}
+                    <Link href="/login" className='text-indigo-500 hover:underline cursor-pointer mt-4'>Already a Member?</Link>
+                </div>
             </form>
-            <Link href="/login">Already a Member?</Link>
         </div>
     </>
   );

@@ -38,7 +38,7 @@ export default function Breadcrumbs({projectID, project, routes}: BreadcrumbsPro
                         <h1>&nbsp;&nbsp;&gt;&nbsp;&nbsp;</h1>
                         <button
                             onClick={() => goneBack(index)}
-                            className="transition-colors duration-300 hover:text-gray-400"
+                            className="transition-colors duration-300 hover:text-indigo-800 dark:hover:text-indigo-400"
                         >
                             {route.replace(/%2B/g, ' ')}
                         </button>

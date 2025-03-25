@@ -259,7 +259,7 @@ function Home() {
         <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-200 w-[40%] m-auto mb-2 mt-8">
           Database Management
         </h2>
-        <div className="bg-indigo-200/50 dark:bg-slate-900 p-4 w-[40%] mx-auto rounded-lg shadow-lg border border-slate-700/50 mt-4">
+        <div className="bg-indigo-200/50 dark:bg-slate-900 p-4 w-[40%] mx-auto rounded-lg border border-slate-700/50 mt-4">
           <p className="text-slate-900 dark:text-gray-300 mb-2">Reset the content of the database, to fix potential database related problems.</p>
           {(databaseExists == 1) ? (
             <button className="px-6 py-3 text-lg font-medium bg-indigo-600 dark:bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50" onClick={() => setupDatabase()}>Reset Database Content</button>
@@ -273,7 +273,7 @@ function Home() {
             Tag Management
           </h2>
           <div>
-            <div className='bg-indigo-200/50 dark:bg-slate-900 p-4 w-[40%] mx-auto rounded-lg shadow-lg border border-slate-700/50 mt-4 ' >
+            <div className='bg-indigo-200/50 dark:bg-slate-900 p-4 w-[40%] mx-auto rounded-lg border border-slate-700/50 mt-4 ' >
               <div>
                 <div id="Create" className='p-1'>
                   <label className="text-slate-900 dark:text-gray-300 text-lg font-semibold">Create Tags Here</label>
@@ -345,7 +345,7 @@ function Home() {
           User Filter
         </h3>
         {/* User Filter */}
-        <div className="bg-indigo-200/50 dark:bg-slate-900 p-4 w-[40%] mx-auto rounded-lg shadow-lg border border-slate-700/50 mt-2">
+        <div className="bg-indigo-200/50 dark:bg-slate-900 p-4 w-[40%] mx-auto rounded-lg border border-slate-700/50 mt-2">
           <p className="text-slate-900 dark:text-gray-300 mb-2">Filter through user emails here.</p>
           <div id="search" className='p-1'>
             <input
@@ -362,7 +362,7 @@ function Home() {
         <h3 className="text-l font-semibold text-slate-900 dark:text-slate-200 w-[40%] m-auto mb-2 mt-4">
           Users
         </h3>
-        <div className="bg-indigo-200/50 dark:bg-slate-900 p-4 w-[40%] m-auto rounded-lg shadow-lg border border-slate-700/50 mt-4 mb-5">
+        <div className="bg-indigo-200/50 dark:bg-slate-900 p-4 w-[40%] m-auto rounded-lg border border-slate-700/50 mt-4 mb-5">
           <div id="users" className="space-y-4">
             {isLoading ? (
               // Skeleton loading while data is fetching
@@ -422,7 +422,7 @@ function Home() {
       {/* Pop up message for db reset*/}
       {(confirmModule) && (
         <>
-          <div className="fixed inset-0 flex items-center justify-center bg-indigo-200/50 dark:bg-slate-900 w-[40%] h-[40%] m-auto rounded-3xl shadow-lg p-8">
+          <div className="fixed inset-0 flex items-center justify-center bg-indigo-200/50 dark:bg-slate-900 w-[40%] h-[40%] m-auto rounded-3xl p-8">
             <div className="text-center text-slate-900 dark:text-slate-200">
               <h1 className='text-3xl'>This will clear all data.</h1> 
               <strong>This action is irreversible.</strong> <p> Your password is needed to complete this action.</p>

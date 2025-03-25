@@ -28,7 +28,7 @@ export default function Filters({ query, onQueryChange, values, onValuesChange }
   }
   return (
     <>
-      <div id="side-bar" className='bg-indigo-200/50 dark:bg-slate-800/50 border border-slate-700/50 text-slate-900 dark:text-slate-200 f p-6 shadow-lg h-screen flex flex-col justify-between max-w-fit'>
+      <div id="side-bar" className='bg-indigo-200/50 dark:bg-slate-800/50 border border-slate-700/50 text-slate-900 dark:text-slate-200 f p-6 h-screen flex flex-col justify-between max-w-fit'>
         <div>
           <Link href="/">
             <div className='flex flex-row justify-between pb-4' >

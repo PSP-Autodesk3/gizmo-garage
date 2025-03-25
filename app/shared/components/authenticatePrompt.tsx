@@ -10,7 +10,7 @@ export default function AuthenticatePrompt({loginErrorMessage}: AuthenticateProp
 
     return (
         <>
-            <div className="bg-gray-300 dark:bg-slate-900 p-4 w-[40%] m-auto rounded-lg shadow-lg mt-16">
+            <div className="bg-indigo-200/50 dark:bg-slate-900 p-4 w-[40%] m-auto rounded-lg border border-slate-700/50 mt-16">
                 <div className="flex flex-col items-center space-y-6">
                     <h1 className="text-4xl text-center font-semibold text-slate-900 dark:text-slate-200">
                         Gizmo Garage

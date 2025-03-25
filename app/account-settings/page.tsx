@@ -58,22 +58,23 @@ function Home() {
     <>
       <BackBtnBar />
       <div className="max-w-2xl mx-auto p-6">
-        <h1 className="text-4xl font-bold mb-4">Account Settings</h1>
-        <p className="font-bold text-2xl mb-4">Gizmo Garage</p>
+        <h1 className="text-4xl font-bold mb-4 text-slate-900 dark:text-gray-300">Account Settings</h1>
+        <p className="font-bold text-2xl mb-4 text-slate-900 dark:text-gray-300">User's Information</p>
         {details && (
-          <div className="bg-gray-800 p-6 rounded-lg shadow-lg text-white mb-6">
+          <div className="bg-indigo-200/50 dark:bg-slate-900 p-6 rounded-lg text-slate-900 dark:text-gray-300 mb-6 border border-slate-700/50 ">
             <p className="text-lg mb-2"><span className="font-bold">First Name:</span> {details.fname}</p>
             <p className="text-lg mb-2"><span className="font-bold">Last Name:</span> {details.lname}</p>
             <p className="text-lg"><span className="font-bold">Email:</span> {details.email}</p>
           </div>
         )}
 
-        <div className="bg-gray-800 p-6 rounded-lg shadow-lg text-white">
+        <p className="font-bold text-2xl mb-4 text-slate-900 dark:text-gray-300">Email Change</p>
+        <div className="bg-indigo-200/50 dark:bg-slate-900 p-6 rounded-lg text-white border border-slate-700/50">
           <form className="flex items-center gap-2">
             <div className="flex-1">
-              <label className="block text-lg">Email</label>
+              <label className="block text-lg text-slate-900 dark:text-gray-300">Enter Email</label>
               <input
-                className="w-full text-white bg-gray-700 p-2 rounded-lg"
+                className="text-slate-900 dark:text-slate-200 w-full p-2 my-2 rounded-lg bg-indigo-100 dark:bg-slate-800 border border-slate-700/50"
                 type="email"
                 placeholder="Email"
                 name="email"

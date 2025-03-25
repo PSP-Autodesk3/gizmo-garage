@@ -52,8 +52,9 @@ export default function Permissions({ project, editors, setEditors }: Permission
     if (project) {
         return (
             <>
-                <div className="bg-gray-300 dark:bg-slate-900 p-4 rounded-lg shadow-lg mt-4">
-                    <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-200 mb-4">Project Permissions</h1>
+                <div className="bg-indigo-200/50 dark:bg-slate-900 p-4 rounded-lg border border-slate-700/50 mt-4">
+                    <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-200">Project Permissions</h1>
+                    <div className="border-b border-slate-700/50 mb-2 mt-2"></div>
                     <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-200 mb-4">Added Accounts</h1>
                     {emails.length > 0 ? (
                         <table className="w-full">
@@ -79,6 +80,7 @@ export default function Permissions({ project, editors, setEditors }: Permission
                 ) : (
                     <p className="text-slate-900 dark:text-slate-200">No accounts added</p>
                 )}
+                    <div className="border-b border-slate-700/50 mb mt-2"></div>
                     <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-200 mb-4 mt-4">Pending Invites</h1>
                     {invites.length > 0 ? (
                         <table className="w-full">
@@ -107,7 +109,8 @@ export default function Permissions({ project, editors, setEditors }: Permission
                     ) : (
                         <p className="text-slate-900 dark:text-slate-200">No pending invites</p>
                     )}
-                    <div className="mt-6">
+                    <div className="border-b border-slate-700/50 mb-2 mt-2"></div>
+                    <div className="mt-2">
                         <EmailSender editors={editors} setEditors={setEditors} />
                     </div>
                 </div>
@@ -196,8 +199,8 @@ const EmailSender = ({ editors, setEditors }: EmailSenderProps) => {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        className={`flex-1 p-2 rounded-lg bg-gray-200 border border-gray-200 text-gray-800 
-                            dark:bg-slate-800 dark:border-slate-700 dark:text-white ${
+                        className={`text-slate-900 dark:text-slate-200 w-full p-2 my-2 rounded-lg bg-indigo-100 dark:bg-slate-800
+                            border border-slate-700/50 ${
                             emailError ? 'border-2 border-red-500' : ''
                         }`}
                     />
@@ -213,6 +216,7 @@ const EmailSender = ({ editors, setEditors }: EmailSenderProps) => {
                 </button>
             </form>
             <div id="emails" className="mt-4">
+                <div className="border-b border-slate-700/50 mb-2 mt-2"></div>
                 <p className="text-xl font-semibold text-slate-900 dark:text-slate-200 mb-2">Proposed Editors:</p>
             </div>
         </div>

@@ -62,14 +62,13 @@ function Home() {
           <h1 className="text-xl font-bold">Password Reset</h1>
           <p className="mx-2">We have sent an email to {email}.</p>
       </div>
-      <div className="bg-gray-300 dark:bg-slate-900 p-4 w-[40%] m-auto rounded-lg shadow-lg mt-16">
+      <div className="bg-indigo-200/50 dark:bg-slate-900 p-4 w-[40%] m-auto rounded-lg mt-16 border border-slate-700/50">
         <h1 className="text-3xl text-center p-2 font-semibold text-slate-900 dark:text-slate-200">Login</h1>
         <form onSubmit={(handleSignIn)}>
             <div className="py-2">
               <label className="text-xl text-slate-900 dark:text-slate-200 font-semibold" htmlFor="email">Email:</label>
               <input
-                  className="w-full p-2 my-2 rounded-lg bg-gray-200 border border-gray-200 text-gray-800
-                    dark:bg-slate-800 dark:border-slate-700 dark:text-white"
+                  className="text-slate-900 dark:text-slate-200 w-full p-2 my-2 rounded-lg bg-indigo-100 dark:bg-slate-800 border border-slate-700/50"
                   type="email"
                   placeholder="Email Address"
                   name="email"
@@ -81,8 +80,7 @@ function Home() {
             <div className="py-2">
               <label htmlFor="password" className="text-xl text-slate-900 dark:text-slate-200 font-semibold">Password:</label>
               <input
-                  className="w-full p-2 my-2 rounded-lg bg-gray-200 border border-gray-200 text-gray-800
-                    dark:bg-slate-800 dark:border-slate-700 dark:text-white"
+                  className="text-slate-900 dark:text-slate-200 w-full p-2 my-2 rounded-lg bg-indigo-100 dark:bg-slate-800 border border-slate-700/50"
                   type="password"
                   placeholder="Password"
                   name="password"
