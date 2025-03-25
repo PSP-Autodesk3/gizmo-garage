@@ -246,15 +246,10 @@ function Home({ params }: ParamProps) {
         setViewerState(!viewerState);
     }
 
-    const viewerSDK = async (status: number, urn: string) => { // Used docs for viewerSDK setup: https://aps.autodesk.com/en/docs/viewer/v7/developers_guide/viewer_basics/starting-html/
+    const viewerSDK = async (urn: string) => { // Used docs for viewerSDK setup: https://aps.autodesk.com/en/docs/viewer/v7/developers_guide/viewer_basics/starting-html/
         setViewerState(true);
         var token = sessionStorage.getItem("token");
-        if (!token) {
-            console.error("No valid token found.");
-            return;
-        }
         let viewer: Autodesk.Viewing.GuiViewer3D;
-        console.log("Token from sessionStorage: ", sessionStorage.getItem("token"));
         var options = {
             env: 'AutodeskProduction2',
             api: 'streamingV2',
@@ -268,49 +263,21 @@ function Home({ params }: ParamProps) {
                 onTokenReady(token, timeInSeconds);  
             }
         };
-        console.log(sessionStorage.getItem("token"))
-        console.log(token);
-        if (status == 1 && urn.length > 0) {
+        if (urn.length > 0) {
             Autodesk.Viewing.Initializer(options, function () {
 
-                var htmlDiv = document.getElementById('forgeViewer');
+                const htmlDiv = document.getElementById('forgeViewer');
                 viewer = new Autodesk.Viewing.GuiViewer3D(htmlDiv, {});
-                var startedCode = viewer.start(btoa('urn:' + urn.substring(4)));
-                if (startedCode > 0) {
-                    console.error('Failed to create a Viewer: WebGL not supported.');
-                    return;
-                }
-                else {
-                    console.log('Initialization complete, loading a model next...');
+                viewer.start(btoa('urn:' + urn.substring(4)), options);
 
-                    const editedUrn = urn.slice(4);
-                    const documentId = "urn:" + btoa(editedUrn);
-                    console.log("documentId", documentId);
-                    console.log("urn:", urn);
-
-                    Autodesk.Viewing.Document.load(documentId, onDocumentLoadSuccess, onDocumentLoadFailure);
-
-                    function onDocumentLoadSuccess(viewerDocument: any) {
-                        // viewerDocument is an instance of Autodesk.Viewing.Document
-                        console.log('1');
-                        var defaultModel = viewerDocument.getRoot().getDefaultGeometry();
-                        viewer.loadDocumentNode(viewerDocument, defaultModel)
-                    }
-
-                    function onDocumentLoadFailure() {
-                        console.error('Failed fetching Forge manifest');
-                    }
-                }
+                const backButton = document.getElementById('viewerBackButton');
+                backButton?.addEventListener('click', () => {
+                    viewer.finish();
+                })
             });
         }
-        else if (status == 2) {
-            viewer.finish();
-            viewer = null;
-            Autodesk.Viewing.shutdown();
-        }
-
-
     }
+
     return (
         <>
             <link rel="stylesheet" href="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/style.min.css" type="text/css"></link>
@@ -363,7 +330,7 @@ function Home({ params }: ParamProps) {
                                 <div className="flex justify-center">
                                     <button
                                         className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
-                                        onClick={() => viewerSDK(1, version.urn)}
+                                        onClick={() => viewerSDK(version.urn)}
                                     >
                                         View
                                     </button>
@@ -447,7 +414,8 @@ function Home({ params }: ParamProps) {
                             <span className="w-[50px] h-[20px]"><div className="w-[50px] h-[20px]" id="forgeViewer"></div></span>
                         </div>
                         <button
-                            onClick={() => { viewerSDK(2, ''); setViewerState(false); }}
+                            id="viewerBackButton"
+                            onClick={() => setViewerState(false) }
                             className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
                         >
                             Back
