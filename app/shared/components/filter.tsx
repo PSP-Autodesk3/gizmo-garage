@@ -104,7 +104,7 @@ export default function Filters({ query, onQueryChange, values, onValuesChange }
         <div className='flex flex-col justify-between'>
           <div id="options" className='flex flex-col p-6 mt-auto text-slate-900 dark:text-slate-200'>
             <button
-              className='p-1 transition-colors duration-300 hover:text-gray-400'
+              className='p-1 transition-colors duration-300 hover:text-indigo-800'
               onClick={() => router.push("/notifications")}
             >
               Notifications
@@ -112,7 +112,7 @@ export default function Filters({ query, onQueryChange, values, onValuesChange }
             {admin && (
               <>
                 <button
-                  className='p-1 transition-colors duration-300 hover:text-gray-400'
+                  className='p-1 transition-colors duration-300 hover:text-indigo-800'
                   onClick={() => router.push("/admin-settings")}
                 >
                   Admin Settings
@@ -120,13 +120,13 @@ export default function Filters({ query, onQueryChange, values, onValuesChange }
               </>
             )}
             <button
-              className='p-1 transition-colors duration-300 hover:text-gray-400'
+              className='p-1 transition-colors duration-300 hover:text-indigo-800'
               onClick={() => router.push("/account-settings")}
             >
               Account Settings
             </button>
             <button
-              className='p-1 transition-colors duration-300 hover:text-gray-400'
+              className='p-1 transition-colors duration-300 hover:text-indigo-800'
               onClick={() => router.push('/signout')}
             >
               Sign Out

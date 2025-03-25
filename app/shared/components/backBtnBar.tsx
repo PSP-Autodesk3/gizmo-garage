@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 export default function BackBtnBar() {
 	return (
-		<div className="w-full bg-gray-500 dark:bg-slate-900 p-3 mb-8 shadow-lg">
+		<div className="w-full border border-slate-700/50 bg-indigo-200/50 dark:bg-slate-900 p-3 mb-8 shadow-lg">
 			<div className="w-full flex justify-between items-center text-white">
 				<Link
 					href="/"
