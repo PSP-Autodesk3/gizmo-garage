@@ -59,7 +59,7 @@ function Home() {
       <BackBtnBar />
       <div className="max-w-2xl mx-auto p-6">
         <h1 className="text-4xl font-bold mb-4 text-slate-900 dark:text-gray-300">Account Settings</h1>
-        <p className="font-bold text-2xl mb-4 text-slate-900 dark:text-gray-300">User's Information</p>
+        <p className="font-bold text-2xl mb-4 text-slate-900 dark:text-gray-300">User&apos;s Information</p>
         {details && (
           <div className="bg-indigo-200/50 dark:bg-slate-900 p-6 rounded-lg text-slate-900 dark:text-gray-300 mb-6 border border-slate-700/50 ">
             <p className="text-lg mb-2"><span className="font-bold">First Name:</span> {details.fname}</p>

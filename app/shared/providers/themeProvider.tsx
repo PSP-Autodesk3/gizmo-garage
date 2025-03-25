@@ -2,7 +2,6 @@
 // Here is the general ref I used for implementing the theme provider: https://ui.shadcn.com/docs/dark-mode/next
 
 import { ThemeProvider as NextThemesProvider } from "next-themes";
-import type { ThemeProviderProps } from "next-themes";
 
 export function ThemeProvider({
     children,

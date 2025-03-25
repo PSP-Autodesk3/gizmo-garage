@@ -422,7 +422,7 @@ function Home() {
       {/* Pop up message for db reset*/}
       {(confirmModule) && (
         <>
-          <div className="fixed inset-0 flex items-center justify-center bg-indigo-200/50 dark:bg-slate-900 w-[40%] h-[40%] m-auto rounded-3xl p-8">
+          <div className="fixed inset-0 flex items-center justify-center bg-indigo-200 border border-slate-700/50 dark:bg-slate-900 w-[40%] h-[40%] m-auto rounded-3xl p-8">
             <div className="text-center text-slate-900 dark:text-slate-200">
               <h1 className='text-3xl'>This will clear all data.</h1> 
               <strong>This action is irreversible.</strong> <p> Your password is needed to complete this action.</p>

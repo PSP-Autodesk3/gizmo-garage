@@ -193,7 +193,7 @@ function Home() {
                 </button>
               </div>
               {/* Sort By */}
-              <label className='pl-8 text-slate-900 dark:text-slate-200/50 font-semibold'>Sort By:</label>
+              <label className='pl-8 text-slate-900 dark:text-slate-200 font-semibold'>Sort By:</label>
               <select onChange={handleSortBy} className='bg-indigo-100 dark:bg-slate-900 text-slate-900 dark:text-slate-200 p-1 rounded-lg m-2 cursor-pointer'>
                 <option value="newest" className='text-slate-900 dark:text-slate-200' >Newest</option>
                 <option value="oldest" className='text-slate-900 dark:text-slate-200' >Oldest</option>
