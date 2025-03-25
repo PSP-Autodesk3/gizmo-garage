@@ -21,13 +21,13 @@ export default function Breadcrumbs({projectID, project, routes}: BreadcrumbsPro
         <div id="breadcrumbs" className="text-slate-900 dark:text-slate-200 font-semibold flex flex-row text-2xl p-4 rounded-lg mx-8 my-4 ">
             <button
                 onClick={() => { router.push(`/`); }}
-                className="transition-colors duration-300 hover:text-indigo-800"
+                className="transition-colors duration-300 hover:text-indigo-800 dark:hover:text-indigo-400"
             >
                 Home
             </button>
             <h1>&nbsp;&nbsp;&gt;&nbsp;&nbsp;</h1>
             <button
-                className="transition-colors duration-300 hover:text-indigo-800"
+                className="transition-colors duration-300 hover:text-indigo-800 dark:hover:text-indigo-400"
                 onClick={() => { router.push(`/project/${projectID}+${project.replace(/%2B/g, '+')}`); }}
             >
                 {project.replace(/%2B/g, ' ')}

@@ -91,7 +91,7 @@ export default function Filters({ query, onQueryChange, values, onValuesChange }
               <label htmlFor="search=bar">Search Projects</label>
               <input
                 className='w-full p-2 my-2 rounded-lg bg-indigo-100 border border-slate-700/50 text-gray-800 
-                  dark:bg-slate-800 dark:border-slate-700 dark:text-white '
+                  dark:bg-slate-800 dark:border-slate-700 dark:text-white'
                 type="text"
                 placeholder="Search"
                 name="search"
@@ -104,7 +104,7 @@ export default function Filters({ query, onQueryChange, values, onValuesChange }
         <div className='flex flex-col justify-between'>
           <div id="options" className='flex flex-col p-6 mt-auto text-slate-900 dark:text-slate-200'>
             <button
-              className='p-1 transition-colors duration-300 hover:text-indigo-800'
+              className='p-1 transition-colors duration-300 hover:text-indigo-800 dark:hover:text-indigo-400 hover:font-semibold'
               onClick={() => router.push("/notifications")}
             >
               Notifications
@@ -112,7 +112,7 @@ export default function Filters({ query, onQueryChange, values, onValuesChange }
             {admin && (
               <>
                 <button
-                  className='p-1 transition-colors duration-300 hover:text-indigo-800'
+                  className='p-1 transition-colors duration-300 hover:text-indigo-800 dark:hover:text-indigo-400 hover:font-semibold'
                   onClick={() => router.push("/admin-settings")}
                 >
                   Admin Settings
@@ -120,13 +120,13 @@ export default function Filters({ query, onQueryChange, values, onValuesChange }
               </>
             )}
             <button
-              className='p-1 transition-colors duration-300 hover:text-indigo-800'
+              className='p-1 transition-colors duration-300 hover:text-indigo-800 dark:hover:text-indigo-400 hover:font-semibold'
               onClick={() => router.push("/account-settings")}
             >
               Account Settings
             </button>
             <button
-              className='p-1 transition-colors duration-300 hover:text-indigo-800'
+              className='p-1 transition-colors duration-300 hover:text-indigo-800 dark:hover:text-indigo-400 hover:font-semibold'
               onClick={() => router.push('/signout')}
             >
               Sign Out

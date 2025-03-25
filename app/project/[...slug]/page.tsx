@@ -131,7 +131,7 @@ function Home({ params }: ParamProps) {
             // Creates a summary tag, which is the preview text
             const summary = document.createElement("summary");
             summary.className = `flex items-center gap-2 py-2 px-3 rounded-md cursor-pointer mt-1
-              ${newValid ? "bg-indigo-300/50 hover:bg-indigo-500/30" : "hover:bg-indigo-400/50"}
+              ${newValid ? "dark:bg-indigo-600/50 hover:bg-indigo-500/30 hover:dark:bg-indigo-400/50" : "hover:bg-indigo-400/50 hover:dark:bg-indigo-400/50"}
               transition-all duration-200 relative`; // Using tailwindcss conditional styling, basically if newValid is true, use the first set of classes, otherwise use the second set 
 
             // Create folder icon and changing its colour dependending on if it is open or not
@@ -140,8 +140,8 @@ function Home({ params }: ParamProps) {
 
             // Create folder button
             const button = document.createElement("button");
-            button.className = `${newValid ? 'text-indigo-800 dark:text-indigo-200 font-medium' : 'text-slate-900 dark:text-slate-400'} 
-              hover:text-slate-900 dark:hover:text-slate-400 transition-colors duration-200 flex-1 text-left`;
+            button.className = `${newValid ? 'text-indigo-800 dark:text-indigo-200 font-medium' : 'text-slate-900 dark:text-slate-200'} 
+              hover:text-slate-900 dark:hover:text-slate-300 transition-colors duration-200 flex-1 text-left`;
             button.textContent = folder.name;
 
             const newHistory = [...history, `/${folder.name.replace(/ /g, "+")}`];
@@ -356,8 +356,8 @@ function Home({ params }: ParamProps) {
           <div className="bg-indigo-200/50 dark:bg-slate-800/50 backdrop-blur mx-8 my-4 rounded-lg overflow-hidden shadow-xl border border-slate-700/50 text-slate-900 dark:text-slate-200">
             <div className="p-4 border-b border-slate-700/50">
               <button
-                className="w-full text-left px-3 py-2 bg-indigo-300/50 rounded-md hover:bg-indigo-400/50 hover:bg-indigo-300/50 
-                                  transition-all duration-200 text-slate-900 dark:text-slate-200 font-medium flex items-center gap-2 shadow-sm hover:shadow"
+                className="w-full text-left px-3 py-2 bg-indigo-400/50 dark:bg-indigo-600/50 hover:bg-indigo-400/50 hover:dark:bg-indigo-400/50 
+                                  transition-all duration-200 rounded-md text-slate-900 dark:text-slate-200 font-medium flex items-center gap-2 shadow-sm hover:shadow"
                 onClick={() => { router.push(`/project/${projectID}+${project.replace(/%2B/g, '+')}`); }}
               >
                 <svg className="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

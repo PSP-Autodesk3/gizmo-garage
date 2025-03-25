@@ -130,9 +130,9 @@ function Home() {
   const handleDisableUser = async (uid: string) => {
     try {
       // Get the current user status
-      const user = users.find(u => u.user_id === uid)
+      const user = users.find(u => u.uid === uid) // Changed from user_id to uid
       if (!user) return;
-
+  
       await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/users/updateStatus`, {
         method: "PUT",
         headers: {
@@ -143,8 +143,8 @@ function Home() {
           disabled: !user.disabled
         })
       })
-
-      setUsers(users.map(u => u.user_id === uid ?
+  
+      setUsers(users.map(u => u.uid === uid ? // Changed from user_id to uid
         { ...u, disabled: !u.disabled } : u))
     } catch (error) {
       console.error('Error disabling user:', error);
@@ -240,7 +240,7 @@ function Home() {
 
   return (
     <>
-      <div className={`min-h-screen bg-gray-100 dark:bg-slate-950 ${confirmModule ? 'blur-xl bg-opacity-40' : ''}`}>
+      <div className={`min-h-screen ${confirmModule ? 'blur-xl bg-opacity-40' : ''}`}>
         <BackBtnBar/>
         {/* Header */}
         <h1 className="text-4xl font-semibold text-slate-900 dark:text-slate-200 w-[40%] m-auto mb-2 mt-16">
@@ -259,8 +259,8 @@ function Home() {
         <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-200 w-[40%] m-auto mb-2 mt-8">
           Database Management
         </h2>
-        <div className="bg-white dark:bg-slate-900 p-4 w-[40%] mx-auto rounded-lg shadow-lg border-gray-200 dark:border-slate-800 mt-4">
-          <p className="text-gray-600 dark:text-gray-300 mb-2">Reset the content of the database, to fix potential database related problems.</p>
+        <div className="bg-indigo-200/50 dark:bg-slate-900 p-4 w-[40%] mx-auto rounded-lg shadow-lg border border-slate-700/50 mt-4">
+          <p className="text-slate-900 dark:text-gray-300 mb-2">Reset the content of the database, to fix potential database related problems.</p>
           {(databaseExists == 1) ? (
             <button className="px-6 py-3 text-lg font-medium bg-indigo-600 dark:bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50" onClick={() => setupDatabase()}>Reset Database Content</button>
           ) : (
@@ -269,18 +269,18 @@ function Home() {
         </div>
         {/* Create, delete and search tags */}
         <div>
-          <h2 className="text-xl font-semibold text-slate-200 w-[40%] mx-auto mb-2 mt-6">
-            Tags
+          <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-200 w-[40%] m-auto mb-2 mt-8">
+            Tag Management
           </h2>
           <div>
-            <div className='bg-slate-900 p-4 w-[40%] mx-auto rounded-lg shadow-lg mt-4' >
+            <div className='bg-indigo-200/50 dark:bg-slate-900 p-4 w-[40%] mx-auto rounded-lg shadow-lg border border-slate-700/50 mt-4 ' >
               <div>
-                <div id="Create" className='p-4'>
-                  <label>Create</label>
+                <div id="Create" className='p-1'>
+                  <label className="text-slate-900 dark:text-gray-300 text-lg font-semibold">Create Tags Here</label>
                   <input
-                    className='text-white w-full p-2 my-2 rounded-lg bg-slate-800'
+                    className='text-slate-900 dark:text-slate-200 w-full p-2 my-2 rounded-lg bg-indigo-100 dark:bg-slate-800 border border-slate-700/50'
                     type="text"
-                    placeholder="Create Tag"
+                    placeholder="Create New Tag"
                     name="search"
                     value={tagName}
                     onChange={(e) => setTagName(e.target.value)}
@@ -292,10 +292,10 @@ function Home() {
                 </button>
               </div>
               <div>
-                <div id="Search" className='p-4'>
-                  <label htmlFor="search=bar">Search</label>
+                <div id="Search" className='p-2'>
+                  <label htmlFor="search=bar" className="text-slate-900 dark:text-gray-300 text-lg font-semibold">Search</label>
                   <input
-                    className='text-white w-full p-2 my-2 rounded-lg bg-slate-800'
+                    className='text-slate-900 dark:text-slate-200 w-full p-2 my-2 rounded-lg bg-indigo-100 dark:bg-slate-800 border border-slate-700/50'
                     type="text"
                     placeholder="Search Tags"
                     name="search"
@@ -304,16 +304,16 @@ function Home() {
                   />
                 </div>
               </div>
-              <div className='bg-slate-800 rounded-lg flex flex-wrap gap-2 p-3'>
+              <div className='bg-indigo-100 dark:bg-slate-800 rounded-lg flex flex-wrap gap-2 border border-slate-700/50 p-3'>
                 {filteredTags.length > 0 ? (
                   filteredTags.map((tag: Tag) => (
                     <button
                       type="button"
-                      className="rounded-full bg-blue-600 text-white text-sm px-4 py-2 flex items-center text-center"
+                      className="rounded-full bg-indigo-700 text-slate-200 dark:text-slate-200 text-sm px-4 py-2 flex items-center text-center"
                       onClick={() => handleDeleteTag(tag.tag_id)} key={tag.tag_id}
                     >
                       <svg
-                        className="w-4 h-4 flex-shrink-0 text-blue-800 dark:text-white"
+                        className="w-4 h-4 flex-shrink-0 text-slate-200 hover:font-bold mr-2"
                         aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg"
                         width="15"
@@ -329,7 +329,7 @@ function Home() {
                         d="M6 18 17.94 6M18 18 6.06 6" />
                       </svg>{tag.tag}</button>
                   ))
-                ) : <p className='m-auto text-slate-400 text-sm'>No tags found</p>}
+                ) : <p className='m-auto text-sm text-slate-200'>No tags found</p>}
               </div>
               {error.length > 0 ? (
                 <p className='text-red-500 p-2 flex justify-center items-center'>{error}</p>
@@ -345,12 +345,11 @@ function Home() {
           User Filter
         </h3>
         {/* User Filter */}
-        <div className="bg-white dark:bg-slate-900 p-4 w-[40%] mx-auto rounded-lg shadow-lg mt-2">
-          <p className="text-gray-600 dark:text-gray-300">Filter through user emails here.</p>
+        <div className="bg-indigo-200/50 dark:bg-slate-900 p-4 w-[40%] mx-auto rounded-lg shadow-lg border border-slate-700/50 mt-2">
+          <p className="text-slate-900 dark:text-gray-300 mb-2">Filter through user emails here.</p>
           <div id="search" className='p-1'>
             <input
-              className='w-full p-2 my-2 rounded-lg bg-gray-200 border border-gray-200 text-gray-800 
-                dark:bg-slate-800 dark:border-slate-700 dark:text-white'
+              className='text-slate-900 dark:text-slate-200 w-full p-2 my-2 rounded-lg bg-indigo-100 dark:bg-slate-800 border border-slate-700/50'
               type="text"
               placeholder="Filter by email"
               name="search"
@@ -363,21 +362,21 @@ function Home() {
         <h3 className="text-l font-semibold text-slate-900 dark:text-slate-200 w-[40%] m-auto mb-2 mt-4">
           Users
         </h3>
-        <div className="bg-white dark:bg-slate-900 p-4 w-[40%] m-auto rounded-lg shadow-lg mt-4 mb-5">
+        <div className="bg-indigo-200/50 dark:bg-slate-900 p-4 w-[40%] m-auto rounded-lg shadow-lg border border-slate-700/50 mt-4 mb-5">
           <div id="users" className="space-y-4">
             {isLoading ? (
               // Skeleton loading while data is fetching
               [...Array(3)].map((_, index) => (
-                <div key={index} className="bg-gray-300 dark:bg-slate-800 p-4 rounded-lg animate-pulse">
+                <div key={index} className="bg-indigo-100 dark:bg-slate-800 p-4 rounded-lg animate-pulse">
                   <div className="flex flex-col">
                     <div className="h-4 bg-gray-400 dark:bg-slate-700 rounded-lg w-3/4 mb-2"></div>
                     <div className="h-3 bg-gray-400 dark:bg-slate-700 rounded-lg w-1/2"></div>
                   </div>
                   <div className="flex justify-between items-center mt-3">
-                    <div className="h-4 bg-gray-500 dark:bg-slate-700 rounded-lg w-24"></div>
+                    <div className="h-4 bg-gray-400 dark:bg-slate-700 rounded-lg w-24"></div>
                     <div className="flex items-center space-x-3">
-                      <div className="w-11 h-6 bg-gray-500 dark:bg-slate-700 rounded-full"></div>
-                      <div className="h-4 bg-gray-500 dark:bg-slate-700 rounded-lg w-16"></div>
+                      <div className="w-11 h-6 bg-gray-400 dark:bg-slate-700 rounded-full"></div>
+                      <div className="h-4 bg-gray-400 dark:bg-slate-700 rounded-lg w-16"></div>
                     </div>
                   </div>
                 </div>
@@ -385,7 +384,7 @@ function Home() {
             ) : filteredUsers.length > 0 ? (
               // Display users when data is loaded
               filteredUsers.map((user: User) => (
-                <div key={user.uid} className="bg-gray-300 dark:bg-slate-800 p-4 rounded-lg">
+                <div key={user.uid} className="bg-indigo-100 dark:bg-slate-800 p-4 rounded-lg border border-slate-700/50">
                   <div className="flex flex-col">
                     <p className="text-gray-700 dark:text-slate-400 text-m">{user.email}</p>
                     <p className="text-gray-600 dark:text-slate-500 text-xs">{user.uid}</p>
@@ -402,7 +401,7 @@ function Home() {
                         type="checkbox"
                         className="sr-only peer"
                         checked={!user.disabled}
-                        onChange={() => handleDisableUser(user.user_id)}
+                        onChange={() => handleDisableUser(user.uid)}
                       />
                       <div className="relative w-11 h-6 bg-red-600 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:red-900 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-600 dark:peer-checked:bg-green-600"></div>
                       <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
@@ -423,14 +422,14 @@ function Home() {
       {/* Pop up message for db reset*/}
       {(confirmModule) && (
         <>
-          <div className="fixed inset-0 flex items-center justify-center bg-opacity-95 bg-gray-300 dark:bg-slate-900 w-[40%] h-[40%] m-auto rounded-3xl shadow-lg p-8">
+          <div className="fixed inset-0 flex items-center justify-center bg-indigo-200/50 dark:bg-slate-900 w-[40%] h-[40%] m-auto rounded-3xl shadow-lg p-8">
             <div className="text-center text-slate-900 dark:text-slate-200">
               <h1 className='text-3xl'>This will clear all data.</h1> 
               <strong>This action is irreversible.</strong> <p> Your password is needed to complete this action.</p>
               <form onSubmit={(e) => e.preventDefault()} autoComplete="off">
                 <input 
-                  className="w-full p-2 my-2 rounded-lg bg-gray-200 border border-gray-200 text-gray-800
-                    dark:bg-slate-800 dark:border-slate-700 dark:text-white"  
+                  className="w-full p-2 my-2 rounded-lg border border-gray-700/50 text-gray-800
+                    bg-indigo-100 dark:bg-slate-800 dark:border-slate-700 dark:text-white"  
                   type="password" 
                   placeholder="Password"
                   value={password}

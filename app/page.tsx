@@ -206,9 +206,9 @@ function Home() {
                   </div>
                 ))
               ) : (
-                <div className='space-y-4 ml-10'>
+                <div className='space-y-4 ml-10 pt-2'>
                   {[...Array(4)].map((_, index) => (
-                    <div key={index} className="bg-gray-300 dark:bg-slate-800 p-4 rounded-lg animate-pulse">
+                    <div key={index} className="bg-indigo-200/50 dark:bg-slate-800 p-2 rounded-lg animate-pulse">
                       <div className='flex justify-between items-center mb-4'>
                         <div className='h-6 bg-gray-400 dark:bg-slate-700 rounded-lg w-2/4'></div>
                       </div>
