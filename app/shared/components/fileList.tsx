@@ -24,7 +24,7 @@ export default function FileList({ files }: { files: File[] }) {
                     files.map((file) => (
                         <div key={file.object_id}>
                             <button
-                                className="text-slate-900 dark:text-slate-200 bg-indigo-100 dark:bg-slate-800 hover:bg-indigo-300 dark:hover:bg-slate-700 transition-colors duration-200 rounded-lg text-xl border border-slate-700/50 my-4 px-4 py-2"
+                                className="text-slate-900 dark:text-slate-200 bg-indigo-100 dark:bg-slate-800 hover:bg-indigo-400/50 dark:hover:bg-slate-700 transition-colors duration-200 rounded-lg text-xl border border-slate-700/50 my-4 px-4 py-2"
                                 onClick={() => {router.push(`/item/${file.object_id}`);}}
                             >   
                               <div className="flex flex-col">

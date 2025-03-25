@@ -98,7 +98,7 @@ function Home({ params }: ParamProps) {
 
           baseFiles.forEach((file: File) => {
             const button = document.createElement("button");
-            button.className = `pl-4 flex items-center gap-2 py-2 px-3 text-slate-900 dark:text-slate-300 hover:text-slate-300 dark:hover:text-slate-50 transition-colors duration-200 flex-1 text-left tree-file
+            button.className = `pl-4 flex items-center gap-2 py-2 px-3 text-slate-900 dark:text-slate-300 hover:text-slate-500 dark:hover:text-slate-50 transition-colors duration-200 flex-1 text-left tree-file
                               ${checkboxOpen === 'false' && 'hidden'}`;
                               button.innerHTML = `
               <svg class="ml-2 w-5 h-5 text-slate-900 dark:text-slate-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
@@ -131,7 +131,7 @@ function Home({ params }: ParamProps) {
             // Creates a summary tag, which is the preview text
             const summary = document.createElement("summary");
             summary.className = `flex items-center gap-2 py-2 px-3 rounded-md cursor-pointer mt-1
-              ${newValid ? "bg-indigo-500/20 hover:bg-indigo-500/30" : "hover:bg-slate-700/50"}
+              ${newValid ? "bg-indigo-300/50 hover:bg-indigo-500/30" : "hover:bg-indigo-400/50"}
               transition-all duration-200 relative`; // Using tailwindcss conditional styling, basically if newValid is true, use the first set of classes, otherwise use the second set 
 
             // Create folder icon and changing its colour dependending on if it is open or not
@@ -141,7 +141,7 @@ function Home({ params }: ParamProps) {
             // Create folder button
             const button = document.createElement("button");
             button.className = `${newValid ? 'text-indigo-800 dark:text-indigo-200 font-medium' : 'text-slate-900 dark:text-slate-400'} 
-              hover:text-slate-700 dark:hover:text-slate-400 transition-colors duration-200 flex-1 text-left`;
+              hover:text-slate-900 dark:hover:text-slate-400 transition-colors duration-200 flex-1 text-left`;
             button.textContent = folder.name;
 
             const newHistory = [...history, `/${folder.name.replace(/ /g, "+")}`];
@@ -356,7 +356,7 @@ function Home({ params }: ParamProps) {
           <div className="bg-indigo-200/50 dark:bg-slate-800/50 backdrop-blur mx-8 my-4 rounded-lg overflow-hidden shadow-xl border border-slate-700/50 text-slate-900 dark:text-slate-200">
             <div className="p-4 border-b border-slate-700/50">
               <button
-                className="w-full text-left px-3 py-2 rounded-md bg-slate-700/30 hover:bg-slate-700/50 
+                className="w-full text-left px-3 py-2 bg-indigo-300/50 rounded-md hover:bg-indigo-400/50 hover:bg-indigo-300/50 
                                   transition-all duration-200 text-slate-900 dark:text-slate-200 font-medium flex items-center gap-2 shadow-sm hover:shadow"
                 onClick={() => { router.push(`/project/${projectID}+${project.replace(/%2B/g, '+')}`); }}
               >
@@ -408,7 +408,7 @@ function Home({ params }: ParamProps) {
                   <div className="content-center">
                     {/* Sort By */}
                     <label className="pl-8 text-slate-900 dark:text-slate-200 font-semibold">Sort By:</label>
-                    <select onChange={handleFolderSortBy} className='bg-gray-400 dark:bg-slate-900 text-slate-900 dark:text-slate-200 p-1 rounded-lg m-2'>
+                    <select onChange={handleFolderSortBy} className='bg-indigo-200/50 dark:bg-slate-900 text-slate-900 dark:text-slate-200 p-1 rounded-lg m-2'>
                       <option value="newest" className='text-slate-900 dark:text-slate-200'>Newest</option>
                       <option value="oldest" className='text-slate-900 dark:text-slate-200'>Oldest</option>
                     </select>
@@ -438,7 +438,7 @@ function Home({ params }: ParamProps) {
                   <div className="content-center">
                     {/* Sort By */}
                     <label className="pl-8 text-slate-900 dark:text-slate-200 font-semibold">Sort By:</label>
-                    <select onChange={handleFileSortBy} className='bg-gray-400 dark:bg-slate-900 text-slate-900 dark:text-slate-200 p-1 rounded-lg m-2'>
+                    <select onChange={handleFileSortBy} className='bg-indigo-200/50 dark:bg-slate-900 text-slate-900 dark:text-slate-200 p-1 rounded-lg m-2'>
                       <option value="newest" className='text-slate-900 dark:text-slate-200'>Newest</option>
                       <option value="oldest" className='text-slate-900 dark:text-slate-200'>Oldest</option>
                     </select>
