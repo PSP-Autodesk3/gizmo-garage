@@ -83,9 +83,10 @@ router.post("/info", async (req, res, next) => {
     try {
         const { id } = req.body;
         const [result] = await pool.execute(`
-            SELECT *
+            SELECT *, Projects.name AS project_name
             FROM Object
             INNER JOIN Users ON Object.author = Users.user_id
+            INNER JOIN Projects ON Projects.project_id = Object.project_id
             WHERE object_id = ?;
         `, [id]);
         res.json(result);

@@ -5,6 +5,7 @@ import withAuth from "@/app/lib/withAuth";
 
 // Other
 import { useState, useEffect } from "react";
+import { useRouter } from 'next/navigation';
 
 //Filter component
 import BackBtnBar from "@/app/shared/components/backBtnBar";
@@ -16,12 +17,17 @@ import { ParamProps } from "@/app/shared/interfaces/paramProps";
 import { auth } from "@/app/firebase/config";
 import { reauthenticateWithCredential } from "firebase/auth";
 import { EmailAuthProvider } from "firebase/auth/web-extension";
+import { Folder } from "@/app/shared/interfaces/folder";
 
 function Home({ params }: ParamProps) {
+    const router = useRouter();
      const [itemId, setItemId] = useState<number | null>(null);
      const [itemName, setItemName] = useState<string | null>(null);
      const [author, setAuthor] = useState<string | null>(null);
      const [bucketKey, setBucketKey] = useState<string | null>(null);
+     const [projectID, setProjectID] = useState<string | null>(null);
+     const [folderID, setFolderID] = useState<number | null>(null);
+     const [projectName, setProjectName] = useState<string | null>(null);
      // File uploads
      const [file, setFile] = useState<File | null>(null);
      const [uploading, setUploading] = useState<boolean>(false);
@@ -230,6 +236,9 @@ function Home({ params }: ParamProps) {
                 setItemName(itemData[0]?.name);
                 setAuthor(itemData[0]?.fname + " " + itemData[0]?.lname);
                 setBucketKey(itemData[0]?.bucket_id);
+                setProjectID(itemData[0]?.project_id);
+                setProjectName(itemData[0]?.project_name);
+                setFolderID(itemData[0]?.folder_id);
             }
         }
         fetchInfo();
@@ -238,11 +247,69 @@ function Home({ params }: ParamProps) {
     useEffect(() => {
         fetchVersions();
     }, [bucketKey]);
+
+    const backButton = async () => {
+        const details = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/folders/get`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: projectID })
+        });
+        const results = await details.json();
+        const currentFolder = results.find((folder: Folder) => folder.folder_id === folderID);
+
+        let folders: Folder[] = [];
+        if (currentFolder) {
+            folders.push(currentFolder);
+            let con = false;
+
+            while (!con) {
+                const currentFolder = results.find((folder: Folder) => folder.folder_id === folders[folders.length - 1].parent_folder_id);
+
+                if (currentFolder) {
+                    folders.push(currentFolder);
+                } else {
+                    con = true;
+                }
+            }
+        }
+        let route = '';
+        folders.slice().reverse().map((folder: Folder) => route += `/${folder.name}`);
+        if (route === '')
+            route = '/'
+        
+        router.push(`../project/${projectID}+${projectName?.replace(/ /g, '+')}/${route}`);
+    }
     
      return (
         <>
         
         <BackBtnBar />
+        <div>
+            <button
+                className="px-4 py-2 text-sm font-medium bg-indigo-600 rounded-lg 
+                           transition-all duration-300 hover:bg-indigo-500 
+                           hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                onClick={backButton}
+            >
+                <svg className="w-6 h-6 text-gray-800 dark:text-white inline-block mr-2"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M5 12h14M5 12l4-4m-4 4 4 4"
+                    />
+                </svg>
+                Back
+            </button>
+        </div>
         <div className={`w-full ${confirmModule ? 'blur-xl bg-opacity-40' : ''}`}>
             <div className="lg:grid lg:grid-cols-2 w-full">
             <div>
