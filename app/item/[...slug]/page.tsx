@@ -275,7 +275,7 @@ function Home({ params }: ParamProps) {
 
                 var htmlDiv = document.getElementById('forgeViewer');
                 viewer = new Autodesk.Viewing.GuiViewer3D(htmlDiv, {});
-                var startedCode = viewer.start();
+                var startedCode = viewer.start(btoa('urn:' + urn.substring(4)));
                 if (startedCode > 0) {
                     console.error('Failed to create a Viewer: WebGL not supported.');
                     return;
