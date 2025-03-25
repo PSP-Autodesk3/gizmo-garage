@@ -28,7 +28,7 @@ export default function Filters({ query, onQueryChange, values, onValuesChange }
   }
   return (
     <>
-      <div id="side-bar" className='bg-gray-300 dark:bg-slate-900 text-slate-900 dark:text-slate-200 f p-6 shadow-lg h-screen flex flex-col justify-between max-w-fit'>
+      <div id="side-bar" className='bg-indigo-200/50 dark:bg-slate-900 border border-slate-700/50 text-slate-900 dark:text-slate-200 f p-6 shadow-lg h-screen flex flex-col justify-between max-w-fit'>
         <div>
           <Link href="/">
             <div className='flex flex-row justify-between pb-4' >
@@ -87,11 +87,11 @@ export default function Filters({ query, onQueryChange, values, onValuesChange }
             </div>
           )}
           {onQueryChange && (
-            <div id="search" className='p-0 '>
+            <div id="search" className='pt-4 '>
               <label htmlFor="search=bar">Search Projects</label>
               <input
-                className='w-full p-2 my-2 rounded-lg bg-gray-200 border border-gray-200 text-gray-800 
-                  dark:bg-slate-800 dark:border-slate-700 dark:text-white'
+                className='w-full p-2 my-2 rounded-lg bg-gray-200 border border-slate-700/50 text-gray-800 
+                  dark:bg-slate-800 dark:border-slate-700 dark:text-white '
                 type="text"
                 placeholder="Search"
                 name="search"

@@ -353,7 +353,7 @@ function Home({ params }: ParamProps) {
 
         {/* Folder tree */}
         <div id="tree-folders" className="min-w-[280px] flex-shrink-0 mt-[80px]">
-          <div className="bg-gray-300 dark:bg-slate-800/50 backdrop-blur mx-8 my-4 rounded-lg overflow-hidden shadow-xl border border-slate-700/50 text-slate-900 dark:text-slate-200">
+          <div className="bg-indigo-200/50 dark:bg-slate-800/50 backdrop-blur mx-8 my-4 rounded-lg overflow-hidden shadow-xl border border-slate-700/50 text-slate-900 dark:text-slate-200">
             <div className="p-4 border-b border-slate-700/50">
               <button
                 className="w-full text-left px-3 py-2 rounded-md bg-slate-700/30 hover:bg-slate-700/50 
@@ -390,7 +390,7 @@ function Home({ params }: ParamProps) {
             routes={routes}
           />
           {(!confirmModule) && (
-            <div className="bg-gray-300 dark:bg-slate-800/50 p-4 w-[90%] mx-auto rounded-lg shadow-xl border border-slate-700/50 mt-4">
+            <div className="bg-indigo-200/50 dark:bg-slate-800/50 w-[90%] mx-auto rounded-lg shadow-xl border border-slate-700/50 mt-4">
 
               {/* Error message for duplicates */}
               <p className="text-red-600">
@@ -419,7 +419,7 @@ function Home({ params }: ParamProps) {
                 />
                 <button
                   className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300
-                   hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 flex justify-center"
+                   hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 flex justify-center ml-auto"
                   onClick={() => {
                     setModuleType(1);
                     setConfirmModule(true);
@@ -448,7 +448,7 @@ function Home({ params }: ParamProps) {
                   files={filteredFiles}
                 />
                 <button
-                  className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 flex justify-center"
+                  className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 flex justify-center ml-auto"
                   onClick={() => {
                     setModuleType(2);
                     setConfirmModule(true);

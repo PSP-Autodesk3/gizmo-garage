@@ -184,7 +184,7 @@ function Home() {
           <div id="projects">
             <div className="w-[50%] py-8 m-auto gap-4 lg:absolute rounded-lg left-1/2 transform -translate-x-1/2">
               <div className="pr-8 flex flex-row justify-between">
-                <h1 className='p-8 text-4xl text-slate-900 dark:text-slate-200 pb-10'>Projects</h1>
+                <h1 className='p-8 text-4xl text-slate-900 dark:text-slate-200 pb-10 font-semibold'>Projects</h1>
                 <button
                   className="self-center flex justify-end px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
                   onClick={() => router.push("/new-project")}
