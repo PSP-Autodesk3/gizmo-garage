@@ -13,9 +13,9 @@ export default function ProjectPreview({ project, query }: { project: Project, q
         <div className="bg-indigo-200/50 dark:bg-slate-800 border border-slate-700/50 p-4 m-auto rounded-lg shadow-lg mx-8 my-4 flex flex-row justify-between">
             <div className='p-2 pr-10'>
                 <div className="mb-2 text-slate-900 dark:text-slate-200">
-                    <p className="text-xl font-bold">Name: {project.name} </p>
-                    <p>Version: </p>
-                    <p>Date: {project.dateOfCreation.toLocaleDateString()} {project.dateOfCreation.toLocaleTimeString()} </p>
+                    <p className="text-2xl font-bold mb-3">{project.name}</p>
+                    <p>Created: {project.dateOfCreation.toLocaleDateString()} {project.dateOfCreation.toLocaleTimeString()}</p>
+                    <p>Status: {project.ownsProject ? 'Owner' : 'Collaborator'}</p>
                 </div>
                 <div className="mt-1 mb-5">
                     {query.trim() && project.editors.length > 0 &&
