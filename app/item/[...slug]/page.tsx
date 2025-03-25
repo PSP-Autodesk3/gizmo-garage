@@ -17,6 +17,7 @@ import { ParamProps } from "@/app/shared/interfaces/paramProps";
 import { auth } from "@/app/firebase/config";
 import { reauthenticateWithCredential } from "firebase/auth";
 import { EmailAuthProvider } from "firebase/auth/web-extension";
+import { Jersey_10 } from "next/font/google";
 
 function Home({ params }: ParamProps) {
     const [itemId, setItemId] = useState<number | null>(null);
@@ -247,11 +248,90 @@ function Home({ params }: ParamProps) {
     }
 
     const viewerSDK = async (urn: string) => { // Used docs for viewerSDK setup: https://aps.autodesk.com/en/docs/viewer/v7/developers_guide/viewer_basics/starting-html/
+        async function checkManifest(urn: string) {
+            console.log("Checking manifest for URN:", urn);
+            const token = await sessionStorage.getItem("token");
+            if (!token) return false;
+        
+            const response = await fetch(
+                `https://developer.api.autodesk.com/modelderivative/v2/designdata/${urn}/manifest`,
+                {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+        
+            const data = await response.json();
+            console.log("Manifest Response:", JSON.stringify(data, null, 2));
+        
+            if (!response.ok) {
+                console.error("Failed to check manifest:", response.status, response.statusText, data);
+                return false;
+            }
+        
+            return data.derivatives[0].children[1].children[0].urn;
+        }        
+        
+        async function requestTranslation(urn: any) {
+            const token = await sessionStorage.getItem("token");
+            if (!token) return false;
+        
+            const response = await fetch(
+                "https://developer.api.autodesk.com/modelderivative/v2/designdata/job",
+                {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        input: { urn: urn },
+                        output: {
+                            formats: [{ type: "svf", views: ["2d", "3d"] }],
+                        },
+                    }),
+                }
+            );
+        
+            if (!response.ok) {
+                console.error("Failed to start translation:", response.status, response.statusText);
+                return false;
+            }
+        
+            return true;
+        }
+        
+        async function waitForSVF(urn: any) {
+            const maxAttempts = 10;
+            const delay = 15000;
+            for (let attempt = 0; attempt < maxAttempts; attempt++) {
+                if (await checkManifest(urn)) return true;
+                await new Promise((resolve) => setTimeout(resolve, delay));
+            }
+            console.log("SVF translation timed out");
+            return false;
+        }
+
         setViewerState(true);
-        var token = sessionStorage.getItem("token");
+
+        urn = btoa(urn);
+
+        const newURN = await checkManifest(urn);
+        console.log("New:", newURN);
+
+        if (!newURN) {
+            console.log("Model not in SVF format. Requesting translation...");
+            console.log(urn);
+            if (!(await requestTranslation(urn))) return;
+            if (!(await waitForSVF(urn))) return;
+        }
+        
         let viewer: Autodesk.Viewing.GuiViewer3D;
         var options = {
-            env: 'AutodeskProduction2',
+            env: 'AutodeskProduction',
             api: 'streamingV2',
             getAccessToken: function (onTokenReady: any) {
                 const token = sessionStorage.getItem("token");
@@ -268,7 +348,7 @@ function Home({ params }: ParamProps) {
 
                 const htmlDiv = document.getElementById('forgeViewer');
                 viewer = new Autodesk.Viewing.GuiViewer3D(htmlDiv, {});
-                viewer.start(btoa('urn:' + urn.substring(4)), options);
+                 viewer.start(newURN);
 
                 const backButton = document.getElementById('viewerBackButton');
                 backButton?.addEventListener('click', () => {
