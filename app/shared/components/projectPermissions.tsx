@@ -61,7 +61,7 @@ export default function Permissions({ project, editors, setEditors }: Permission
                             <thead>
                                 <tr>
                                     <th colSpan={2} className="p-0">
-                                        <div className="flex justify-between bg-indigo-200/50 dark:bg-slate-900 p-2 rounded-lg">
+                                        <div className="flex justify-between p-2 rounded-lg">
                                             <span className="text-left text-slate-900 dark:text-slate-200">Email</span>
                                             <span className="text-left text-slate-900 dark:text-slate-200 text-end pr-3">Actions</span>
                                         </div>
@@ -93,7 +93,7 @@ export default function Permissions({ project, editors, setEditors }: Permission
                             <thead>
                                 <tr>
                                     <th colSpan={2} className="p-0">
-                                        <div className="flex justify-between bg-indigo-200/50 dark:bg-slate-900 p-2 rounded-lg">
+                                        <div className="flex justify-between p-2 rounded-lg">
                                             <span className="text-left text-slate-900 dark:text-slate-200">Email</span>
                                             <span className="text-left text-slate-900 dark:text-slate-200 text-end pr-3">Actions</span>
                                         </div>
