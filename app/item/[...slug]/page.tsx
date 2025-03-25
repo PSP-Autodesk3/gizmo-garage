@@ -4,7 +4,7 @@
 import withAuth from "@/app/lib/withAuth";
 
 // Other
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 //Filter component
@@ -12,6 +12,7 @@ import BackBtnBar from "@/app/shared/components/backBtnBar";
 
 // Interfaces
 import { ParamProps } from "@/app/shared/interfaces/paramProps";
+import { Version } from "@/app/shared/interfaces/version";
 
 // Firebase
 import { auth } from "@/app/firebase/config";
@@ -28,7 +29,7 @@ function Home({ params }: ParamProps) {
      const [file, setFile] = useState<File | null>(null);
      const [uploading, setUploading] = useState<boolean>(false);
      const [message, setMessage] = useState<string | null>(null);
-     const [versions, setVersions] = useState<any[]>([]);
+     const [versions, setVersions] = useState<Version[]>([]);
      // Password confirmation
      const [confirmModule, setConfirmModule] = useState<boolean>(false);
      const [password, setPassword] = useState<string>('');
@@ -63,7 +64,7 @@ function Home({ params }: ParamProps) {
             }
         }
 
-        const fetchVersions = async () => {
+        const fetchVersions = useCallback(async () => {
             if (bucketKey) {
                 const getVersions = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/versions/allVersions`, {
                     method: "POST",
@@ -74,7 +75,7 @@ function Home({ params }: ParamProps) {
                 });
                 setVersions(await getVersions.json());
             }
-        }
+        }, [bucketKey])
 
         const tagNewVersion = async (version: number, urn: string, bucketKey: string, objectKey: string) => {
             try {
@@ -129,6 +130,7 @@ function Home({ params }: ParamProps) {
             }
             catch (error) {
                 setMessage("Error uploading file");
+                console.log(error);
             }
         }
         catch (error) {
@@ -156,7 +158,7 @@ function Home({ params }: ParamProps) {
                     const error = await response.text();
                     throw new Error(error || 'Download failed');
                 }
-                let filename = objectKey;        
+                const filename = objectKey;        
                 // Create download link
                 const blob = await response.blob();
                 const url = window.URL.createObjectURL(blob);
@@ -267,10 +269,11 @@ function Home({ params }: ParamProps) {
                     body: JSON.stringify({ id: itemId }),
                 });
                 const itemData = await response.json();
+                console.log("Data:", itemData);
                 setItemName(itemData[0]?.name);
                 setAuthor(itemData[0]?.fname + " " + itemData[0]?.lname);
                 setBucketKey(itemData[0]?.bucket_id);
-                setProjectOwner(itemData[0]?.email.toLowerCase());
+                setProjectOwner(itemData[0]?.owner.toLowerCase());
                 if (itemData[0]?.archived === 1) {
                     setArchiveStatus(true);
                 } else {
@@ -283,7 +286,7 @@ function Home({ params }: ParamProps) {
 
     useEffect(() => {
         fetchVersions();
-    }, [bucketKey]);
+    }, [bucketKey, fetchVersions]);
     
      return (
         <>
