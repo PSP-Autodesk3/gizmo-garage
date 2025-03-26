@@ -88,16 +88,17 @@ export default function Home() {
             <div className="flex min-h-screen">
                 {/* Create Project */}
                 <div className="flex-1 flex justify-center items-start mt-16">
-                    <div className="bg-slate-900 py-8 px-12 rounded-lg w-auto">
+                    <div className="bg-indigo-200/50 dark:bg-slate-900 border border-slate-700/50 py-8 px-12 rounded-lg w-auto mx-8 my-4">
                         <form onSubmit={(e) => newProjectSubmitted(e)} className='flex flex-col items-center'>
                             <div className='flex items-center justify-between w-full mb-8'>
-                                <label htmlFor="name" className="text-2xl text-slate-200 whitespace-nowrap">New Project Name:</label>
+                                <label htmlFor="name" className="text-2xl font-semibold text-slate-200 text-slate-900 dark:text-slate-200 whitespace-nowrap">New Project Name:</label>
                                 <input
                                     type="text"
                                     value={name}
-                                    placeholder='...'
+                                    placeholder='Enter project name'
                                     onChange={(e) => setName(e.target.value)}
-                                    className="rounded-lg bg-slate-800 p-2 text-2xl ml-4 w-[300px] text-white"
+                                    className="rounded-lg p-2 text-2xl ml-4 w-[300px] rounded-lg bg-indigo-100 border border-slate-700/50 text-slate-900 
+                                        dark:bg-slate-800 dark:border-slate-700 dark:text-white"
                                 />
                             </div>
                             <button className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">
@@ -108,7 +109,7 @@ export default function Home() {
                 </div>
                 {/* Right Side Permissions */}
                 <div className="w-[400px] pr-4 mr-16 mt-16">
-                    <div className="bg-slate-900 p-4 rounded-lg shadow-lg mt-4">
+                    <div className="bg-indigo-200/50 dark:bg-slate-900 border border-slate-700/50 p-4 rounded-lg mt-4">
                         <Permissions editors={editors} setEditors={setEditors}/>
                     </div>
                 </div>

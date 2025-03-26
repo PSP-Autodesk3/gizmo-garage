@@ -56,11 +56,12 @@ function Home({ params }: ParamProps) {
       setProject(resolved.slug[0].split('%2B').slice(1).join('%2B'));
       setProjectID(Number.parseInt(resolved.slug[0].split('%2B')[0]));
       setRoutes((prevRoutes) => {
-        const newRoutes = resolved.slug.slice(1);
+        const newRoutes = resolved.slug.slice(1).map(decodeURIComponent);
         return prevRoutes.length === newRoutes.length
           && prevRoutes.every((route, index) => route === newRoutes[index])
           ? prevRoutes : newRoutes;
       });
+      
 
       async function getFolders(): Promise<Folder[]> {
         const query = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/folders/get`, {
@@ -98,10 +99,10 @@ function Home({ params }: ParamProps) {
 
           baseFiles.forEach((file: File) => {
             const button = document.createElement("button");
-            button.className = `pl-4 flex items-center gap-2 py-2 px-3 text-slate-300 hover:text-slate-100 transition-colors duration-200 flex-1 text-left tree-file
+            button.className = `pl-4 flex items-center gap-2 py-2 px-3 text-slate-900 dark:text-slate-300 hover:text-slate-500 dark:hover:text-slate-50 transition-colors duration-200 flex-1 text-left tree-file
                               ${checkboxOpen === 'false' && 'hidden'}`;
                               button.innerHTML = `
-              <svg class="ml-2 w-5 h-5 text-slate-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+              <svg class="ml-2 w-5 h-5 text-slate-900 dark:text-slate-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
               </svg>
               ${file.name}`;
@@ -131,7 +132,7 @@ function Home({ params }: ParamProps) {
             // Creates a summary tag, which is the preview text
             const summary = document.createElement("summary");
             summary.className = `flex items-center gap-2 py-2 px-3 rounded-md cursor-pointer mt-1
-              ${newValid ? "bg-indigo-500/20 hover:bg-indigo-500/30" : "hover:bg-slate-700/50"}
+              ${newValid ? "bg-indigo-400/50 hover:bg-indigo-500/50 dark:bg-indigo-600/50 hover:dark:bg-indigo-400/50" : "hover:bg-indigo-400/50 hover:dark:bg-indigo-400/50"}
               transition-all duration-200 relative`; // Using tailwindcss conditional styling, basically if newValid is true, use the first set of classes, otherwise use the second set 
 
             // Create folder icon and changing its colour dependending on if it is open or not
@@ -140,11 +141,11 @@ function Home({ params }: ParamProps) {
 
             // Create folder button
             const button = document.createElement("button");
-            button.className = `${newValid ? 'text-indigo-200 font-medium' : 'text-slate-300'} 
-              hover:text-slate-100 transition-colors duration-200 flex-1 text-left`;
+            button.className = `${newValid ? 'text-indigo-800 dark:text-indigo-200 font-medium' : 'text-slate-900 dark:text-slate-200'} 
+              hover:text-slate-900 dark:hover:text-slate-300 transition-colors duration-200 flex-1 text-left`;
             button.textContent = folder.name;
 
-            const newHistory = [...history, `/${folder.name.replace(/ /g, "+")}`];
+            const newHistory = [...history, `/${encodeURIComponent(folder.name)}`];
             const newDepth = depth + 1;
 
             // Clicking routes to the folder
@@ -353,14 +354,14 @@ function Home({ params }: ParamProps) {
 
         {/* Folder tree */}
         <div id="tree-folders" className="min-w-[280px] flex-shrink-0 mt-[80px]">
-          <div className="bg-slate-800/50 backdrop-blur mx-8 my-4 rounded-lg overflow-hidden shadow-xl border border-slate-700/50">
+          <div className="bg-indigo-200/50 dark:bg-slate-800/50 backdrop-blur mx-8 my-4 rounded-lg overflow-hidden border border-slate-700/50 text-slate-900 dark:text-slate-200">
             <div className="p-4 border-b border-slate-700/50">
               <button
-                className="w-full text-left px-3 py-2 rounded-md bg-slate-700/30 hover:bg-slate-700/50 
-                                  transition-all duration-200 text-slate-200 font-medium flex items-center gap-2 shadow-sm hover:shadow"
+                className="w-full text-left px-3 py-2 bg-indigo-400/50 dark:bg-indigo-600/50 hover:bg-indigo-400/50 hover:dark:bg-indigo-400/50 
+                                  transition-all duration-200 rounded-md text-slate-900 dark:text-slate-200 font-medium flex items-center gap-2 shadow-sm hover:shadow"
                 onClick={() => { router.push(`/project/${projectID}+${project.replace(/%2B/g, '+')}`); }}
               >
-                <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
@@ -390,7 +391,7 @@ function Home({ params }: ParamProps) {
             routes={routes}
           />
           {(!confirmModule) && (
-            <div className="bg-slate-800 mx-8 my-4 rounded-lg p-4">
+            <div className="bg-indigo-200/50 dark:bg-slate-800/50 w-[90%] mx-auto rounded-lg border border-slate-700/50 mt-4">
 
               {/* Error message for duplicates */}
               <p className="text-red-600">
@@ -404,13 +405,13 @@ function Home({ params }: ParamProps) {
               {/* Folders */}
               <div id="folders" className="mx-8 my-4">
                 <div className="flex flex-row justify-between">
-                  <h1 className="text-3xl my-4">Folders:</h1>
+                  <h1 className="text-3xl my-4 text-slate-900 dark:text-slate-200 font-semibold">Folders:</h1>
                   <div className="content-center">
                     {/* Sort By */}
-                    <label>Sort By:</label>
-                    <select onChange={handleFolderSortBy} className='bg-slate-900 p-1 rounded-lg m-2'>
-                      <option value="newest" >Newest</option>
-                      <option value="oldest" >Oldest</option>
+                    <label className="pl-8 text-slate-900 dark:text-slate-200 font-semibold">Sort By:</label>
+                    <select onChange={handleFolderSortBy} className='bg-indigo-200/50 dark:bg-slate-900 text-slate-900 dark:text-slate-200 p-1 rounded-lg m-2'>
+                      <option value="newest" className='text-slate-900 dark:text-slate-200'>Newest</option>
+                      <option value="oldest" className='text-slate-900 dark:text-slate-200'>Oldest</option>
                     </select>
                   </div>
                 </div>
@@ -419,7 +420,7 @@ function Home({ params }: ParamProps) {
                 />
                 <button
                   className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300
-                   hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 flex justify-center"
+                   hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 flex justify-center ml-auto"
                   onClick={() => {
                     setModuleType(1);
                     setConfirmModule(true);
@@ -429,16 +430,18 @@ function Home({ params }: ParamProps) {
                 </button>
               </div>
 
+              <div className="p border-b border-slate-700/50"></div>
+
               {/* Files */}
               <div id="files" className="mx-8 my-4">
                 <div className='flex flex-row justify-between'>
-                  <h1 className="my-4 text-3xl">Files:</h1>
+                  <h1 className="my-4 text-3xl text-slate-900 dark:text-slate-200 font-semibold">Files:</h1>
                   <div className="content-center">
                     {/* Sort By */}
-                    <label>Sort By:</label>
-                    <select onChange={handleFileSortBy} className='bg-slate-900 p-1 rounded-lg m-2'>
-                      <option value="newest" >Newest</option>
-                      <option value="oldest" >Oldest</option>
+                    <label className="pl-8 text-slate-900 dark:text-slate-200 font-semibold">Sort By:</label>
+                    <select onChange={handleFileSortBy} className='bg-indigo-200/50 dark:bg-slate-900 text-slate-900 dark:text-slate-200 p-1 rounded-lg m-2'>
+                      <option value="newest" className='text-slate-900 dark:text-slate-200'>Newest</option>
+                      <option value="oldest" className='text-slate-900 dark:text-slate-200'>Oldest</option>
                     </select>
                   </div>
                 </div>
@@ -446,7 +449,7 @@ function Home({ params }: ParamProps) {
                   files={filteredFiles}
                 />
                 <button
-                  className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 flex justify-center"
+                  className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 flex justify-center ml-auto"
                   onClick={() => {
                     setModuleType(2);
                     setConfirmModule(true);
@@ -460,7 +463,7 @@ function Home({ params }: ParamProps) {
 
           {/* Confirmation for creating new items */}
           {(confirmModule) && (
-            <div className="fixed inset-0 overflow-auto flex border-indigo-600 border-2 items-center justify-center bg-slate-900 p-4 w-[40%] h-[60%] m-auto rounded-lg shadow-lg mt-16">
+            <div className="fixed inset-0 flex border-slate-700/50 border items-center justify-center bg-indigo-200 dark:bg-slate-900 text-slate-900 dark:text-slate-200 w-[40%] h-[50%] m-auto rounded-lg mt-16">
               <ConfirmModule
                 itemType={(moduleType === 1 ? "Folder" : "File")}
                 projectID={projectID}

@@ -219,7 +219,8 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                     type="text"
                     value={folderName}
                     onChange={(e) => setFolderName(e.target.value)}
-                    className="w-full mt-4 p-2 rounded-lg bg-slate-800"
+                    className="w-full p-2 my-2 rounded-lg bg-indigo-100 border text-gray-800
+                        dark:bg-slate-800 border-slate-700/50 dark:text-white"
                     placeholder="Enter folder name"
                     id="dir-name-input"
                 />
@@ -231,7 +232,7 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                         Create
                     </button>
                     <button
-                        className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                        className="text-white px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
                         onClick={() => setConfirmModule(false)}
                     >
                         Cancel
@@ -249,14 +250,16 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                     type="text"
                     value={itemName}
                     onChange={(e) => setItemName(e.target.value)}
-                    className="w-full mt-4 p-2 rounded-lg bg-slate-800"
+                    className="w-full p-2 my-2 rounded-lg bg-indigo-100 border text-gray-800
+                        dark:bg-slate-800 border-slate-700/50 dark:text-white"
                     placeholder="Enter Item name"
                 />
-                <div className='bg-slate-800 mt-4 rounded-lg max-w-[350px] flex flex-col items-center ' >
+                <div className='dark:bg-slate-800 bg-indigo-100 border border-slate-700/50 mt-4 rounded-lg mb-4 flex flex-col items-center ' >
                     <div id="search" className='p-4'>
                         <label htmlFor="search=bar">Search</label>
                         <input
-                            className='text-white w-full p-2 my-2 rounded-lg bg-slate-900'
+                            className='w-full p-2 my-2 rounded-lg bg-indigo-100 border border-slate-700/50 text-gray-800
+                                dark:bg-slate-800 dark:border-slate-700 dark:text-white'
                             type="text"
                             placeholder="Search"
                             name="search"
@@ -264,13 +267,13 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                             onChange={(e) => setTagQuery(e.target.value)}
                         />
                     </div>
-                    <div className='bg-slate-900 rounded-lg overflow-hidden flex flex-wrap w-[90%]'>
+                    <div className='dark:bg-slate-800 border border-slate-700/50 rounded-lg overflow-hidden flex flex-wrap w-[90%]'>
                         {filteredTags.length > 0 ? (
                             filteredTags.map((tag: Tag) => (
-                                <button type="button" className='m-2 rounded-full bg-blue-600 text-white text-sm px-4 py-2 flex items-center text-center' onClick={() => applyTag(tag.tag_id)} key={tag.tag_id}>{tag.tag}</button>
+                                <button type="button" className='m-2 rounded-full bg-blue-600 dark:text-white text-gray-800 text-sm px-4 py-2 flex items-center text-center' onClick={() => applyTag(tag.tag_id)} key={tag.tag_id}>{tag.tag}</button>
                             ))
                         ) : (
-                            <span className='text-white m-auto p-2'>No tags found</span>
+                            <span className='text-gray-800 dark:text-white m-auto p-2'>No tags found</span>
                         )
                         }
                     </div>
@@ -300,7 +303,7 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                                     </svg>{tag.tag}</button>
                             ))
                         ) : (
-                            <span className='text-white'>No tags applied</span>
+                            <span className='text-gray-800 dark:text-white'>No tags applied</span>
                         )
                         }
                     </div>
@@ -312,9 +315,9 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                 </div>
 
                 <div className="px-8">
-                    <input type="file" onChange={handleFileChange} className="mb-4 bg-slate-800 rounded-lg p-4 text-lg" />
+                    <input type="file" onChange={handleFileChange} className="mb-4 dark:bg-slate-800 border border-slate-700/50 bg-indigo-100 rounded-lg p-4 text-lg" />
                     <br />
-                    {message && <p className="mt-2 text-sm">{message}</p>}
+                    {message && <p className="mt-2 text-sm dark:text-white text-gray-800">{message}</p>}
                 </div>
 
                 <div className="mt-4">
@@ -325,7 +328,7 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                         Create
                     </button>
                     <button
-                        className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                        className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 text-white"
                         onClick={() => setConfirmModule(false)}
                     >
                         Cancel
