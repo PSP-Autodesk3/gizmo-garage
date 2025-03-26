@@ -117,7 +117,7 @@ function Home({ params }: ParamProps) {
                 const objectKey = data.objectKey;
                 if (data.message === "File uploaded successfully!") {
                     setMessage("File uploaded successfully");
-                    
+
                     await fetch('https://developer.api.autodesk.com/modelderivative/v2/designdata/job',
                         {
                             method: "POST",
@@ -277,7 +277,7 @@ function Home({ params }: ParamProps) {
 
     const viewerSDK = async (urn: string) => { // Used docs for viewerSDK setup: https://aps.autodesk.com/en/docs/viewer/v7/developers_guide/viewer_basics/starting-html/
         const token = sessionStorage.getItem("token");
-        setViewerState(true);
+        viewSDK()
         const returnedUrn = btoa(urn).slice(0, -1);
 
         const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -367,8 +367,10 @@ function Home({ params }: ParamProps) {
             <link rel="stylesheet" href="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/style.min.css" type="text/css"></link>
             <Script onLoad={() => { console.log("loaded SDK") }} defer src="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/viewer3D.min.js"></Script>
 
-            <BackBtnBar />
-            <div className={`w-full ${confirmModule ? 'blur-xl bg-opacity-40' : ''}`}>
+            <div className={`w-full ${viewerState ? 'blur-xl bg-opacity-40' : ''}`}>
+                <div className={`${viewerState ? 'pointer-events-none' : ''}`}>
+                    <BackBtnBar />
+                </div>
                 <div className="lg:grid lg:grid-cols-2 w-full">
                     <div>
                         <div className="bg-slate-800/50 backdrop-blur mx-8 my-4 rounded-lg overflow-hidden shadow-xl border border-slate-700/50 p-4">
@@ -395,7 +397,7 @@ function Home({ params }: ParamProps) {
                         <br />
                         <button
                             onClick={handleUpload}
-                            className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                            className={`px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 ${viewerState ? ' pointer-events-none' : ''}`}
                             disabled={uploading}
                         >
                             {uploading ? "Uploading..." : "Upload File"}
@@ -413,14 +415,14 @@ function Home({ params }: ParamProps) {
                                 <p className="text-2xl p-4">Version: <b>{version.version}</b></p>
                                 <div className="flex justify-center">
                                     <button
-                                        className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                                        className={`px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 ${viewerState ? 'pointer-events-none' : ''}`}
                                         onClick={() => viewerSDK(version.urn)}
                                     >
                                         View
                                     </button>
                                     <button
                                         onClick={() => downloadFile(version.urn, version.object_key)}
-                                        className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                                        className={`px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 ${viewerState ? 'pointer-events-none' : ''}`}
                                     >
                                         Download
                                     </button>
@@ -431,7 +433,7 @@ function Home({ params }: ParamProps) {
                                                 setConfirmModule(true);
                                             }
                                         }}
-                                        className="px-6 m-1 py-3 text-lg font-medium bg-red-500 rounded-lg transition-all duration-300 hover:bg-red-400 hover:scale-105 shadow-lg hover:shadow-red-400/50"
+                                        className={`px-6 m-1 py-3 text-lg font-medium bg-red-500 rounded-lg transition-all duration-300 hover:bg-red-400 hover:scale-105 shadow-lg hover:shadow-red-400/50 pointer-events-none ${viewerState ? 'pointer-events-none' : ''}`}
                                     >
                                         Rollback
                                     </button>
@@ -493,15 +495,17 @@ function Home({ params }: ParamProps) {
 
             {(viewerState) && (
                 <>
-                    <div className="fixed inset-0 flex items-center justify-center bg-opacity-95 bg-slate-900 w-[40%] h-[40%] m-auto rounded-3xl shadow-lg p-8">
+                    <div className="fixed inset-0 flex items-center justify-center bg-slate-900 w-full h-full max-w-[900px] max-h-[600px] m-auto rounded-3xl shadow-lg p-8">
+                        <div className="w-full h-full max-w-[700px] max-h-[500px] relative mr-4">
+                            <div id="forgeViewer" className="w-full h-full"></div>
+                        </div>
                         <button
                             id="viewerBackButton"
-                            onClick={() => setViewerState(false)}
+                            onClick={() => viewSDK()}
                             className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
                         >
                             Back
                         </button>
-                        <div id="forgeViewer" className="w-full h-full m-0 bg-[#F0F8FF]" />
                     </div>
                 </>
             )}
