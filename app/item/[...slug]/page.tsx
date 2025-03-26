@@ -283,6 +283,7 @@ function Home({ params }: ParamProps) {
         const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
         const getManifest = async () => {
+            // Gets status of svf conversion
             let query = await fetch(`https://developer.api.autodesk.com/modelderivative/v2/designdata/${returnedUrn}/manifest`, {
                 method: "GET",
                 headers: {
@@ -293,12 +294,14 @@ function Home({ params }: ParamProps) {
             console.log("Manifest response:", JSON.stringify(response, null, 2));
 
             if (response.status === 'success') {
+                // Returns true if the svf is converted
                 return true;
             }
             return false;
         }
 
         let loop = true;
+        // Checks svf status and timesout after 10 attempts
         for (let iteration = 0; iteration < 10 && loop; iteration++) {
             const found = await getManifest();
             if (found) {
@@ -308,6 +311,7 @@ function Home({ params }: ParamProps) {
             }
         }
 
+        // Returns if it wasn't successful
         if (loop) {
             alert("Failed to retrieve the file");
             return;
@@ -328,16 +332,19 @@ function Home({ params }: ParamProps) {
             }
         };
         if (urn.length > 0) {
+            // Initialises the viewer
             Autodesk.Viewing.Initializer(options, function () {
                 const htmlDiv = document.getElementById('forgeViewer');
                 viewer = new Autodesk.Viewing.GuiViewer3D(htmlDiv, {});
                 console.log("urn:" + btoa(returnedUrn));
+                // Start the viewer
                 viewer.start();
 
                 const backButton = document.getElementById('viewerBackButton');
                 backButton?.addEventListener('click', () => {
                     viewer.finish();
                 })
+                // Load the object into the document
                 Autodesk.Viewing.Document.load(documentId, onDocumentLoadSuccess, onDocumentLoadFailure);
             });
 
@@ -345,6 +352,7 @@ function Home({ params }: ParamProps) {
 
             function onDocumentLoadSuccess(viewerDocument: any) {
                 const defaultViewable = viewerDocument.getRoot().getDefaultGeometry();
+                // Load the svf item into the viewer
                 viewer.loadDocumentNode(viewerDocument, defaultViewable);
             }
 
