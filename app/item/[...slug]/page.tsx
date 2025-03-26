@@ -117,6 +117,33 @@ function Home({ params }: ParamProps) {
                 const objectKey = data.objectKey;
                 if (data.message === "File uploaded successfully!") {
                     setMessage("File uploaded successfully");
+                    
+                    await fetch('https://developer.api.autodesk.com/modelderivative/v2/designdata/job',
+                        {
+                            method: "POST",
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                                "Content-Type": "application/json",
+                                'x-ads-force': 'true'
+                            },
+                            body: JSON.stringify({
+                                "input": {
+                                    urn: btoa(urn)
+                                },
+                                "output": {
+                                    "formats": [
+                                        {
+                                            "type": "svf2",
+                                            "views": [
+                                                "2d",
+                                                "3d"
+                                            ]
+                                        }
+                                    ]
+                                }
+                            })
+                        }
+                    )
                 } else {
                     setMessage("Error uploading file");
                 }
@@ -251,37 +278,7 @@ function Home({ params }: ParamProps) {
     const viewerSDK = async (urn: string) => { // Used docs for viewerSDK setup: https://aps.autodesk.com/en/docs/viewer/v7/developers_guide/viewer_basics/starting-html/
         const token = sessionStorage.getItem("token");
         setViewerState(true);
-
-        let query = await fetch('https://developer.api.autodesk.com/modelderivative/v2/designdata/job',
-            {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                    'x-ads-force': 'true'
-                },
-                body: JSON.stringify({
-                    "input": {
-                        urn: btoa(urn)
-                    },
-                    "output": {
-                        "formats": [
-                            {
-                                "type": "svf2",
-                                "views": [
-                                    "2d",
-                                    "3d"
-                                ]
-                            }
-                        ]
-                    }
-                })
-            }
-        )
-
-        let response = await query.json();
-        console.log(response);
-        const returnedUrn = response.urn;
+        const returnedUrn = btoa(urn).slice(0, -1);
 
         const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 

@@ -71,6 +71,33 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
             const objectKey = data.objectKey;
             if (data.ok) {
                 setMessage("File uploaded successfully");
+                
+                await fetch('https://developer.api.autodesk.com/modelderivative/v2/designdata/job',
+                    {
+                        method: "POST",
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json",
+                            'x-ads-force': 'true'
+                        },
+                        body: JSON.stringify({
+                            "input": {
+                                urn: btoa(urn)
+                            },
+                            "output": {
+                                "formats": [
+                                    {
+                                        "type": "svf2",
+                                        "views": [
+                                            "2d",
+                                            "3d"
+                                        ]
+                                    }
+                                ]
+                            }
+                        })
+                    }
+                )
             } else {
                 setMessage("Error uploading file");
             }
