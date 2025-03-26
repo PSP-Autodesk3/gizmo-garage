@@ -487,7 +487,7 @@ function Home({ params }: ParamProps) {
                             <p className="text-2xl p-4">Version: <b>{version.version}</b></p>
                             <div className="flex justify-center">
                                 <button
-                                    className={`px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 ${viewerState ? 'pointer-events-none' : ''}`}
+                                    className={`px-6 m-1 py-3 text-lg text-white font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 ${viewerState ? 'pointer-events-none' : ''}`}
                                     onClick={() => viewerSDK(version.urn)}
                                 >
                                     View
@@ -561,20 +561,22 @@ function Home({ params }: ParamProps) {
 
             {(viewerState) && (
                 <>
-                    <div className="fixed inset-0 flex items-center justify-center bg-slate-900 w-full h-full max-w-[900px] max-h-[600px] m-auto rounded-3xl shadow-lg p-8">
-                        <div className="w-full h-full max-w-[700px] max-h-[500px] relative mr-4">
+                    <div className="bg-indigo-200 dark:bg-slate-900 fixed inset-0 flex-col items-center justify-center w-full h-full max-w-[900px] max-h-[600px] border border-slate-700/50 m-auto rounded-3xl p-8">
+                        <div className="w-full h-full max-w-[850px] max-h-[500px] relative border border-slate-700/50 rounded-lg overflow-hidden">
                             <div id="forgeViewer" className="w-full h-full"></div>
                         </div>
-                        <button
-                            id="viewerBackButton"
-                            onClick={() => viewSDK()}
-                            className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
-                        >
-                            Back
-                        </button>
-                        {itemTranslating && (
-                            <div>Processing file...</div>
-                        )}
+                        <div className="flex justify-center gap-4 mt-2">
+                            <button
+                                id="viewerBackButton"
+                                onClick={() => viewSDK()}
+                                className="px-6 py-3 text-lg font-medium text-white bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                            >
+                                Back
+                            </button>
+                            {itemTranslating && (
+                                <div className="text-white">Processing file...</div>
+                            )}
+                        </div>
                     </div>
                 </>
             )}
