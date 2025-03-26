@@ -11,6 +11,7 @@ import BackBtnBar from '@/app/shared/components/backBtnBar';;
 
 // Firebase
 import { auth } from '@/app/firebase/config';
+import { useAuthState } from 'react-firebase-hooks/auth';
 import { reauthenticateWithCredential, sendPasswordResetEmail } from 'firebase/auth';
 import { EmailAuthProvider } from "firebase/auth/web-extension";
 
@@ -19,6 +20,7 @@ import { User } from '@/app/shared/interfaces/user';
 import { Tag } from '@/app/shared/interfaces/tag';
 
 function Home() {
+  const [user] = useAuthState(auth);
   const [databaseExists, setDatabaseExists] = useState(2);
   const [confirmModule, setConfirmModule] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
@@ -32,6 +34,31 @@ function Home() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
+  useEffect(() => {
+    if (user) {
+      const checkAdmin = async () => {
+        try {
+          const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/users/checkAdmin`, {
+            method: "POST",
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              email: user.email
+            })
+          });
+          console.log(await response.json());
+          const isAdmin = await response.json();
+          if (!isAdmin) {
+            console.log('Not an admin');
+          }
+        } catch (error) {
+          console.error('Error checking admin:', error);
+        }
+      };
+      checkAdmin();
+    }
+  }, [user]);
 
   //fetch all tags
   const fetchTags = async () => {
