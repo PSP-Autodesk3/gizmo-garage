@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 // For Firebase Auth
 import { auth } from '@/app/firebase/config';
@@ -18,7 +18,7 @@ export default function Permissions({ project, editors, setEditors }: Permission
     const [emails, updateEmails] = useState<Emails[]>([]);
     const [invites, updateInvites] = useState<Emails[]>([]);
 
-    const getAccounts = async () => {
+    const getAccounts = useCallback(async () => {
         const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/projects/editors`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -30,9 +30,9 @@ export default function Permissions({ project, editors, setEditors }: Permission
         if (emailResponse && emailResponse.length > 0) {
             setEditors(emailResponse[0].email.toLowerCase());
         }
-    }
+    }, [project, setEditors])
 
-    const getInvited = async () => {
+    const getInvited = useCallback(async () => {
         const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/projects/invited`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -41,14 +41,14 @@ export default function Permissions({ project, editors, setEditors }: Permission
 
         const emailResponse = await response.json();
         updateInvites(emailResponse);
-    }
+    }, [project]);
 
     useEffect(() => {
         if (project && project > 0) {
             getAccounts();
             getInvited();
         }
-    }, [project, setEditors])
+    }, [project, getAccounts, getInvited])
 
     const handleEditorDelete = async (userID: number) => {
         const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/projects/removeEditor`, {
