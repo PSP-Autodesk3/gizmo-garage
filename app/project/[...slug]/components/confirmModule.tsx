@@ -71,7 +71,29 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
             const objectKey = data.objectKey;
             if (data.ok) {
                 setMessage("File uploaded successfully");
+            } else {
+                setMessage("Error uploading file");
+            }
+            tagVersion(bucketKey, urn, objectKey);
+        }
+        catch (error) {
+            setMessage("Error uploading file");
+            console.log(error);
+        }
+    }
+
+    const tagVersion = async (bucketKey: string, urn: string, objectKey: string) => {
+        try {
+            const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/versions/tag`, {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ bucket_id: bucketKey, urn: urn, version: 1, object_key: objectKey }),
+            });
+            const data = await response.json();
+            if (data.message == "Version tagged successfully") {
+                console.log("Version tagged successfully");
                 
+                const token = sessionStorage.getItem("token");
                 await fetch('https://developer.api.autodesk.com/modelderivative/v2/designdata/job',
                     {
                         method: "POST",
@@ -98,27 +120,6 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                         })
                     }
                 )
-            } else {
-                setMessage("Error uploading file");
-            }
-            tagVersion(bucketKey, urn, objectKey);
-        }
-        catch (error) {
-            setMessage("Error uploading file");
-            console.log(error);
-        }
-    }
-
-    const tagVersion = async (bucketKey: string, urn: string, objectKey: string) => {
-        try {
-            const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/versions/tag`, {
-                method: "POST",
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ bucket_id: bucketKey, urn: urn, version: 1, object_key: objectKey }),
-            });
-            const data = await response.json();
-            if (data.message == "Version tagged successfully") {
-                console.log("Version tagged successfully");
             } else {
                 console.log("Error tagging version");
             }
