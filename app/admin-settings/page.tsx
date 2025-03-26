@@ -52,9 +52,7 @@ function Home() {
           
           const isAdmin = (await response.json()).isAdmin;
 
-          console.log("Checking if admin");
           if (!isAdmin) {
-            alert('Access Denied! You are not an admin.');
             router.push("/");
           }
         } catch (error) {
