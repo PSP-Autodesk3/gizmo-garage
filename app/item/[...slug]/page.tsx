@@ -144,7 +144,9 @@ function Home({ params }: ParamProps) {
                             })
                         }
                     )
-                } else {
+                } else if (data.message.startsWith("Not allowed file type:")) {
+                    setMessage(data.message + data.extension);
+                }else {
                     setMessage("Error uploading file");
                 }
                 if (bucketKey) {
@@ -335,7 +337,9 @@ function Home({ params }: ParamProps) {
             // Initialises the viewer
             Autodesk.Viewing.Initializer(options, function () {
                 const htmlDiv = document.getElementById('forgeViewer');
-                viewer = new Autodesk.Viewing.GuiViewer3D(htmlDiv, {});
+                if (htmlDiv) {
+                    viewer = new Autodesk.Viewing.GuiViewer3D(htmlDiv, {});
+                }
                 console.log("urn:" + btoa(returnedUrn));
                 // Start the viewer
                 viewer.start();
