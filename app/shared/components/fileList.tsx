@@ -41,7 +41,7 @@ export default function FileList({ files }: { files: File[] }) {
                     });
                 }
                 catch (error) {
-                    console.log("Thumbnail not found");
+                    console.log("Thumbnail not found:", error);
                     return;
                 }
                 
