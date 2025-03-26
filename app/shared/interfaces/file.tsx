@@ -8,4 +8,6 @@ export interface File {
   archived: boolean;
   bucket_id: number;
   dateOfCreation: Date;
+  encoded_urn: string;
+  thumbnail: Blob;
 }

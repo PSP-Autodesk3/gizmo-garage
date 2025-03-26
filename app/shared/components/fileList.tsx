@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 
 // Interfaces
 import { File } from "@/app/shared/interfaces/file";
-import { Thumbnails } from "@/app/shared/interfaces/thumbnail";
 
 // Skeleton Loading
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
@@ -16,74 +15,51 @@ import { useRouter } from "next/navigation";
 
 export default function FileList({ files }: { files: File[] }) {
     const router = useRouter();
-    const [thumbnails, setThumbnails] = useState<{ [key: number]: string }>({});
 
     useEffect(() => {
         if (files) {
             files.forEach(file => {
                 // Get URN of file
                 let urn: string | null = null;
-                const retrieveUrn = async () => {
-                    const getUrn = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/versions/latestVersion`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ bucket_id: file.bucket_id }),
-                    });
-                    const data = await getUrn.json();
-                    console.log(data);
-                    urn = data.urn;
-                }
-                retrieveUrn().then(() => {
-                    if (urn) {
-                        getManifest(urn);
+                try {
+                    const retrieveUrn = async () => {
+                        const getUrn = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/versions/latestVersion`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ bucket_id: file.bucket_id }),
+                        });
+                        const data = await getUrn.json();
+                        console.log(data);
+                        urn = data.urn;
                     }
-                });
-
-                const getManifest = async (urn: string) => {
-                    const returnedUrn = btoa(urn).slice(0, -1);
-                    const token = sessionStorage.getItem("token");
-                    let query = await fetch(`https://developer.api.autodesk.com/modelderivative/v2/designdata/${returnedUrn}/manifest`, {
-                        method: "GET",
-                        headers: {
-                            Authorization: `Bearer ${token}`
+                    retrieveUrn().then(() => {
+                        if (urn) {
+                            getManifest(urn);
                         }
                     });
-                    let response = await query.json();
-                    console.log("Manifest response:", JSON.stringify(response, null, 2));
-                    // Extract thumbnail URN
-                    let thumbnailURN: string | null = null;
-                    if (response.derivatives) {
-                        response.derivatives.forEach((derivative: any) => {
-                            if (derivative.children) {
-                                derivative.children.forEach((child: any) => {
-                                    if (child.children) { 
-                                        child.children.forEach((grandChild: any) => {
-                                            if (grandChild.role === "thumbnail" && grandChild.urn) {
-                                                thumbnailURN = grandChild.urn;
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-                        });
-                    }
-                    console.log(thumbnailURN);
+                }
+                catch (error) {
+                    console.log("Thumbnail not found");
+                    return;
+                }
+                
 
-                    const getThumbnail = async (thumbnailURN: string) => {
-                        const response = await fetch (`https://developer.api.autodesk.com/modelderivative/v2/designdata/${btoa(thumbnailURN)}/thumbnail`, {
+                const getManifest = async (urn: string) => {
+                    const returnedUrn = btoa(urn);
+                    const token = sessionStorage.getItem("token");
+                    const getThumbnail = async () => {
+                        const response = await fetch (`https://developer.api.autodesk.com/modelderivative/v2/designdata/${returnedUrn}/thumbnail`, {
                             method: "GET",
                             headers: {
                                 Authorization: `Bearer ${token}`
                             }
                         })
-                        const data = await response.json();
-                        console.log(data);
+                        const data = await response.blob();
+                        file.thumbnail = data;
                     }
-                    if (thumbnailURN) {
-                        getThumbnail(thumbnailURN);
-                    }
+                    getThumbnail();
                 }
             });
         }
@@ -104,9 +80,9 @@ export default function FileList({ files }: { files: File[] }) {
                                 onClick={() => {router.push(`/item/${file.object_id}`);}}
                             >   
                               <div className="flex flex-col">
-                              {thumbnails[file.object_id] ? (
+                              {file.thumbnail? (
                                         <img 
-                                            src={thumbnails[file.object_id] as string} 
+                                            src={URL.createObjectURL(file.thumbnail)} 
                                             alt="Thumbnail" 
                                             className="w-full h-auto mb-2 rounded-lg"
                                         />
