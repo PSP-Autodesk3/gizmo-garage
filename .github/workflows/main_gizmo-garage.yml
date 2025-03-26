@@ -23,6 +23,9 @@ jobs:
         with:
           node-version: '22.x'
 
+      - name: Set environment variables
+        run: echo "NEXT_PUBLIC_FIREBASE_API_KEY=${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}" >> $GITHUB_ENV
+
       - name: npm install, build, and test
         run: |
           npm install
