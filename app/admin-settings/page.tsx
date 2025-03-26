@@ -5,6 +5,7 @@ import withAuth from "@/app/lib/withAuth";
 
 // Other
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation';
 
 // Components
 import BackBtnBar from '@/app/shared/components/backBtnBar';;
@@ -33,6 +34,7 @@ function Home() {
   const [error, setError] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     if (user) {
@@ -47,18 +49,22 @@ function Home() {
               email: user.email
             })
           });
-          console.log(await response.json());
-          const isAdmin = await response.json();
+          
+          const isAdmin = (await response.json()).isAdmin;
+
+          console.log("Checking if admin");
           if (!isAdmin) {
-            console.log('Not an admin');
+            alert('Access Denied! You are not an admin.');
+            router.push("/");
           }
         } catch (error) {
           console.error('Error checking admin:', error);
+          router.push("/");
         }
       };
       checkAdmin();
     }
-  }, [user]);
+  }, [user, router]);
 
   //fetch all tags
   const fetchTags = async () => {
