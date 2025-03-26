@@ -30,7 +30,7 @@ router.post("/latestVersion", async (req, res, next) => {
             throw new Error("Missing required fields");
         }
         const [result] = await pool.execute(`
-            SELECT version
+            SELECT version, urn
             FROM Version
             WHERE bucket_id = ?
             ORDER BY version DESC
@@ -39,7 +39,7 @@ router.post("/latestVersion", async (req, res, next) => {
         if (result.length === 0) {
             throw new Error("No versions found");
         }
-        res.json({ version: result[0].version });
+        res.json({ version: result[0].version, urn: result[0].urn });
     }
     catch (error) {
         next(error);

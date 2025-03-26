@@ -6,5 +6,8 @@ export interface File {
   tags: Tag[];
   folder_id: number;
   archived: boolean;
+  bucket_id: number;
   dateOfCreation: Date;
+  encoded_urn: string;
+  thumbnail: Blob;
 }
