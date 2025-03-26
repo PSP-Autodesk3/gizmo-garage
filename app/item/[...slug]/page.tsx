@@ -6,6 +6,7 @@ import withAuth from "@/app/lib/withAuth";
 // Other
 import { useState, useEffect } from "react";
 import Script from "next/script";
+import Head from 'next/head';
 
 //Filter component
 import BackBtnBar from "@/app/shared/components/backBtnBar";
@@ -248,87 +249,73 @@ function Home({ params }: ParamProps) {
     }
 
     const viewerSDK = async (urn: string) => { // Used docs for viewerSDK setup: https://aps.autodesk.com/en/docs/viewer/v7/developers_guide/viewer_basics/starting-html/
-        async function checkManifest(urn: string) {
-            console.log("Checking manifest for URN:", urn);
-            const token = await sessionStorage.getItem("token");
-            if (!token) return false;
-        
-            const response = await fetch(
-                `https://developer.api.autodesk.com/modelderivative/v2/designdata/${urn}/manifest`,
-                {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json",
+        const token = sessionStorage.getItem("token");
+        setViewerState(true);
+
+        let query = await fetch('https://developer.api.autodesk.com/modelderivative/v2/designdata/job',
+            {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                    'x-ads-force': 'true'
+                },
+                body: JSON.stringify({
+                    "input": {
+                        urn: btoa(urn)
                     },
+                    "output": {
+                        "formats": [
+                            {
+                                "type": "svf2",
+                                "views": [
+                                    "2d",
+                                    "3d"
+                                ]
+                            }
+                        ]
+                    }
+                })
+            }
+        )
+
+        let response = await query.json();
+        console.log(response);
+        const returnedUrn = response.urn;
+
+        const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+        const getManifest = async () => {
+            let query = await fetch(`https://developer.api.autodesk.com/modelderivative/v2/designdata/${returnedUrn}/manifest`, {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${token}`
                 }
-            );
-        
-            const data = await response.json();
-            console.log("Manifest Response:", JSON.stringify(data, null, 2));
-        
-            if (!response.ok) {
-                console.error("Failed to check manifest:", response.status, response.statusText, data);
-                return false;
+            });
+            let response = await query.json();
+            console.log("Manifest response:", JSON.stringify(response, null, 2));
+
+            if (response.status === 'success') {
+                return true;
             }
-        
-            return data.derivatives[0].children[1].children[0].urn;
-        }        
-        
-        async function requestTranslation(urn: any) {
-            const token = await sessionStorage.getItem("token");
-            if (!token) return false;
-        
-            const response = await fetch(
-                "https://developer.api.autodesk.com/modelderivative/v2/designdata/job",
-                {
-                    method: "POST",
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        input: { urn: urn },
-                        output: {
-                            formats: [{ type: "svf", views: ["2d", "3d"] }],
-                        },
-                    }),
-                }
-            );
-        
-            if (!response.ok) {
-                console.error("Failed to start translation:", response.status, response.statusText);
-                return false;
-            }
-        
-            return true;
-        }
-        
-        async function waitForSVF(urn: any) {
-            const maxAttempts = 10;
-            const delay = 15000;
-            for (let attempt = 0; attempt < maxAttempts; attempt++) {
-                if (await checkManifest(urn)) return true;
-                await new Promise((resolve) => setTimeout(resolve, delay));
-            }
-            console.log("SVF translation timed out");
             return false;
         }
 
-        setViewerState(true);
-
-        urn = btoa(urn);
-
-        const newURN = await checkManifest(urn);
-        console.log("New:", newURN);
-
-        if (!newURN) {
-            console.log("Model not in SVF format. Requesting translation...");
-            console.log(urn);
-            if (!(await requestTranslation(urn))) return;
-            if (!(await waitForSVF(urn))) return;
+        let loop = true;
+        for (let iteration = 0; iteration < 10 && loop; iteration++) {
+            const found = await getManifest();
+            if (found) {
+                loop = false;
+            } else {
+                await delay(5000);
+            }
         }
-        
+
+        if (loop) {
+            alert("Failed to retrieve the file");
+            return;
+        }
+
         let viewer: Autodesk.Viewing.GuiViewer3D;
         var options = {
             env: 'AutodeskProduction',
@@ -339,22 +326,34 @@ function Home({ params }: ParamProps) {
                     console.error("No valid token found.");
                     return;
                 }
-                var timeInSeconds = 3600;  
-                onTokenReady(token, timeInSeconds);  
+                var timeInSeconds = 3600;
+                onTokenReady(token, timeInSeconds);
             }
         };
         if (urn.length > 0) {
             Autodesk.Viewing.Initializer(options, function () {
-
                 const htmlDiv = document.getElementById('forgeViewer');
                 viewer = new Autodesk.Viewing.GuiViewer3D(htmlDiv, {});
-                 viewer.start(newURN);
+                console.log("urn:" + btoa(returnedUrn));
+                viewer.start();
 
                 const backButton = document.getElementById('viewerBackButton');
                 backButton?.addEventListener('click', () => {
                     viewer.finish();
                 })
+                Autodesk.Viewing.Document.load(documentId, onDocumentLoadSuccess, onDocumentLoadFailure);
             });
+
+            const documentId = "urn:" + returnedUrn;
+
+            function onDocumentLoadSuccess(viewerDocument: any) {
+                const defaultViewable = viewerDocument.getRoot().getDefaultGeometry();
+                viewer.loadDocumentNode(viewerDocument, defaultViewable);
+            }
+
+            function onDocumentLoadFailure() {
+                console.error('Failed fetching Forge manifest');
+            }
         }
     }
 
@@ -490,16 +489,14 @@ function Home({ params }: ParamProps) {
             {(viewerState) && (
                 <>
                     <div className="fixed inset-0 flex items-center justify-center bg-opacity-95 bg-slate-900 w-[40%] h-[40%] m-auto rounded-3xl shadow-lg p-8">
-                        <div>
-                            <span className="w-[50px] h-[20px]"><div className="w-[50px] h-[20px]" id="forgeViewer"></div></span>
-                        </div>
                         <button
                             id="viewerBackButton"
-                            onClick={() => setViewerState(false) }
+                            onClick={() => setViewerState(false)}
                             className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
                         >
                             Back
                         </button>
+                        <div id="forgeViewer" className="w-full h-full m-0 bg-[#F0F8FF]" />
                     </div>
                 </>
             )}
