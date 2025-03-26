@@ -4,50 +4,89 @@ import React, { useEffect, useState } from 'react';
 import { auth } from '@/app/firebase/config';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
+// Interfaces
+import { Emails } from "@/app/shared/interfaces/emails";
+
+
 interface PermissionsProps {
     project?: number;
     editors: string[];
     setEditors: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-interface Emails {
-    email: string;
-}
-
 export default function Permissions({ project, editors, setEditors }: PermissionsProps) {
     const [emails, updateEmails] = useState<Emails[]>([]);
     const [invites, updateInvites] = useState<Emails[]>([]);
 
+    const getAccounts = async () => {
+        const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/projects/editors`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ project_id: project })
+        })
+
+        const emailResponse = await response.json()
+        updateEmails(emailResponse);
+        if (emailResponse && emailResponse.length > 0) {
+            setEditors(emailResponse[0].email.toLowerCase());
+        }
+    }
+
+    const getInvited = async () => {
+        const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/projects/invited`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ project_id: project })
+        })
+
+        const emailResponse = await response.json();
+        updateInvites(emailResponse);
+    }
+
     useEffect(() => {
         if (project && project > 0) {
-            const getAccounts = async () => {
-                const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/projects/editors`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ project_id: project })
-                })
-                
-                const emailResponse = await response.json()
-                updateEmails(emailResponse);
-                if (emailResponse && emailResponse.length > 0) {
-                    setEditors(emailResponse[0].email.toLowerCase());
-                }
-            }
             getAccounts();
-
-            const getInvited = async () => {
-                const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/projects/invited`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ project_id: project })
-                })
-
-                const emailResponse = await response.json();
-                updateInvites(emailResponse);
-            }
             getInvited();
         }
     }, [project, setEditors])
+
+    const handleEditorDelete = async (userID: number) => {
+        const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/projects/removeEditor`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                project_id: project,
+                user_id: userID
+            })
+        })
+
+        if (response.ok) {
+            getAccounts();
+        }
+        else {
+            console.log("Error");
+        }
+    }
+
+    const handleInviteDelete = async (userID: number) => {
+        const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/projects/removeInvite`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                project_id: project,
+                user_id: userID
+            })
+        })
+
+
+        if (response.ok) {
+            getInvited();
+        }
+        else {
+            console.log("Error");
+        }
+
+    }
 
     if (project) {
         return (
@@ -57,7 +96,7 @@ export default function Permissions({ project, editors, setEditors }: Permission
                     <div className="border-b border-slate-700/50 mb-2 mt-2"></div>
                     <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-200 mb-4">Added Accounts</h1>
                     {emails.length > 0 ? (
-                        <table className="w-full"> 
+                        <table className="w-full">
                             <thead>
                                 <tr>
                                     <th colSpan={2} className="p-0">
@@ -74,18 +113,18 @@ export default function Permissions({ project, editors, setEditors }: Permission
                                         <td colSpan={2} className="pb-2">
                                             <div className="flex justify-between items-center p-2 bg-indigo-100 border border-slate-700/50 dark:bg-slate-800 rounded-lg">
                                                 <span className="text-slate-900 dark:text-slate-200">{email.email}</span>
-                                                <button className="px-4 py-2 text-sm font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">
+                                                <button onClick={() => handleEditorDelete(email.user_id)} className="px-4 py-2 text-sm font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">
                                                     Delete
                                                 </button>
                                             </div>
                                         </td>
                                     </tr>
                                 ))}
-                            </tbody> 
+                            </tbody>
                         </table>
-                ) : (
-                    <p className="text-slate-900 dark:text-slate-200">No accounts added</p>
-                )}
+                    ) : (
+                        <p className="text-slate-900 dark:text-slate-200">No accounts added</p>
+                    )}
                     <div className="border-b border-slate-700/50 mb mt-2"></div>
                     <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-200 mb-4 mt-4">Pending Invites</h1>
                     {invites.length > 0 ? (
@@ -106,7 +145,7 @@ export default function Permissions({ project, editors, setEditors }: Permission
                                         <td colSpan={2} className="pb-2">
                                             <div className="flex justify-between items-center p-2 bg-indigo-100 border border-slate-700/50 dark:bg-slate-800 rounded-lg">
                                                 <span className="text-slate-900 dark:text-slate-200">{invite.email}</span>
-                                                <button className="px-4 py-2 text-sm font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">
+                                                <button onClick={() => handleInviteDelete(invite.user_id)} className="px-4 py-2 text-sm font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">
                                                     Delete
                                                 </button>
                                             </div>
@@ -143,10 +182,10 @@ const EmailSender = ({ editors, setEditors }: EmailSenderProps) => {
 
     // For reseting the error so it doesnt stay on the screen
     useEffect(() => {
-        if (emailError) { 
+        if (emailError) {
             const timer = setTimeout(() => {
-                setEmailError(""); 
-            }, 3000); 
+                setEmailError("");
+            }, 3000);
 
             return () => clearTimeout(timer);
         }
@@ -162,7 +201,6 @@ const EmailSender = ({ editors, setEditors }: EmailSenderProps) => {
         setEmailError("");
 
         if (!editors.includes(email.toLowerCase()) && user?.email !== email.toLowerCase()) {
-            console.log(editors);
             if (validateEmail(email)) {
                 const parentDiv = document.getElementById("emails");
 
@@ -209,9 +247,8 @@ const EmailSender = ({ editors, setEditors }: EmailSenderProps) => {
                         onChange={(e) => setEmail(e.target.value)}
                         required
                         className={`text-slate-900 dark:text-slate-200 w-full p-2 my-2 rounded-lg bg-indigo-100 dark:bg-slate-800
-                            border border-slate-700/50 ${
-                            emailError ? 'border-2 border-red-500' : ''
-                        }`}
+                            border border-slate-700/50 ${emailError ? 'border-2 border-red-500' : ''
+                            }`}
                     />
                     {emailError && (
                         <p className="text-red-500 text-sm">{emailError}</p>
@@ -220,8 +257,8 @@ const EmailSender = ({ editors, setEditors }: EmailSenderProps) => {
                 <button
                     type="submit"
                     className="px-6 py-2 text-sm font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 mt-2"
-                    >
-                        Add
+                >
+                    Add
                 </button>
             </form>
             <div id="emails" className="mt-4">
