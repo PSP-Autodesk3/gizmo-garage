@@ -463,7 +463,8 @@ function Home({ params }: ParamProps) {
 
           {/* Confirmation for creating new items */}
           {(confirmModule) && (
-            <div className="fixed inset-0 flex border-slate-700/50 border items-center justify-center bg-indigo-200 dark:bg-slate-900 text-slate-900 dark:text-slate-200 w-[40%] h-[50%] m-auto rounded-lg mt-16">
+          <div className="fixed inset-0 flex items-center justify-center overflow-auto">
+            <div className="text-slate-900 dark:text-slate-200 relative bg-indigo-200 dark:bg-slate-900 border border-slate-700/50 rounded-lg p-6 w-[600px] max-h-[80vh] overflow-y-auto m-4">
               <ConfirmModule
                 itemType={(moduleType === 1 ? "Folder" : "File")}
                 projectID={projectID}
@@ -477,6 +478,7 @@ function Home({ params }: ParamProps) {
                 setFilteredTags={setFilteredTags}
               />
             </div>
+          </div>
           )}
         </div>
       </div>

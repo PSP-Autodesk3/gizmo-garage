@@ -254,7 +254,7 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                 />
                 <div className="mt-4">
                     <button
-                        className={`px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50` + (folderName.trim() ? "" : " opacity-50 cursor-not-allowed")}
+                        className={`px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 text-white` + (folderName.trim() ? "" : " opacity-50 cursor-not-allowed")}
                         disabled={!folderName.trim()}
                     >
                         Create
@@ -272,7 +272,7 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
     else if (itemType === "File") {
         return (
             <form className="text-center" onSubmit={(e) => newItem(e)}>
-                <h1 className='text-3xl'>Item name</h1>
+                <h1 className='text-3xl'>Create Item</h1>
                 <input
                     name="item-name"
                     type="text"
@@ -282,75 +282,77 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                         dark:bg-slate-800 border-slate-700/50 dark:text-white"
                     placeholder="Enter Item name"
                 />
-                <div className='dark:bg-slate-800 bg-indigo-100 border border-slate-700/50 mt-4 rounded-lg mb-4 flex flex-col items-center ' >
-                    <div id="search" className='p-4'>
-                        <label htmlFor="search=bar">Search</label>
-                        <input
-                            className='w-full p-2 my-2 rounded-lg bg-indigo-100 border border-slate-700/50 text-gray-800
-                                dark:bg-slate-800 dark:border-slate-700 dark:text-white'
-                            type="text"
-                            placeholder="Search"
-                            name="search"
-                            value={tagQuery}
-                            onChange={(e) => setTagQuery(e.target.value)}
-                        />
-                    </div>
-                    <div className='dark:bg-slate-800 border border-slate-700/50 rounded-lg overflow-hidden flex flex-wrap w-[90%]'>
-                        {filteredTags.length > 0 ? (
-                            filteredTags.map((tag: Tag) => (
-                                <button type="button" className='m-2 rounded-full bg-blue-600 dark:text-white text-gray-800 text-sm px-4 py-2 flex items-center text-center' onClick={() => applyTag(tag.tag_id)} key={tag.tag_id}>{tag.tag}</button>
-                            ))
-                        ) : (
-                            <span className='text-gray-800 dark:text-white m-auto p-2'>No tags found</span>
-                        )
-                        }
-                    </div>
+                <div className="flex flex-row gap-4 justify-between px-8">
+                    <div className='flex-1 dark:bg-slate-800 bg-indigo-100 border border-slate-700/50 mt-4 rounded-lg mb-4 flex flex-col items-center ' >
+                        <div id="search" className='p-4'>
+                            <label htmlFor="search=bar">Search</label>
+                            <input
+                                className='w-full p-2 my-2 rounded-lg bg-indigo-100 border border-slate-700/50 text-gray-800
+                                    dark:bg-slate-800 dark:border-slate-700 dark:text-white'
+                                type="text"
+                                placeholder="Search"
+                                name="search"
+                                value={tagQuery}
+                                onChange={(e) => setTagQuery(e.target.value)}
+                            />
+                        </div>
+                        <div className='dark:bg-slate-800 border border-slate-700/50 rounded-lg overflow-hidden flex flex-wrap w-[90%]'>
+                            {filteredTags.length > 0 ? (
+                                filteredTags.map((tag: Tag) => (
+                                    <button type="button" className='m-2 rounded-full bg-blue-600 dark:text-white text-gray-800 text-sm px-4 py-2 flex items-center text-center' onClick={() => applyTag(tag.tag_id)} key={tag.tag_id}>{tag.tag}</button>
+                                ))
+                            ) : (
+                                <span className='text-gray-800 dark:text-white m-auto p-2'>No tags found</span>
+                            )
+                            }
+                        </div>
 
-                    <div id='appliedTags' className='pt-5 rounded-lg my-3 flex-wrap flex p-2'>
-                        {appliedTags.length > 0 ? (
-                            appliedTags.map((tag: Tag) => (
-                                <button type='button'
-                                    className='rounded-full overflow-hidden white-space-nowrap truncate m-1 bg-blue-600 text-white text-sm px-4 py-2 flex max-w-[100px] items-center text-center'
-                                    onClick={() => removeTag(tag.tag_id)}
-                                    key={tag.tag_id}
-                                >
-                                    <svg
-                                        className="w-6 h-6 flex-shrink-0 text-blue-800 dark:text-white"
-                                        aria-hidden="true"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="15"
-                                        height="15"
-                                        fill="none"
-                                        viewBox="0 0 24 24">
-                                        <path
-                                            stroke="currentColor"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth="2"
-                                            d="M6 18 17.94 6M18 18 6.06 6" />
-                                    </svg>{tag.tag}</button>
-                            ))
-                        ) : (
-                            <span className='text-gray-800 dark:text-white'>No tags applied</span>
-                        )
-                        }
-                    </div>
-                    <div>
-                        {alreadyApplied === 1 && (
-                            <span className='text-red-500'>Already Applied</span>
-                        )}
+                        <div id='appliedTags' className='pt-5 rounded-lg my-3 flex-wrap flex p-2'>
+                            {appliedTags.length > 0 ? (
+                                appliedTags.map((tag: Tag) => (
+                                    <button type='button'
+                                        className='rounded-full overflow-hidden white-space-nowrap truncate m-1 bg-blue-600 text-white text-sm px-4 py-2 flex max-w-[100px] items-center text-center'
+                                        onClick={() => removeTag(tag.tag_id)}
+                                        key={tag.tag_id}
+                                    >
+                                        <svg
+                                            className="w-6 h-6 flex-shrink-0 text-blue-800 dark:text-white"
+                                            aria-hidden="true"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="15"
+                                            height="15"
+                                            fill="none"
+                                            viewBox="0 0 24 24">
+                                            <path
+                                                stroke="currentColor"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth="2"
+                                                d="M6 18 17.94 6M18 18 6.06 6" />
+                                        </svg>{tag.tag}</button>
+                                ))
+                            ) : (
+                                <span className='text-gray-800 dark:text-white'>No tags applied</span>
+                            )
+                            }
+                        </div>
+                        <div>
+                            {alreadyApplied === 1 && (
+                                <span className='text-red-500'>Already Applied</span>
+                            )}
+                        </div>
                     </div>
                 </div>
-
                 <div className="px-8">
                     <input type="file" onChange={handleFileChange} className="mb-4 dark:bg-slate-800 border border-slate-700/50 bg-indigo-100 rounded-lg p-4 text-lg" />
                     <br />
                     {message && <p className="mt-2 text-sm dark:text-white text-gray-800">{message}</p>}
                 </div>
 
+
                 <div className="mt-4">
                     <button
-                        className={`px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50` + (itemName.trim() ? "" : " opacity-50 cursor-not-allowed")}
+                        className={`px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 text-white` + (itemName.trim() ? "" : " opacity-50 cursor-not-allowed")}
                         disabled={!itemName.trim()}
                     >
                         Create
