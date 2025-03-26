@@ -1,7 +1,7 @@
 "use client";
 
 // React
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 // Interfaces
 import { File } from "@/app/shared/interfaces/file";
@@ -69,13 +69,13 @@ export default function FileList({ files }: { files: File[] }) {
                 location.reload();
             }
         }
-    }, [files]);
+    }, [files, router]);
 
     return (
         <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
             {!files ? (
                 <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
-                    <Skeleton width={100} height={100} style={{ margin: '5px' }} />
+                    <Skeleton width={100} height={100} style={{ margin: '5px' }} className="bg-red-500" />
                 </SkeletonTheme>
             ) : (
                 Array.isArray(files) && files.length > 0 && (
@@ -93,7 +93,12 @@ export default function FileList({ files }: { files: File[] }) {
                                             className="w-full h-auto mb-2 rounded-lg"
                                         />
                                     ) : (
-                                        <Skeleton width={100} height={100} style={{ margin: '5px' }} />
+                                        <div>
+                                            <div className="flex flex-col my-2 animate-pulse">
+                                                <div className="h-4 bg-gray-400 dark:bg-slate-700 rounded-lg w-3/4 mb-2"></div>
+                                                <div className="h-3 bg-gray-400 dark:bg-slate-700 rounded-lg w-1/2"></div>
+                                            </div>
+                                        </div>
                                     )}
                                 <div className="flex flex-row">
                                   <svg className="w-5 h-5 text-slate-900 dark:text-slate-200 flex-shrink-0 mt-1 mr-1" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
