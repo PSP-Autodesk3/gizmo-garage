@@ -574,7 +574,7 @@ function Home({ params }: ParamProps) {
                                 Back
                             </button>
                             {itemTranslating && (
-                                <div className="text-white">Processing file...</div>
+                                <div className="text-slate-800 dark:text-white">Processing file...</div>
                             )}
                         </div>
                     </div>
