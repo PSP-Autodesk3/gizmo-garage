@@ -209,24 +209,33 @@ function Home({ params }: ParamProps) {
         displayTree(newFolders, newFiles);
       }
 
+      let usableFiles: File[] = [];
       if (currentFolder) {
-        setFiles(newFiles.filter((file: File) => file.folder_id === currentFolder?.folder_id))
-        setFilteredFiles(newFiles.filter((file: File) => file.folder_id === currentFolder?.folder_id))
+        usableFiles = newFiles.filter((file: File) => file.folder_id === currentFolder?.folder_id);
+        setFiles(usableFiles);
+        setFilteredFiles(usableFiles);
       } else {
-        setFiles(newFiles.filter((file: File) => file.folder_id === null))
-        setFilteredFiles(newFiles.filter((file: File) => file.folder_id === null))
+        usableFiles = newFiles.filter((file: File) => file.folder_id === null);
+        setFiles(usableFiles);
+        setFilteredFiles(usableFiles);
       }
 
       setID(currentFolder ? (currentFolder.folder_id) : (projectID));
       setType(currentFolder ? (0) : (1));
 
+      let usableFolders: Folder[] = []
       if (currentFolder) {
-        setFolders(newFolders.filter((folder: Folder) => folder.parent_folder_id === currentFolder?.folder_id));
-        setFilteredFolders(newFolders.filter((folder: Folder) => folder.parent_folder_id === currentFolder?.folder_id));
+        usableFolders = newFolders.filter((folder: Folder) => folder.parent_folder_id === currentFolder?.folder_id);
+        setFolders(usableFolders);
+        setFilteredFolders(usableFolders);
       } else {
-        setFolders(newFolders.filter((folder: Folder) => folder.parent_folder_id === null));
-        setFilteredFolders(newFolders.filter((folder: Folder) => folder.parent_folder_id === null));
+        usableFolders = newFolders.filter((folder: Folder) => folder.parent_folder_id === null);
+        setFolders(usableFolders);
+        setFilteredFolders(usableFolders);
       }
+
+      console.log(usableFiles);
+      console.log(usableFolders);
       // Get Tags
 
       // All Tags
@@ -254,13 +263,14 @@ function Home({ params }: ParamProps) {
 
       const folderTags = await folderTagsQuery.json();
 
-      folders.forEach((folder: Folder) => {
+      usableFolders.forEach((folder: Folder) => {
         folder.tags = folderTags.filter((tag: FolderTags) => tag.folder_id === folder.folder_id);
       });
 
       // Adds tags to files
-      files.forEach((file: File) => {
+      usableFiles.forEach((file: File) => {
         file.tags = objectTags.filter((tag: ItemTags) => tag.object_id === file.object_id);
+        console.log(file.tags);
       });
 
       const checkbox = document.getElementById('file-checkbox'); 
