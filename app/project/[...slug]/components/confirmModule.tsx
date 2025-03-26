@@ -92,6 +92,34 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
             const data = await response.json();
             if (data.message == "Version tagged successfully") {
                 console.log("Version tagged successfully");
+                
+                const token = sessionStorage.getItem("token");
+                await fetch('https://developer.api.autodesk.com/modelderivative/v2/designdata/job',
+                    {
+                        method: "POST",
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json",
+                            'x-ads-force': 'true'
+                        },
+                        body: JSON.stringify({
+                            "input": {
+                                urn: btoa(urn)
+                            },
+                            "output": {
+                                "formats": [
+                                    {
+                                        "type": "svf2",
+                                        "views": [
+                                            "2d",
+                                            "3d"
+                                        ]
+                                    }
+                                ]
+                            }
+                        })
+                    }
+                )
             } else {
                 console.log("Error tagging version");
             }
