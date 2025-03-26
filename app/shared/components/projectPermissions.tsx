@@ -50,7 +50,6 @@ export default function Permissions({ project, editors, setEditors }: Permission
         }
     }, [project, setEditors])
 
-
     const handleEditorDelete = async (userID: number) => {
         const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/projects/removeEditor`, {
             method: 'POST',
@@ -146,7 +145,7 @@ export default function Permissions({ project, editors, setEditors }: Permission
                                         <td colSpan={2} className="pb-2">
                                             <div className="flex justify-between items-center p-2 bg-indigo-100 border border-slate-700/50 dark:bg-slate-800 rounded-lg">
                                                 <span className="text-slate-900 dark:text-slate-200">{invite.email}</span>
-                                                <button onClick={() => handleInviteDelete(invite.email)} className="px-4 py-2 text-sm font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">
+                                                <button onClick={() => handleInviteDelete(invite.user_id)} className="px-4 py-2 text-sm font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">
                                                     Delete
                                                 </button>
                                             </div>

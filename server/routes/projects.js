@@ -117,7 +117,7 @@ router.post("/invited", async (req, res, next) => {
         const { project_id } = req.body;
 
         const [result] = await pool.execute(`
-            SELECT email
+            SELECT email, Users.user_id
             FROM Users
             INNER JOIN Invite ON  Users.user_id = Invite.user_id
             INNER JOIN Projects ON Invite.project_id = Projects.project_id
@@ -180,7 +180,6 @@ router.post("/removeEditor", async (req, res, next) => {
             WHERE Editor.user_id = ? AND Editor.project_id = ?
         `, [user_id, project_id]);
 
-        console.log(result);
         res.json(result);
     }
     catch (error) {
@@ -191,7 +190,6 @@ router.post("/removeEditor", async (req, res, next) => {
 router.post("/removeInvite", async (req, res, next) => {
     try {
         const { project_id, user_id } = req.body;
-
         const [result] = await pool.execute(`
             DELETE FROM
             Invite
