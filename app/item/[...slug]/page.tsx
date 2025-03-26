@@ -35,7 +35,7 @@ function Home({ params }: ParamProps) {
     const [password, setPassword] = useState<string>('');
     const [rollbackVer, setRollbackVer] = useState<number | null>(null);
     const [viewerState, setViewerState] = useState<Boolean>(false);
-
+    const [itemTranslating, setItemTranslating] = useState(false);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files.length > 0) {
@@ -307,8 +307,10 @@ function Home({ params }: ParamProps) {
         for (let iteration = 0; iteration < 10 && loop; iteration++) {
             const found = await getManifest();
             if (found) {
+                setItemTranslating(false);
                 loop = false;
             } else {
+                setItemTranslating(true);
                 await delay(5000);
             }
         }
@@ -510,6 +512,9 @@ function Home({ params }: ParamProps) {
                         >
                             Back
                         </button>
+                        {itemTranslating && (
+                            <div>Processing file...</div>
+                        )}
                     </div>
                 </>
             )}
