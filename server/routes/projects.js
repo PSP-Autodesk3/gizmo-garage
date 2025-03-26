@@ -8,8 +8,8 @@ router.post("/create", async (req, res, next) => {
     try {
         const { name, owner } = req.body;
         const [rows] = await pool.execute(
-        "INSERT INTO Projects (name, owner) VALUES (?, ?)",
-        [name, owner]
+            "INSERT INTO Projects (name, owner) VALUES (?, ?)",
+            [name, owner]
         );
         res.json({ message: "Project created successfully", project_id: rows.insertId });
     }
@@ -22,7 +22,7 @@ router.post("/create", async (req, res, next) => {
 router.post("/changeName", async (req, res, next) => {
     try {
         console.log("body:", req.body);
-        const {name, id} = req.body;
+        const { name, id } = req.body;
         if (!name || name.trim() === "") {
             return res.status(400).json({ error: "Missing 'name' parameter" });
         }
@@ -41,7 +41,7 @@ router.post("/changeName", async (req, res, next) => {
 // Get projects
 router.post("/get", async (req, res, next) => {
     try {
-        const {email} = req.body;
+        const { email } = req.body;
         const [result] = await pool.execute(`
             SELECT Projects.project_id, Projects.name, Projects.dateOfCreation,
             CASE WHEN Projects.owner = Users.user_id THEN 1 ELSE 0 END AS ownsProject
@@ -60,7 +60,7 @@ router.post("/get", async (req, res, next) => {
 // Get project editors
 router.post("/getProjectEditors", async (req, res, next) => {
     try {
-        const {email} = req.body;
+        const { email } = req.body;
         const [result] = await pool.execute(`
             SELECT Projects.project_id, Projects.name, Projects.dateOfCreation,
             CASE WHEN Projects.owner = Users.user_id THEN 1 ELSE 0 END AS ownsProject
@@ -98,7 +98,7 @@ router.post("/editors", async (req, res, next) => {
         const { project_id } = req.body;
 
         const [result] = await pool.execute(`
-            SELECT email
+            SELECT email, Users.user_id
             FROM Users
             INNER JOIN Editor ON  Users.user_id = Editor.user_id
             INNER JOIN Projects ON Editor.project_id = Projects.project_id
@@ -171,4 +171,37 @@ router.post("/tags", async (req, res, next) => {
     }
 })
 
+router.post("/removeEditor", async (req, res, next) => {
+    try {
+        const { project_id, user_id } = req.body;
+        const [result] = await pool.execute(`
+            DELETE FROM
+            Editor
+            WHERE Editor.user_id = ? AND Editor.project_id = ?
+        `, [user_id, project_id]);
+
+        console.log(result);
+        res.json(result);
+    }
+    catch (error) {
+        next(error);
+    }
+})
+
+router.post("/removeInvite", async (req, res, next) => {
+    try {
+        const { project_id, user_id } = req.body;
+
+        const [result] = await pool.execute(`
+            DELETE FROM
+            Invite
+            WHERE Invite.user_id = ? AND Invite.project_id = ?
+        `, [user_id, project_id]);
+
+        res.json(result);
+    }
+    catch (error) {
+        next(error);
+    }
+})
 export default router;
