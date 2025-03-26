@@ -1,8 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from "next/image"
 import { Range } from 'react-range';
 import Link from 'next/link';
+
+// Firebase
+import { auth } from '@/app/firebase/config';
+import { useAuthState } from 'react-firebase-hooks/auth';
+
+// Interface
+import { User } from '@/app/shared/interfaces/user';
 
 interface FiltersProps {
   query?: string;
@@ -14,6 +21,33 @@ interface FiltersProps {
 export default function Filters({ query, onQueryChange, values, onValuesChange }: FiltersProps) {
   const router = useRouter();
   const admin = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [user] = useAuthState(auth);
+
+  useEffect(() => {
+      if (user) {
+        const checkAdmin = async () => {
+          try {
+            const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/users/checkAdmin`, {
+              method: "POST",
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                email: user.email
+              })
+            });
+            
+            const data = await response.json();
+            setIsAdmin(data.isAdmin);
+          } catch (error) {
+            console.error('Error checking admin:', error);
+            setIsAdmin(false);
+          }
+        };
+        checkAdmin();
+      }
+    }, [user]);
 
   const handleRangeValues = async () => {
     if (values) {
@@ -109,7 +143,7 @@ export default function Filters({ query, onQueryChange, values, onValuesChange }
             >
               Notifications
             </button>
-            {admin && (
+            {isAdmin && (
               <>
                 <button
                   className='p-1 transition-colors duration-300 hover:text-indigo-800 dark:hover:text-indigo-400 hover:font-semibold'

@@ -9,7 +9,7 @@ router.post("/create", async (req, res, next) => {
     try {
         const { email, fName, lName } = req.body;
         const [result] = await pool.execute(
-            "INSERT INTO Users (email, fname, lname) VALUES (?, ?, ?)", [email, fName, lName]
+            "INSERT INTO Users (email, fname, lname, admin) VALUES (?, ?, ?, 0)", [email, fName, lName]
         )
         res.json({ message: "User created", user_id: result.insertId });
     }
@@ -61,6 +61,24 @@ router.post("/details", async (req, res, next) => {
         )
 
         res.json(result);
+    }
+    catch (error) {
+        next(error);
+    }
+});
+
+router.post("/checkAdmin", async (req, res, next) => {
+    try {
+        const {email} = req.body;
+        const [result] = await pool.execute(`
+            SELECT admin
+            FROM Users
+            WHERE Users.email = ?
+        `, [email]);
+
+        res.json({
+            isAdmin: result.length > 0 ? !!result[0].admin : false
+        });
     }
     catch (error) {
         next(error);
