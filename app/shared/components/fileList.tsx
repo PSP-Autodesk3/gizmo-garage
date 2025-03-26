@@ -62,6 +62,12 @@ export default function FileList({ files }: { files: File[] }) {
                     getThumbnail();
                 }
             });
+            // Temp fix
+            const reload = sessionStorage.getItem("reload");
+            if (reload === "yes") {
+                sessionStorage.setItem("reload", "no");
+                location.reload();
+            }
         }
     }, [files]);
 
