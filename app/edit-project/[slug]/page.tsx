@@ -96,10 +96,10 @@ function Home({ params }: ParamProps) {
             <div className="flex min-h-screen">
                 {/* Center Project Name Section */}
                 <div className="flex-1 flex justify-center items-start mt-16">
-                    <div className="bg-slate-900 py-8 px-12 rounded-lg w-auto">
+                    <div className="bg-indigo-200/50 dark:bg-slate-900 border border-slate-700/50 py-8 px-12 rounded-lg w-auto">
                         <form onSubmit={(e) => saveProject(e)} className="flex flex-col items-center">
                             <div className='flex items-center justify-between w-full mb-8'>
-                                <label htmlFor="name" className="text-2xl text-slate-200 whitespace-nowrap">
+                                <label htmlFor="name" className="text-2xl font-semibold text-slate-900 dark:text-slate-200 pt-2 mb-4 whitespace-nowrap">
                                     Edit Project Name:
                                 </label>
                                 <input
@@ -107,7 +107,8 @@ function Home({ params }: ParamProps) {
                                     value={name}
                                     placeholder="Edit Project Name"
                                     onChange={(e) => setName(e.target.value)}
-                                    className="rounded-lg bg-slate-800 p-2 text-2xl ml-4 w-[300px] text-white"
+                                    className="p-2 text-2xl ml-4 w-[300px] rounded-lg bg-indigo-100 border border-slate-700/50 text-gray-800 
+                                        dark:bg-slate-800 dark:text-white" 
                                 />
                             </div>
                             <button className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">
@@ -123,7 +124,7 @@ function Home({ params }: ParamProps) {
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
 export default withAuth(Home);

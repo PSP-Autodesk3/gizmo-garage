@@ -52,62 +52,74 @@ export default function Permissions({ project, editors, setEditors }: Permission
     if (project) {
         return (
             <>
-                <div className="bg-slate-900 p-4 rounded-lg shadow-lg mt-4">
-                    <h1 className="text-2xl font-semibold text-slate-200 mb-4">Project Permissions</h1>
-                    <h1 className="text-xl font-semibold text-slate-200 mb-4">Added Accounts</h1>
+                <div className="bg-indigo-200/50 dark:bg-slate-900 p-4 rounded-lg border border-slate-700/50 mt-4">
+                    <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-200">Project Permissions</h1>
+                    <div className="border-b border-slate-700/50 mb-2 mt-2"></div>
+                    <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-200 mb-4">Added Accounts</h1>
                     {emails.length > 0 ? (
-                        <table className="w-full">
-                            <thead className="bg-slate-800">
+                        <table className="w-full"> 
+                            <thead>
                                 <tr>
-                                    <th className="text-left text-slate-200">Email</th>
-                                    <th className="text-left text-slate-200">Actions</th>
+                                    <th colSpan={2} className="p-0">
+                                        <div className="flex justify-between p-2 rounded-lg">
+                                            <span className="text-left text-slate-900 dark:text-slate-200">Email</span>
+                                            <span className="text-left text-slate-900 dark:text-slate-200 text-end pr-3">Actions</span>
+                                        </div>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {emails.map((email, index) => (
-                                    <tr key={index} className="border-t border-slate-800">
-                                        <td className="p-2 text-slate-400">{email.email}</td>
-                                        <td className="p-2 text-right">
-                                            <button className="px-4 py-2 text-sm font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">
-                                                Delete
-                                            </button>
+                                    <tr key={index}>
+                                        <td colSpan={2} className="pb-2">
+                                            <div className="flex justify-between items-center p-2 bg-indigo-100 border border-slate-700/50 dark:bg-slate-800 rounded-lg">
+                                                <span className="text-slate-900 dark:text-slate-200">{email.email}</span>
+                                                <button className="px-4 py-2 text-sm font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">
+                                                    Delete
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
                             </tbody> 
                         </table>
                 ) : (
-                    <p className="text-slate-400">No accounts added</p>
+                    <p className="text-slate-900 dark:text-slate-200">No accounts added</p>
                 )}
-                    <h1 className="text-xl font-semibold text-slate-200 mb-4 mt-4">Pending Invites</h1>
+                    <div className="border-b border-slate-700/50 mb mt-2"></div>
+                    <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-200 mb-4 mt-4">Pending Invites</h1>
                     {invites.length > 0 ? (
                         <table className="w-full">
-                            <thead className="bg-slate-800">
+                            <thead>
                                 <tr>
-                                    <th className="text-left text-slate-200">Email</th>
-                                    <th className="text-left text-slate-200">Actions</th>
+                                    <th colSpan={2} className="p-0">
+                                        <div className="flex justify-between p-2 rounded-lg">
+                                            <span className="text-left text-slate-900 dark:text-slate-200">Email</span>
+                                            <span className="text-left text-slate-900 dark:text-slate-200 text-end pr-3">Actions</span>
+                                        </div>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {invites.map((invite, index) => (
-                                    <tr key={index} className="border-t border-slate-800">
-                                        <td className="p-2 text-slate-400">{invite.email}</td>
-                                        <td className="p-2 text-right">
-                                            <button
-                                                // onClick={() => handleDeleteInvite(invite.email)}
-                                                className="px-4 py-2 text-sm font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
-                                            >
-                                                Delete
-                                            </button>
+                                    <tr key={index}>
+                                        <td colSpan={2} className="pb-2">
+                                            <div className="flex justify-between items-center p-2 bg-indigo-100 border border-slate-700/50 dark:bg-slate-800 rounded-lg">
+                                                <span className="text-slate-900 dark:text-slate-200">{invite.email}</span>
+                                                <button className="px-4 py-2 text-sm font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">
+                                                    Delete
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
                     ) : (
-                        <p className="text-slate-400">No pending invites</p>
+                        <p className="text-slate-900 dark:text-slate-200">No pending invites</p>
                     )}
-                    <div className="mt-6">
+                    <div className="border-b border-slate-700/50 mb-2 mt-2"></div>
+                    <div className="mt-2">
                         <EmailSender editors={editors} setEditors={setEditors} />
                     </div>
                 </div>
@@ -156,11 +168,11 @@ const EmailSender = ({ editors, setEditors }: EmailSenderProps) => {
 
                 // div for each email 
                 const childDiv = document.createElement("div");
-                childDiv.className = "flex justify-between items-center p-2 mb-2 bg-slate-800 rounded-lg";
+                childDiv.className = "flex justify-between items-center p-2 mb-2 bg-indigo-100 border border-slate-700/50 dark:bg-slate-800 rounded-lg";
                 parentDiv?.appendChild(childDiv);
 
                 const p = document.createElement("p");
-                p.className = "text-slate-400";
+                p.className = "text-slate-900 dark:text-slate-400";
                 p.innerHTML = email;
                 childDiv.appendChild(p);
 
@@ -188,7 +200,7 @@ const EmailSender = ({ editors, setEditors }: EmailSenderProps) => {
     return (
         <div>
             <form onSubmit={sendInvite} className="mb-4">
-                <p className="text-xl font-semibold text-slate-200 mb-2">Invite to project</p>
+                <p className="text-xl font-semibold text-slate-900 dark:text-slate-200 mb-2">Invite to project</p>
                 <div className="flex gap-2">
                     <input
                         type="email"
@@ -196,7 +208,8 @@ const EmailSender = ({ editors, setEditors }: EmailSenderProps) => {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        className={`flex-1 text-white p-2 rounded-lg bg-slate-800 ${
+                        className={`text-slate-900 dark:text-slate-200 w-full p-2 my-2 rounded-lg bg-indigo-100 dark:bg-slate-800
+                            border border-slate-700/50 ${
                             emailError ? 'border-2 border-red-500' : ''
                         }`}
                     />
@@ -212,7 +225,8 @@ const EmailSender = ({ editors, setEditors }: EmailSenderProps) => {
                 </button>
             </form>
             <div id="emails" className="mt-4">
-                <p className="text-xl font-semibold text-slate-200 mb-2">Proposed Editors:</p>
+                <div className="border-b border-slate-700/50 mb-2 mt-2"></div>
+                <p className="text-xl font-semibold text-slate-900 dark:text-slate-200 mb-2">Proposed Editors:</p>
             </div>
         </div>
     );
