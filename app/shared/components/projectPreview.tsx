@@ -35,16 +35,18 @@ export default function ProjectPreview({ project, query }: { project: Project, q
             <div className='content-center'>
                 <button
                     className="px-6 py-3 mr-4 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
-                    onClick={() => router.push(`/project/${project.project_id}+${project.name.replace(/ /g, '+')}`)}
+                    onClick={() => { sessionStorage.setItem("reload", "yes"); router.push(`/project/${project.project_id}+${project.name.replace(/ /g, '+')}`) }}
                 >
                     View
                 </button>
-                <button
-                    className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
-                    onClick={() => router.push(`/edit-project/${project.project_id}`)}
-                >
-                    Edit
-                </button>
+                {project.ownsProject ? (
+                    <button
+                        className="px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                        onClick={() => router.push(`/edit-project/${project.project_id}`)}
+                    >
+                        Edit
+                    </button>
+                ) : (<></>)}
             </div>
         </div>
     );

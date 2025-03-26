@@ -105,7 +105,7 @@ export default function withAuth<T extends object>(
           }
         }
         }
-    }, [user]);
+    }, [user, pathname, router]);
 
     return <WrappedComponent {...props} />;
   };
