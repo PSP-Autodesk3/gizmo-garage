@@ -5,4 +5,5 @@ export interface User {
   fname: string;
   lname: string;
   disabled: boolean;
+  admin: boolean;
 }
