@@ -296,7 +296,6 @@ function Home({ params }: ParamProps) {
     
      return (
         <>
-        
         <BackBtnBar back={true} projectID={projectID} folderID={folderID} projectName={projectName} />
         <div className={`w-full ${confirmModule ? 'blur-xl bg-opacity-40' : ''}`}>
             {archiveStatus && (
@@ -306,27 +305,27 @@ function Home({ params }: ParamProps) {
             )}
             <div className="lg:grid lg:grid-cols-2 w-full">
             <div>
-                <div className="bg-slate-800/50 backdrop-blur mx-8 my-4 rounded-lg overflow-hidden shadow-xl border border-slate-700/50 p-4">
+                <div className="bg-indigo-200 text-slate-800 dark:text-white dark:bg-slate-800/50 backdrop-blur mx-8 my-4 rounded-lg overflow-hidden shadow-xl border border-slate-700/50 p-4">
                     <h1 className="text-2xl text-center pb-4">
                         Item Details
                     </h1>
-                    <div className="flex flex-col w-full border px-2 border-slate-700/50 py-2 my-2 rounded-lg text-lg">
+                    <div className="flex flex-col bg-indigo-100/50 dark:bg-slate-800/50 w-full border px-2 border-slate-700/50 py-2 my-2 rounded-lg text-lg">
                         <p><b>ID:</b> {itemId}</p>
                     </div>
-                    <div className="flex flex-col w-full border px-2 border-slate-700/50 py-2 my-2 rounded-lg text-lg">
+                    <div className="flex flex-col w-full border px-2 bg-indigo-100/50 dark:bg-slate-800/50 border-slate-700/50 py-2 my-2 rounded-lg text-lg">
                         <p><b>Name:</b> {itemName}</p>
                     </div>
-                    <div className="flex flex-col w-full border px-2 border-slate-700/50 py-2 my-2 rounded-lg text-l">
+                    <div className="flex flex-col w-full border px-2 bg-indigo-100/50 dark:bg-slate-800/50 border-slate-700/50 py-2 my-2 rounded-lg text-l">
                         <p><b>Author:</b> {author}</p>
                     </div>
-                    <div className="flex flex-col w-full border px-2 border-slate-700/50 py-2 my-2 rounded-lg text-lg">
+                    <div className="flex flex-col w-full border px-2 bg-indigo-100/50 dark:bg-slate-800/50 border-slate-700/50 py-2 my-2 rounded-lg text-lg">
                         <p><b>Bucket Key:</b> {bucketKey}</p>
                     </div>
                     {projectOwner === user?.email?.toLowerCase() && (
                      <>
                         <button
                         onClick={async () => await archiveItem(archiveStatus ? "unarchive" : "archive")}
-                        className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                        className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg text-white transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
                         disabled={uploading}
                     >
                         {archiveStatus ? "Unarchive" : "Archive"}
@@ -335,13 +334,13 @@ function Home({ params }: ParamProps) {
                     )}
                 </div>
             </div>
-            <div className={`bg-slate-800/50 backdrop-blur mx-8 my-4 transition-all duration-300 rounded-lg overflow-hidden shadow-xl border border-slate-700/50 p-4 ${archiveStatus ? 'opacity-40 pointer-events-none' : ''}`}>
+            <div className={`bg-indigo-200 dark:bg-slate-800/50 dark:text-white text-slate-800 backdrop-blur mx-8 my-4 transition-all duration-300 rounded-lg overflow-hidden shadow-xl border border-slate-700/50 p-4 ${archiveStatus ? 'opacity-40 pointer-events-none' : ''}`}>
             <h1 className="text-2xl text-center pb-4">Tag new version</h1>
                 <input type="file" onChange={handleFileChange} className="mb-4 rounded-lg p-4 text-lg" />
                     <br />
                     <button
                         onClick={handleUpload}
-                        className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                        className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50 text-white"
                         disabled={uploading}
                     >
                         {uploading ? "Uploading..." : "Upload File"}
@@ -349,18 +348,18 @@ function Home({ params }: ParamProps) {
                     {message && <p className="mt-2 text-sm">{message}</p>}
             </div>
             </div>
-            <div className="bg-slate-800/50 backdrop-blur mx-8 my-4 rounded-lg overflow-hidden shadow-xl border border-slate-700/50 p-4">
+            <div className="bg-indigo-200 dark:bg-slate-800/50 text-slate-800 dark:text-white backdrop-blur mx-8 my-4 rounded-lg overflow-hidden shadow-xl border border-slate-700/50 p-4">
                 <h1 className="text-2xl text-center pb-4">
                     Versions
                 </h1>
                 <div className="flex flex-col items-center">
                     {versions.map((version, index) => (
-                        <div key={index} className="flex justify-between w-full border px-2 border-slate-700/50 py-2 my-2 rounded-lg text-lg">
+                        <div key={index} className="flex justify-between w-full border px-2 bg-indigo-100/50 dark:bg-slate-800/50 border-slate-700/50 py-2 my-2 rounded-lg text-lg">
                             <p className="text-2xl p-4">Version: <b>{version.version}</b></p>
                             <div className="flex justify-center">
                                 <button
                                     onClick={() => downloadFile(version.urn, version.object_key)}
-                                    className="px-6 m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
+                                    className="px-6 text-white m-1 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
                                 >
                                     Download
                                 </button>
@@ -371,7 +370,7 @@ function Home({ params }: ParamProps) {
                                             setConfirmModule(true);
                                         }
                                     }}
-                                    className={`px-6 m-1 py-3 text-lg font-medium bg-red-500 rounded-lg transition-all duration-300 hover:bg-red-400 hover:scale-105 shadow-lg hover:shadow-red-400/50 ${archiveStatus ? 'opacity-30 pointer-events-none' : ''}`}
+                                    className={`px-6 m-1 py-3 text-lg font-medium bg-red-500 rounded-lg transition-all duration-300 hover:bg-red-400 hover:scale-105 shadow-lg hover:shadow-red-400/50 text-white ${archiveStatus ? 'opacity-30 pointer-events-none' : ''}`}
                                 >
                                     Rollback
                                 </button>

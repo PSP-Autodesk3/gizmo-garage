@@ -184,7 +184,7 @@ function Home() {
           <div id="projects">
             <div className="w-[50%] py-8 m-auto gap-4 lg:absolute rounded-lg left-1/2 transform -translate-x-1/2">
               <div className="pr-8 flex flex-row justify-between">
-                <h1 className='p-10 text-4xl text-white transition-colors duration-300 hover:text-gray-400 pb-10'>Projects</h1>
+                <h1 className='p-8 text-4xl text-slate-900 dark:text-slate-200 pb-10 font-semibold'>Projects</h1>
                 <button
                   className="self-center flex justify-end px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
                   onClick={() => router.push("/new-project")}
@@ -193,10 +193,10 @@ function Home() {
                 </button>
               </div>
               {/* Sort By */}
-              <label>Sort By:</label>
-              <select onChange={handleSortBy} className='bg-slate-900 p-1 rounded-lg m-2'>
-                <option value="newest" >Newest</option>
-                <option value="oldest" >Oldest</option>
+              <label className='pl-8 text-slate-900 dark:text-slate-200 font-semibold'>Sort By:</label>
+              <select onChange={handleSortBy} className='bg-indigo-100 dark:bg-slate-900 text-slate-900 dark:text-slate-200 p-1 rounded-lg m-2 cursor-pointer'>
+                <option value="newest" className='text-slate-900 dark:text-slate-200' >Newest</option>
+                <option value="oldest" className='text-slate-900 dark:text-slate-200' >Oldest</option>
               </select>
               {/* Loading */}
               {!loadingProjects ? (
@@ -206,23 +206,21 @@ function Home() {
                   </div>
                 ))
               ) : (
-                <>
-                  <div className='space-y-4 ml-10'>
-                    {[...Array(4)].map((_, index) => (
-                      <div key={index} className="bg-slate-800 p-4 rounded-lg animate-pulse">
-                        <div className='flex justify-between items-center mb-4'>
-                          <div className='h-6 bg-slate-700 rounded-lg w-2/4'></div>
-                        </div>
-                        <div className='space-y-3'>
-                          <div className='h-4 bg-slate-700 rounded-lg w-1/4'></div>
-                        </div>
-                        <div className='flex gap-2 mt-4'>
-                          <div className='h-4 bg-slate-700 rounded-lg w-20'></div>
-                        </div>
+                <div className='space-y-4 ml-10 pt-2'>
+                  {[...Array(4)].map((_, index) => (
+                    <div key={index} className="bg-indigo-200/50 dark:bg-slate-800 p-2 rounded-lg animate-pulse">
+                      <div className='flex justify-between items-center mb-4'>
+                        <div className='h-6 bg-gray-400 dark:bg-slate-700 rounded-lg w-2/4'></div>
                       </div>
-                    ))}
-                  </div>
-                </>
+                      <div className='space-y-3'>
+                        <div className='h-4 bg-gray-400 dark:bg-slate-700 rounded-lg w-1/4'></div>
+                      </div>
+                      <div className='flex gap-2 mt-4'>
+                        <div className='h-4 bg-gray-400 dark:bg-slate-700 rounded-lg w-20'></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           </div>
