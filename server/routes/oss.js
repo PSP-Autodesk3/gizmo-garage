@@ -56,7 +56,7 @@ router.post("/upload", upload.single("file"), async (req, res, next) => {
         const {token, bucketKey} = req.body;
         const file = req.file;
         if (!file) {
-            throw new Error("Not allowed file type: ", extension);
+            throw new Error("No file uploaded");
         }
         const fileName = file.originalname;
         const extension = fileName.substring(fileName.lastIndexOf("."));
