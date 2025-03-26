@@ -56,10 +56,26 @@ router.post("/upload", upload.single("file"), async (req, res, next) => {
         const {token, bucketKey} = req.body;
         const file = req.file;
         if (!file) {
-            throw new Error("No file uploaded");
+            throw new Error("Not allowed file type: ", extension);
         }
         const fileName = file.originalname;
         const extension = fileName.substring(fileName.lastIndexOf("."));
+        // Allowed file types
+        const allowedFileTypes = [
+            ".3dm", ".3ds", ".a", ".asm", ".axm", ".brd", ".catpart", ".catproduct",
+            ".cgr", ".collaboration", ".dae", ".ddx", ".ddz", ".dgk", ".dgn", ".dlv3",
+            ".dmt", ".dwf", ".dwfx", ".dwg", ".dwt", ".dxf", ".emodel", ".exp", ".f3d",
+            ".fbrd", ".fbx", ".fsch", ".g", ".gbxml", ".glb", ".gltf", ".iam", ".idw",
+            ".ifc", ".ige", ".iges", ".igs", ".ipt", ".iwm", ".jt", ".max", ".model",
+            ".mpf", ".msr", ".neu", ".nwc", ".nwd", ".obj", ".osb", ".par", ".pmlprj",
+            ".pmlprjz", ".prt", ".psm", ".psmodel", ".rvt", ".sab", ".sat", ".sch",
+            ".session", ".skp", ".sldasm", ".sldprt", ".smb", ".smt", ".ste", ".step",
+            ".stl", ".stla", ".stlb", ".stp", ".stpz", ".vpb", ".vue", ".wire", ".x_b",
+            ".x_t", ".xas", ".xpr"
+        ];  
+        if (!allowedFileTypes.includes(extension)) {
+            res.json({ message: "Not allowed file type: ", extension });
+        }
         const fileUUID = crypto.randomUUID();
         const objectKey = `${fileUUID}${extension}`;
         const ObjectDetails = await ossClient.uploadObject(bucketKey, objectKey, file.buffer, { accessToken: token}); // Upload file to OSS: https://aps.autodesk.com/en/docs/data/v2/reference/typescript-sdk-oss/ - Adam

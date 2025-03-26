@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import {ThemeProvider} from "@/app/shared/providers/themeProvider";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 //skeleton loading
 import 'react-loading-skeleton/dist/skeleton.css'
+import ThemeSwitcher from "./shared/components/themeSwitcher";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,14 +28,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="stylesheet" href="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/style.min.css" type="text/css"></link>
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} 
+        antialiased bg-indigo-100 dark:bg-slate-950`}
       >
-        {children}
+        <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <ThemeSwitcher />
+            {children}
+          </ThemeProvider>
       </body>
     </html>
   );
