@@ -1,7 +1,11 @@
 "use client";
 
+// React
+import { useEffect, useState } from "react";
+
 // Interfaces
 import { File } from "@/app/shared/interfaces/file";
+import { Thumbnails } from "@/app/shared/interfaces/thumbnail";
 
 // Skeleton Loading
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
@@ -12,6 +16,78 @@ import { useRouter } from "next/navigation";
 
 export default function FileList({ files }: { files: File[] }) {
     const router = useRouter();
+    const [thumbnails, setThumbnails] = useState<{ [key: number]: string }>({});
+
+    useEffect(() => {
+        if (files) {
+            files.forEach(file => {
+                // Get URN of file
+                let urn: string | null = null;
+                const retrieveUrn = async () => {
+                    const getUrn = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/versions/latestVersion`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ bucket_id: file.bucket_id }),
+                    });
+                    const data = await getUrn.json();
+                    console.log(data);
+                    urn = data.urn;
+                }
+                retrieveUrn().then(() => {
+                    if (urn) {
+                        getManifest(urn);
+                    }
+                });
+
+                const getManifest = async (urn: string) => {
+                    const returnedUrn = btoa(urn).slice(0, -1);
+                    const token = sessionStorage.getItem("token");
+                    let query = await fetch(`https://developer.api.autodesk.com/modelderivative/v2/designdata/${returnedUrn}/manifest`, {
+                        method: "GET",
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    });
+                    let response = await query.json();
+                    console.log("Manifest response:", JSON.stringify(response, null, 2));
+                    // Extract thumbnail URN
+                    let thumbnailURN: string | null = null;
+                    if (response.derivatives) {
+                        response.derivatives.forEach((derivative: any) => {
+                            if (derivative.children) {
+                                derivative.children.forEach((child: any) => {
+                                    if (child.children) { 
+                                        child.children.forEach((grandChild: any) => {
+                                            if (grandChild.role === "thumbnail" && grandChild.urn) {
+                                                thumbnailURN = grandChild.urn;
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                    console.log(thumbnailURN);
+
+                    const getThumbnail = async (thumbnailURN: string) => {
+                        const response = await fetch (`https://developer.api.autodesk.com/modelderivative/v2/designdata/${btoa(thumbnailURN)}/thumbnail`, {
+                            method: "GET",
+                            headers: {
+                                Authorization: `Bearer ${token}`
+                            }
+                        })
+                        const data = await response.json();
+                        console.log(data);
+                    }
+                    if (thumbnailURN) {
+                        getThumbnail(thumbnailURN);
+                    }
+                }
+            });
+        }
+    }, [files]);
 
     return (
         <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
@@ -28,6 +104,15 @@ export default function FileList({ files }: { files: File[] }) {
                                 onClick={() => {router.push(`/item/${file.object_id}`);}}
                             >   
                               <div className="flex flex-col">
+                              {thumbnails[file.object_id] ? (
+                                        <img 
+                                            src={thumbnails[file.object_id] as string} 
+                                            alt="Thumbnail" 
+                                            className="w-full h-auto mb-2 rounded-lg"
+                                        />
+                                    ) : (
+                                        <Skeleton width={100} height={100} style={{ margin: '5px' }} />
+                                    )}
                                 <div className="flex flex-row">
                                   <svg className="w-5 h-5 text-slate-900 dark:text-slate-200 flex-shrink-0 mt-1 mr-1" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
