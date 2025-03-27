@@ -61,7 +61,7 @@ function Home({ params }: ParamProps) {
           && prevRoutes.every((route, index) => route === newRoutes[index])
           ? prevRoutes : newRoutes;
       });
-      
+
 
       async function getFolders(): Promise<Folder[]> {
         const query = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/folders/get`, {
@@ -72,7 +72,7 @@ function Home({ params }: ParamProps) {
 
         return await query.json();
       }
-      async function getFiles(): Promise<File[]>  {
+      async function getFiles(): Promise<File[]> {
         const query = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/items/get`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -101,15 +101,15 @@ function Home({ params }: ParamProps) {
             const button = document.createElement("button");
             button.className = `pl-4 flex items-center gap-2 py-2 px-3 text-slate-900 dark:text-slate-300 hover:text-slate-500 dark:hover:text-slate-50 transition-colors duration-200 flex-1 text-left tree-file
                               ${checkboxOpen === 'false' && 'hidden'}`;
-                              button.innerHTML = `
+            button.innerHTML = `
               <svg class="ml-2 w-5 h-5 text-slate-900 dark:text-slate-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
               </svg>
               ${file.name}`;
-              button.onclick = () => {
-                const route = `/item/${file.object_id}`;
-                router.push(route);
-              }
+            button.onclick = () => {
+              const route = `/item/${file.object_id}`;
+              router.push(route);
+            }
             parentObject.appendChild(button);
           })
 
@@ -162,7 +162,7 @@ function Home({ params }: ParamProps) {
             summary.appendChild(button);
             details.appendChild(summary);
             parentObject.appendChild(details);
-            
+
             outputFolder(folder.folder_id, details, newValid, newDepth, newHistory);
           })
         }
@@ -174,7 +174,7 @@ function Home({ params }: ParamProps) {
       // Get stored data
       const storedFolders = sessionStorage.getItem(`folders_${projectID}`);
       const storedFiles = sessionStorage.getItem(`files_${projectID}`);
-      
+
       // Load stored folders
       let folders: Folder[];
       if (storedFolders) {
@@ -210,22 +210,31 @@ function Home({ params }: ParamProps) {
       }
 
       if (currentFolder) {
-        setFiles(newFiles.filter((file: File) => file.folder_id === currentFolder?.folder_id))
-        setFilteredFiles(newFiles.filter((file: File) => file.folder_id === currentFolder?.folder_id))
+        // Sort by new initially
+        const sortedFiles = sortArray(newFiles, { by: 'dateOfCreation', order: 'desc' });
+        setFiles(sortedFiles.filter((file: File) => file.folder_id === currentFolder?.folder_id))
+        setFilteredFiles(sortedFiles.filter((file: File) => file.folder_id === currentFolder?.folder_id))
       } else {
-        setFiles(newFiles.filter((file: File) => file.folder_id === null))
-        setFilteredFiles(newFiles.filter((file: File) => file.folder_id === null))
+        // Sort by new initially
+        const sortedFiles = sortArray(newFiles, { by: 'dateOfCreation', order: 'desc' });
+        setFiles(sortedFiles.filter((file: File) => file.folder_id === null))
+        setFilteredFiles(sortedFiles.filter((file: File) => file.folder_id === null))
       }
 
       setID(currentFolder ? (currentFolder.folder_id) : (projectID));
       setType(currentFolder ? (0) : (1));
 
       if (currentFolder) {
-        setFolders(newFolders.filter((folder: Folder) => folder.parent_folder_id === currentFolder?.folder_id));
-        setFilteredFolders(newFolders.filter((folder: Folder) => folder.parent_folder_id === currentFolder?.folder_id));
+        // Sort by new initially
+        const sortedfolders = sortArray(newFolders, { by: 'dateOfCreation', order: 'desc' });
+        setFolders(sortedfolders.filter((folder: Folder) => folder.parent_folder_id === currentFolder?.folder_id));
+        setFilteredFolders(sortedfolders.filter((folder: Folder) => folder.parent_folder_id === currentFolder?.folder_id));
       } else {
-        setFolders(newFolders.filter((folder: Folder) => folder.parent_folder_id === null));
-        setFilteredFolders(newFolders.filter((folder: Folder) => folder.parent_folder_id === null));
+        // Sort by new initially
+        const sortedfolders = sortArray(newFolders, { by: 'dateOfCreation', order: 'desc' });
+
+        setFolders(sortedfolders.filter((folder: Folder) => folder.parent_folder_id === null));
+        setFilteredFolders(sortedfolders.filter((folder: Folder) => folder.parent_folder_id === null));
       }
       // Get Tags
 
@@ -263,7 +272,7 @@ function Home({ params }: ParamProps) {
         file.tags = objectTags.filter((tag: ItemTags) => tag.object_id === file.object_id);
       });
 
-      const checkbox = document.getElementById('file-checkbox'); 
+      const checkbox = document.getElementById('file-checkbox');
       if (checkbox) {
         (checkbox as HTMLInputElement).checked = checkboxOpen === 'true'; // Docs on HTMLInputElement https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement#instance_properties_that_apply_only_to_elements_of_type_checkbox_or_radio
         checkbox.addEventListener('change', () => {
@@ -370,12 +379,12 @@ function Home({ params }: ParamProps) {
                 {project.replace(/%2B/g, ' ')}
               </button>
               <div className="flex flex-row mt-[20px] gap-[7.5px]">
-              <input
-                id="file-checkbox"
-                type="checkbox"
-                defaultChecked={sessionStorage.getItem('checkboxOpen') === 'true'}
-                className={`m-1 w-4 h-4 checked:bg-green-600 checked:border-green-600 bg-red-600 border-red-600 border-2 appearance-none rounded transition-colors duration-200`}
-              />
+                <input
+                  id="file-checkbox"
+                  type="checkbox"
+                  defaultChecked={sessionStorage.getItem('checkboxOpen') === 'true'}
+                  className={`m-1 w-4 h-4 checked:bg-green-600 checked:border-green-600 bg-red-600 border-red-600 border-2 appearance-none rounded transition-colors duration-200`}
+                />
                 <p>Show files</p>
               </div>
             </div>
