@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 
 // Interfaces
 import { Folder } from "@/app/shared/interfaces/folder";
+import next from 'next';
 
 interface ButtonProps {
 	back?: boolean;
@@ -18,36 +19,37 @@ export default function BackBtnBar({ back, projectID, folderID, projectName }: B
 	const router = useRouter();
 
 	const backButton = async () => {
-        const details = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/folders/get`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id: projectID })
-        });
-        const results = await details.json();
-        const currentFolder = results.find((folder: Folder) => folder.folder_id === folderID);
+		const details = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/folders/get`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ id: projectID })
+		});
+		const results = await details.json();
+		const currentFolder = results.find((folder: Folder) => folder.folder_id === folderID);
 
-        const folders: Folder[] = [];
-        if (currentFolder) {
-            folders.push(currentFolder);
-            let con = false;
+		const folders: Folder[] = [];
+		if (currentFolder) {
+			folders.push(currentFolder);
+			let con = false;
 
-            while (!con) {
-                const currentFolder = results.find((folder: Folder) => folder.folder_id === folders[folders.length - 1].parent_folder_id);
+			while (!con) {
+				const currentFolder = results.find((folder: Folder) => folder.folder_id === folders[folders.length - 1].parent_folder_id);
 
-                if (currentFolder) {
-                    folders.push(currentFolder);
-                } else {
-                    con = true;
-                }
-            }
-        }
-        let route = '';
-        folders.slice().reverse().map((folder: Folder) => route += `/${folder.name}`);
-        if (route === '')
-            route = '/'
-        
-        router.push(`../project/${projectID}+${projectName?.replace(/ /g, '+')}/${route}`);
-    }
+				if (currentFolder) {
+					folders.push(currentFolder);
+				} else {
+					con = true;
+				}
+			}
+		}
+		let route = '';
+		folders.slice().reverse().map((folder: Folder) => route += `/${folder.name}`);
+		if (route === '')
+			route = '/'
+
+		router.push(`../project/${projectID}+${projectName?.replace(/ /g, '+')}/${route}`);
+		sessionStorage.setItem("reload", "yes");
+	}
 
 	return (
 		<div className="w-full bg-indigo-200/50 dark:bg-slate-800/50 border border-slate-700/50 p-3 mb-8">
@@ -103,7 +105,7 @@ export default function BackBtnBar({ back, projectID, folderID, projectName }: B
 						Home
 					</Link>
 				)}
-				
+
 				<Link
 					href="/signout"
 					className="flex items-center px-4 py-2 text-sm font-medium bg-indigo-600 rounded-lg 

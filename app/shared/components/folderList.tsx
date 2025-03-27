@@ -27,6 +27,7 @@ export default function FolderList({ folders }: { folders: Folder[] }) {
                             <Link
                                 className="bg-indigo-100 dark:bg-slate-800 hover:bg-indigo-400/50 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-200 transition-colors duration-200 rounded-lg text-xl my-4 px-4 py-2 gap-2 border border-slate-700/50 items-center flex"
                                 href={`${pathname}/${folder.name.replace(/ /g, '%20')}`}
+                                onClick={() => sessionStorage.setItem("reload", "yes")}
                             >
                                 <svg className="w-5 h-5 text-slate-900 dark:text-slate-200 flex-shrink-0" 
                                     fill="none"

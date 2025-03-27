@@ -152,6 +152,7 @@ function Home({ params }: ParamProps) {
             button.onclick = () => {
               const route = `/project/${projectID}+${project}${newHistory.join('/')}`;
               router.push(route);
+              sessionStorage.setItem("reload", "yes")
             }
 
             details.addEventListener("toggle", () => {
@@ -369,7 +370,7 @@ function Home({ params }: ParamProps) {
               <button
                 className="w-full text-left px-3 py-2 bg-indigo-400/50 dark:bg-indigo-600/50 hover:bg-indigo-400/50 hover:dark:bg-indigo-400/50 
                                   transition-all duration-200 rounded-md text-slate-900 dark:text-slate-200 font-medium flex items-center gap-2 shadow-sm hover:shadow"
-                onClick={() => { router.push(`/project/${projectID}+${project.replace(/%2B/g, '+')}`); }}
+                onClick={() => { router.push(`/project/${projectID}+${project.replace(/%2B/g, '+')}`); sessionStorage.setItem("reload", "yes"); }}
               >
                 <svg className="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round"
