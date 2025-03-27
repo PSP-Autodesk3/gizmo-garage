@@ -106,7 +106,7 @@ export default function FileList({ files }: { files: File[] }) {
                                 <div className='flex flex-wrap max-w-full'>
                                     {Array.isArray(file.tags) && file.tags.length > 0 && (
                                         file.tags.map((tag, index) => (
-                                            <span key={index} className='rounded-full m-1 p-1 text-xs bg-blue-600 self-center'>
+                                            <span key={index} className='rounded-full bg-indigo-700 text-slate-200 dark:text-slate-200 text-sm px-4 py-1 flex items-center text-center mb-2 mr-2'>
                                                 {tag.tag}
                                             </span>
                                         ))
