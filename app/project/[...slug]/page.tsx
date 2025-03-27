@@ -308,11 +308,11 @@ function Home({ params }: ParamProps) {
       setFilteredFiles(files);
     }
     else {
-      setFilteredFolders(folders.filter(folder => folder.name.toLowerCase().includes(query.trim())
-        || folder.tags.some(tag => tag.tag.toLowerCase().includes(query.trim()))));
+      setFilteredFolders(folders.filter(folder => folder.name.toLowerCase().includes(query.trim().toLowerCase())
+        || folder.tags.some(tag => tag.tag.toLowerCase().includes(query.trim().toLowerCase()))));
 
-      setFilteredFiles(files.filter(file => file.name.toLowerCase().includes(query.trim())
-        || file.tags.some(tag => tag.tag.toLowerCase().includes(query.trim()))));
+      setFilteredFiles(files.filter(file => file.name.toLowerCase().includes(query.trim().toLowerCase())
+        || file.tags.some(tag => tag.tag.toLowerCase().includes(query.trim().toLowerCase()))));
     }
   }, [query, files, folders])
 
