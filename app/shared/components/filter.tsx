@@ -10,11 +10,10 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 interface FiltersProps {
   query?: string;
   onQueryChange?: React.Dispatch<React.SetStateAction<string>>;
-  values?: number[];
   onValuesChange?: React.Dispatch<React.SetStateAction<number[]>>;
 }
 
-export default function Filters({ query, onQueryChange, values, onValuesChange }: FiltersProps) {
+export default function Filters({ query, onQueryChange }: FiltersProps) {
   const router = useRouter();
   const [isAdmin, setIsAdmin] = useState(false);
   const [user] = useAuthState(auth);

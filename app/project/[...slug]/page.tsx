@@ -33,7 +33,6 @@ function Home({ params }: ParamProps) {
   const [folders, setFolders] = useState<Folder[]>([]);
   const [files, setFiles] = useState<File[]>([]);
   const [query, setQuery] = useState<string>('');
-  const [values, setValues] = useState([20, 80]);
   const [confirmModule, setConfirmModule] = useState(false);
   const [id, setID] = useState(0);
   const [type, setType] = useState(0);
@@ -364,7 +363,7 @@ function Home({ params }: ParamProps) {
       <div className='flex m-auto'>
         {/* Filters */}
         <div id='Filter'>
-          <Filters query={query} onQueryChange={setQuery} values={values} onValuesChange={setValues} />
+          <Filters query={query} onQueryChange={setQuery} />
         </div>
 
         {/* Folder tree */}

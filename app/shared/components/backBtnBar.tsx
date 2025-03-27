@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 
 // Interfaces
 import { Folder } from "@/app/shared/interfaces/folder";
-import next from 'next';
 
 interface ButtonProps {
 	back?: boolean;
