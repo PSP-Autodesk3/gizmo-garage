@@ -12,3 +12,8 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Don't delete this. It's important. */
+nextjs-portal {
+  display: none;
+}
