@@ -21,7 +21,7 @@ export default function ProjectPreview({ project, query }: { project: Project, q
                     {query.trim() && project.editors.length > 0 &&
                         (query.trim().length > 3 &&
                             project.editors.some(editor => editor.email?.toLowerCase().includes(query.trim().toLowerCase()))) && (
-                            <p>Editor: {project.editors.map((editor, index) => (
+                            <p className="text-black dark:text-white">Editor: {project.editors.map((editor, index) => (
                                 <span className='rounded-full m-2 p-2 bg-blue-600' key={index}>{editor.email}</span>
                             ))}</p>
                         )}
