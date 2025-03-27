@@ -472,7 +472,7 @@ function Home({ params }: ParamProps) {
                     </div>
                     <div className={`bg-indigo-200 dark:bg-slate-800/50 dark:text-white text-slate-800 backdrop-blur mx-8 my-4 transition-all duration-300 rounded-lg overflow-hidden shadow-xl border border-slate-700/50 p-4 ${archiveStatus ? 'opacity-40 pointer-events-none' : ''}`}>
                         <h1 className="text-2xl text-center pb-4">Tag new version</h1>
-                            <input type="file" onChange={handleFileChange} className="mb-4 rounded-lg p-4 text-lg" />
+                            <input type="file" onChange={handleFileChange} className="mb-4 rounded-lg p-4 text-lg" aria-label="File Upload" />
                             <br />
                             <button
                                 onClick={handleUpload}
