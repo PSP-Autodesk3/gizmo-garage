@@ -25,7 +25,7 @@ export default function AuthenticatePrompt({loginErrorMessage}: AuthenticateProp
 
 
                     {loginErrorMessage && (
-                        <div id="error-message">
+                        <div id="error-message" className='text-center text-black dark:text-white'>
                             <p>{loginErrorMessage}</p>
                             <p>Open the console to view more details</p>
                         </div>
