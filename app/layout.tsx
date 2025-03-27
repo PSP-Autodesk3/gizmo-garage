@@ -2,10 +2,8 @@ import type { Metadata } from "next";
 import {ThemeProvider} from "@/app/shared/providers/themeProvider";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
-//skeleton loading
-import 'react-loading-skeleton/dist/skeleton.css'
 import ThemeSwitcher from "./shared/components/themeSwitcher";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
