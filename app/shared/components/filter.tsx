@@ -8,9 +8,6 @@ import Link from 'next/link';
 import { auth } from '@/app/firebase/config';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
-// Interface
-import { User } from '@/app/shared/interfaces/user';
-
 interface FiltersProps {
   query?: string;
   onQueryChange?: React.Dispatch<React.SetStateAction<string>>;
@@ -20,7 +17,6 @@ interface FiltersProps {
 
 export default function Filters({ query, onQueryChange, values, onValuesChange }: FiltersProps) {
   const router = useRouter();
-  const admin = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [user] = useAuthState(auth);
 
