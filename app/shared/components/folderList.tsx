@@ -43,7 +43,7 @@ export default function FolderList({ folders }: { folders: Folder[] }) {
                             </Link>
                             {Array.isArray(folder.tags) && folder.tags.length > 0 && (
                                 folder.tags.map((tag) => (
-                                    <span className='rounded-full m-2 p-2 bg-blue-600 self-center' key={tag.tag_id}>
+                                    <span className='rounded-full bg-indigo-700 text-slate-200 dark:text-slate-200 text-sm px-4 py-1 items-center text-center mb-2 mr-2' key={tag.tag_id}>
                                         {tag.tag}
                                     </span>
                                 ))
