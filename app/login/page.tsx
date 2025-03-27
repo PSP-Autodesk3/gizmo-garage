@@ -115,7 +115,7 @@ function Home() {
                   Reset Password
               </button>
               <div className="mt-4 text-slate-900 dark:text-slate-200">
-                  <Link href="/register" className='text-indigo-500 hover:underline cursor-pointer font-semibold mt-4'>Not a Member?</Link>
+                  <Link href="/register" className='text-indigo-700 dark:text-white hover:underline cursor-pointer font-semibold mt-4'>Not a Member?</Link>
               </div>
             </div>
         </form>

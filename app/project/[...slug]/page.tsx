@@ -33,7 +33,6 @@ function Home({ params }: ParamProps) {
   const [folders, setFolders] = useState<Folder[]>([]);
   const [files, setFiles] = useState<File[]>([]);
   const [query, setQuery] = useState<string>('');
-  const [values, setValues] = useState([20, 80]);
   const [confirmModule, setConfirmModule] = useState(false);
   const [id, setID] = useState(0);
   const [type, setType] = useState(0);
@@ -61,7 +60,7 @@ function Home({ params }: ParamProps) {
           && prevRoutes.every((route, index) => route === newRoutes[index])
           ? prevRoutes : newRoutes;
       });
-      
+
 
       async function getFolders(): Promise<Folder[]> {
         const query = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/folders/get`, {
@@ -72,7 +71,7 @@ function Home({ params }: ParamProps) {
 
         return await query.json();
       }
-      async function getFiles(): Promise<File[]>  {
+      async function getFiles(): Promise<File[]> {
         const query = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/items/get`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -101,15 +100,15 @@ function Home({ params }: ParamProps) {
             const button = document.createElement("button");
             button.className = `pl-4 flex items-center gap-2 py-2 px-3 text-slate-900 dark:text-slate-300 hover:text-slate-500 dark:hover:text-slate-50 transition-colors duration-200 flex-1 text-left tree-file
                               ${checkboxOpen === 'false' && 'hidden'}`;
-                              button.innerHTML = `
+            button.innerHTML = `
               <svg class="ml-2 w-5 h-5 text-slate-900 dark:text-slate-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
               </svg>
               ${file.name}`;
-              button.onclick = () => {
-                const route = `/item/${file.object_id}`;
-                router.push(route);
-              }
+            button.onclick = () => {
+              const route = `/item/${file.object_id}`;
+              router.push(route);
+            }
             parentObject.appendChild(button);
           })
 
@@ -152,6 +151,7 @@ function Home({ params }: ParamProps) {
             button.onclick = () => {
               const route = `/project/${projectID}+${project}${newHistory.join('/')}`;
               router.push(route);
+              sessionStorage.setItem("reload", "yes")
             }
 
             details.addEventListener("toggle", () => {
@@ -162,7 +162,7 @@ function Home({ params }: ParamProps) {
             summary.appendChild(button);
             details.appendChild(summary);
             parentObject.appendChild(details);
-            
+
             outputFolder(folder.folder_id, details, newValid, newDepth, newHistory);
           })
         }
@@ -174,7 +174,7 @@ function Home({ params }: ParamProps) {
       // Get stored data
       const storedFolders = sessionStorage.getItem(`folders_${projectID}`);
       const storedFiles = sessionStorage.getItem(`files_${projectID}`);
-      
+
       // Load stored folders
       let folders: Folder[];
       if (storedFolders) {
@@ -209,24 +209,37 @@ function Home({ params }: ParamProps) {
         displayTree(newFolders, newFiles);
       }
 
+      let usableFiles: File[] = [];
       if (currentFolder) {
-        setFiles(newFiles.filter((file: File) => file.folder_id === currentFolder?.folder_id))
-        setFilteredFiles(newFiles.filter((file: File) => file.folder_id === currentFolder?.folder_id))
+        usableFiles = newFiles.filter((file: File) => file.folder_id === currentFolder?.folder_id);
+        usableFiles = sortArray(usableFiles, { by: 'dateOfCreation', order: 'desc' });
+        setFiles(usableFiles);
+        setFilteredFiles(usableFiles);
       } else {
-        setFiles(newFiles.filter((file: File) => file.folder_id === null))
-        setFilteredFiles(newFiles.filter((file: File) => file.folder_id === null))
+        usableFiles = newFiles.filter((file: File) => file.folder_id === null);
+        usableFiles = sortArray(usableFiles, { by: 'dateOfCreation', order: 'desc' });
+        setFiles(usableFiles);
+        setFilteredFiles(usableFiles);
       }
 
       setID(currentFolder ? (currentFolder.folder_id) : (projectID));
       setType(currentFolder ? (0) : (1));
 
+      let usableFolders: Folder[] = []
       if (currentFolder) {
-        setFolders(newFolders.filter((folder: Folder) => folder.parent_folder_id === currentFolder?.folder_id));
-        setFilteredFolders(newFolders.filter((folder: Folder) => folder.parent_folder_id === currentFolder?.folder_id));
+        usableFolders = newFolders.filter((folder: Folder) => folder.parent_folder_id === currentFolder?.folder_id);
+        usableFolders = sortArray(usableFolders, { by: 'dateOfCreation', order: 'desc' });
+        setFolders(usableFolders);
+        setFilteredFolders(usableFolders);
       } else {
-        setFolders(newFolders.filter((folder: Folder) => folder.parent_folder_id === null));
-        setFilteredFolders(newFolders.filter((folder: Folder) => folder.parent_folder_id === null));
+        usableFolders = newFolders.filter((folder: Folder) => folder.parent_folder_id === null);
+        usableFolders = sortArray(usableFolders, { by: 'dateOfCreation', order: 'desc' });
+        setFolders(usableFolders);
+        setFilteredFolders(usableFolders);
       }
+
+      console.log(usableFiles);
+      console.log(usableFolders);
       // Get Tags
 
       // All Tags
@@ -254,16 +267,17 @@ function Home({ params }: ParamProps) {
 
       const folderTags = await folderTagsQuery.json();
 
-      folders.forEach((folder: Folder) => {
+      usableFolders.forEach((folder: Folder) => {
         folder.tags = folderTags.filter((tag: FolderTags) => tag.folder_id === folder.folder_id);
       });
 
       // Adds tags to files
-      files.forEach((file: File) => {
+      usableFiles.forEach((file: File) => {
         file.tags = objectTags.filter((tag: ItemTags) => tag.object_id === file.object_id);
+        console.log(file.tags);
       });
 
-      const checkbox = document.getElementById('file-checkbox'); 
+      const checkbox = document.getElementById('file-checkbox');
       if (checkbox) {
         (checkbox as HTMLInputElement).checked = checkboxOpen === 'true'; // Docs on HTMLInputElement https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement#instance_properties_that_apply_only_to_elements_of_type_checkbox_or_radio
         checkbox.addEventListener('change', () => {
@@ -349,7 +363,7 @@ function Home({ params }: ParamProps) {
       <div className='flex m-auto'>
         {/* Filters */}
         <div id='Filter'>
-          <Filters query={query} onQueryChange={setQuery} values={values} onValuesChange={setValues} />
+          <Filters query={query} onQueryChange={setQuery} />
         </div>
 
         {/* Folder tree */}
@@ -359,7 +373,7 @@ function Home({ params }: ParamProps) {
               <button
                 className="w-full text-left px-3 py-2 bg-indigo-400/50 dark:bg-indigo-600/50 hover:bg-indigo-400/50 hover:dark:bg-indigo-400/50 
                                   transition-all duration-200 rounded-md text-slate-900 dark:text-slate-200 font-medium flex items-center gap-2 shadow-sm hover:shadow"
-                onClick={() => { router.push(`/project/${projectID}+${project.replace(/%2B/g, '+')}`); }}
+                onClick={() => { router.push(`/project/${projectID}+${project.replace(/%2B/g, '+')}`); sessionStorage.setItem("reload", "yes"); }}
               >
                 <svg className="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round"
@@ -370,12 +384,12 @@ function Home({ params }: ParamProps) {
                 {project.replace(/%2B/g, ' ')}
               </button>
               <div className="flex flex-row mt-[20px] gap-[7.5px]">
-              <input
-                id="file-checkbox"
-                type="checkbox"
-                defaultChecked={sessionStorage.getItem('checkboxOpen') === 'true'}
-                className={`m-1 w-4 h-4 checked:bg-green-600 checked:border-green-600 bg-red-600 border-red-600 border-2 appearance-none rounded transition-colors duration-200`}
-              />
+                <input
+                  id="file-checkbox"
+                  type="checkbox"
+                  defaultChecked={sessionStorage.getItem('checkboxOpen') === 'true'}
+                  className={`m-1 w-4 h-4 checked:bg-green-600 checked:border-green-600 bg-red-600 border-red-600 border-2 appearance-none rounded transition-colors duration-200`}
+                />
                 <p>Show files</p>
               </div>
             </div>
@@ -463,7 +477,8 @@ function Home({ params }: ParamProps) {
 
           {/* Confirmation for creating new items */}
           {(confirmModule) && (
-            <div className="fixed inset-0 flex border-slate-700/50 border items-center justify-center bg-indigo-200 dark:bg-slate-900 text-slate-900 dark:text-slate-200 w-[40%] h-[50%] m-auto rounded-lg mt-16">
+          <div className="fixed inset-0 flex items-center justify-center overflow-auto">
+            <div className="text-slate-900 dark:text-slate-200 relative bg-indigo-200 dark:bg-slate-900 border border-slate-700/50 rounded-lg p-6 w-[600px] max-h-[80vh] overflow-y-auto m-4">
               <ConfirmModule
                 itemType={(moduleType === 1 ? "Folder" : "File")}
                 projectID={projectID}
@@ -477,6 +492,7 @@ function Home({ params }: ParamProps) {
                 setFilteredTags={setFilteredTags}
               />
             </div>
+          </div>
           )}
         </div>
       </div>

@@ -137,7 +137,7 @@ function Home() {
                     <button type="submit" className="text-white px-6 py-3 text-lg font-medium bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50">
                         Sign up
                     </button>
-                    <Link href="/login" className='text-indigo-500 hover:underline cursor-pointer'>
+                    <Link href="/login" className='text-indigo-700 dark:text-white hover:underline cursor-pointer'>
                         Already a Member?
                     </Link>
                 </div>

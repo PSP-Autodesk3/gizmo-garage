@@ -6,10 +6,6 @@ import { useEffect } from "react";
 // Interfaces
 import { File } from "@/app/shared/interfaces/file";
 
-// Skeleton Loading
-import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
-import 'react-loading-skeleton/dist/skeleton.css'
-
 // Other
 import { useRouter } from "next/navigation";
 
@@ -70,14 +66,11 @@ export default function FileList({ files }: { files: File[] }) {
             }
         }
     }, [files, router]);
+    
 
     return (
         <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4">
-            {!files ? (
-                <SkeletonTheme baseColor='#0f172a' highlightColor='#1e293b' enableAnimation duration={0.5}>
-                    <Skeleton width={100} height={100} style={{ margin: '5px' }} className="bg-red-500" />
-                </SkeletonTheme>
-            ) : (
+            {files && (
                 Array.isArray(files) && files.length > 0 && (
                     files.map((file) => (
                         <div key={file.object_id}>
@@ -113,7 +106,7 @@ export default function FileList({ files }: { files: File[] }) {
                                 <div className='flex flex-wrap max-w-full'>
                                     {Array.isArray(file.tags) && file.tags.length > 0 && (
                                         file.tags.map((tag, index) => (
-                                            <span key={index} className='rounded-full m-1 p-1 text-xs bg-blue-600 self-center'>
+                                            <span key={index} className='rounded-full bg-indigo-700 text-slate-200 dark:text-slate-200 text-sm px-4 py-1 flex items-center text-center mb-2 mr-2'>
                                                 {tag.tag}
                                             </span>
                                         ))

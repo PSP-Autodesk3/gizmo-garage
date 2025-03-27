@@ -19,13 +19,14 @@ router.get("/create", async (_req, res, next) => {
           user_id INT PRIMARY KEY AUTO_INCREMENT,
           email VARCHAR(255) NOT NULL,
           fname VARCHAR(255) NOT NULL,
-          lname VARCHAR(255) NOT NULL
+          lname VARCHAR(255) NOT NULL,
+          admin TINYINT(1) DEFAULT 0 NOT NULL
         );
       `);
 
     // Just for development, delete for final version
     await pool.execute(`
-        INSERT INTO Users (user_id, email, fname, lname) VALUES (1,'John.Doe@outlook.com','John','Doe'), (2,'User@email.com','New','User');
+        INSERT INTO Users (user_id, email, fname, lname, admin) VALUES (1,'John.Doe@outlook.com','John','Doe', 1), (2,'User@email.com','New','User', 0);
       `);
 
     await pool.execute(`

@@ -28,7 +28,7 @@ export default function ProjectPreview({ project, query }: { project: Project, q
                 </div>
                 {project.tags.length > 0 && (
                     <p>{project.tags.map((tag, index) => (
-                        <span className='rounded-full m-2 p-2 bg-blue-600' key={index}>{tag.tag}</span>
+                        <span className='rounded-full bg-indigo-700 text-slate-200 dark:text-slate-200 text-sm px-4 py-2 items-center text-center mr-2 mb-2' key={index}>{tag.tag}</span>
                     ))}</p>
                 )}
             </div>

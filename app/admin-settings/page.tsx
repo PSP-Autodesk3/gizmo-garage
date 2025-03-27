@@ -5,12 +5,14 @@ import withAuth from "@/app/lib/withAuth";
 
 // Other
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation';
 
 // Components
 import BackBtnBar from '@/app/shared/components/backBtnBar';;
 
 // Firebase
 import { auth } from '@/app/firebase/config';
+import { useAuthState } from 'react-firebase-hooks/auth';
 import { reauthenticateWithCredential, sendPasswordResetEmail } from 'firebase/auth';
 import { EmailAuthProvider } from "firebase/auth/web-extension";
 
@@ -19,6 +21,7 @@ import { User } from '@/app/shared/interfaces/user';
 import { Tag } from '@/app/shared/interfaces/tag';
 
 function Home() {
+  const [user] = useAuthState(auth);
   const [databaseExists, setDatabaseExists] = useState(2);
   const [confirmModule, setConfirmModule] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
@@ -31,7 +34,35 @@ function Home() {
   const [error, setError] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
+  useEffect(() => {
+    if (user) {
+      const checkAdmin = async () => {
+        try {
+          const response = await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/users/checkAdmin`, {
+            method: "POST",
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              email: user.email
+            })
+          });
+
+          const isAdmin = (await response.json()).isAdmin;
+
+          if (!isAdmin) {
+            router.push("/");
+          }
+        } catch (error) {
+          console.error('Error checking admin:', error);
+          router.push("/");
+        }
+      };
+     checkAdmin();
+    }
+  }, [user, router]);
 
   //fetch all tags
   const fetchTags = async () => {
@@ -132,7 +163,7 @@ function Home() {
       // Get the current user status
       const user = users.find(u => u.uid === uid) // Changed from user_id to uid
       if (!user) return;
-  
+
       await fetch(`http://${process.env.NEXT_PUBLIC_SERVER_HOST}:3001/users/updateStatus`, {
         method: "PUT",
         headers: {
@@ -143,7 +174,7 @@ function Home() {
           disabled: !user.disabled
         })
       })
-  
+
       setUsers(users.map(u => u.uid === uid ? // Changed from user_id to uid
         { ...u, disabled: !u.disabled } : u))
     } catch (error) {
@@ -241,14 +272,14 @@ function Home() {
   return (
     <>
       <div className={`min-h-screen ${confirmModule ? 'blur-xl bg-opacity-40' : ''}`}>
-        <BackBtnBar/>
+        <BackBtnBar />
         {/* Header */}
         <h1 className="text-4xl font-semibold text-slate-900 dark:text-slate-200 w-[40%] m-auto mb-2 mt-16">
           Admin Settings
         </h1>
         {/* Database Reset Popup */}
         <div className="fixed bottom-0 left-50 right-0 m-4 rounded-lg bg-indigo-500 dark:bg-indigo-600 p-2 text-white text-center text-sm popup hidden">
-          {(databaseExists == 1) ? ( <h1 className="text-xl font-bold">Database Reset.</h1> ) : ( <h1 className="text-xl font-bold">Database Created.</h1> )}
+          {(databaseExists == 1) ? (<h1 className="text-xl font-bold">Database Reset.</h1>) : (<h1 className="text-xl font-bold">Database Created.</h1>)}
         </div>
         {/* Password Reset Popup */}
         <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 m-4 rounded-lg bg-indigo-500 p-2 text-gray-200 dark:text-white text-center text-sm password-reset-popup hidden">
@@ -321,12 +352,12 @@ function Home() {
                         fill="none"
                         viewBox="0 0 24 24"
                       >
-                        <path 
-                        stroke="currentColor" 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round" 
-                        strokeWidth="2" 
-                        d="M6 18 17.94 6M18 18 6.06 6" />
+                        <path
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M6 18 17.94 6M18 18 6.06 6" />
                       </svg>{tag.tag}</button>
                   ))
                 ) : <p className='m-auto text-sm text-slate-200'>No tags found</p>}
@@ -424,13 +455,13 @@ function Home() {
         <>
           <div className="fixed inset-0 flex items-center justify-center bg-indigo-200 border border-slate-700/50 dark:bg-slate-900 w-[40%] h-[40%] m-auto rounded-3xl p-8">
             <div className="text-center text-slate-900 dark:text-slate-200">
-              <h1 className='text-3xl'>This will clear all data.</h1> 
+              <h1 className='text-3xl'>This will clear all data.</h1>
               <strong>This action is irreversible.</strong> <p> Your password is needed to complete this action.</p>
               <form onSubmit={(e) => e.preventDefault()} autoComplete="off">
-                <input 
+                <input
                   className="w-full p-2 my-2 rounded-lg border border-gray-700/50 text-gray-800
-                    bg-indigo-100 dark:bg-slate-800 dark:border-slate-700 dark:text-white"  
-                  type="password" 
+                    bg-indigo-100 dark:bg-slate-800 dark:border-slate-700 dark:text-white"
+                  type="password"
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -443,14 +474,14 @@ function Home() {
               </form>
               {/* Buttons */}
               <div className="mt-4">
-                <button 
+                <button
                   className="px-6 m-1 py-3 text-lg font-medium text-white bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
                   onClick={validatePasswordAndReset}
                 >
                   Reset
                 </button>
-                <button 
-                  className="px-6 m-1 py-3 text-lg font-medium text-white bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50" 
+                <button
+                  className="px-6 m-1 py-3 text-lg font-medium text-white bg-indigo-600 rounded-lg transition-all duration-300 hover:bg-indigo-500 hover:scale-105 shadow-lg hover:shadow-indigo-500/50"
                   onClick={() => {
                     setConfirmModule(false);
                     setPassword('');
