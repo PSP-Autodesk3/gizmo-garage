@@ -46,7 +46,7 @@ function Home() {
     }
     else {
       // Display where the search equals the query or matches at least one of the tags
-      setFilteredProjects(projects.filter(project => project.name.toLowerCase().includes(query.trim()) ||
+      setFilteredProjects(projects.filter(project => project.name.toLowerCase().trim().includes(query.trim().toLowerCase()) ||
         project.tags.some(tag => tag.tag.toLowerCase().includes(query.trim())) ||
         (query.trim().length > 3 &&
           project.editors.some(editor => editor.email?.toLowerCase().includes(query.trim().toLowerCase())))));
