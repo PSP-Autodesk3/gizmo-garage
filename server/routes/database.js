@@ -26,7 +26,7 @@ router.get("/create", async (_req, res, next) => {
 
     // Just for development, delete for final version
     await pool.execute(`
-        INSERT INTO Users (user_id, email, fname, lname, admin) VALUES (1,'John.Doe@outlook.com','John','Doe', 1), (2,'User@email.com','New','User', 1);
+        INSERT INTO Users (user_id, email, fname, lname, admin) VALUES (1,'John.Doe@outlook.com','John','Doe', 1), (2,'User@email.com','New','User', 0);
       `);
 
     await pool.execute(`
