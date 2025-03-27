@@ -152,6 +152,7 @@ function Home({ params }: ParamProps) {
             button.onclick = () => {
               const route = `/project/${projectID}+${project}${newHistory.join('/')}`;
               router.push(route);
+              sessionStorage.setItem("reload", "yes")
             }
 
             details.addEventListener("toggle", () => {
@@ -209,33 +210,37 @@ function Home({ params }: ParamProps) {
         displayTree(newFolders, newFiles);
       }
 
+      let usableFiles: File[] = [];
       if (currentFolder) {
-        // Sort by new initially
-        const sortedFiles = sortArray(newFiles, { by: 'dateOfCreation', order: 'desc' });
-        setFiles(sortedFiles.filter((file: File) => file.folder_id === currentFolder?.folder_id))
-        setFilteredFiles(sortedFiles.filter((file: File) => file.folder_id === currentFolder?.folder_id))
+        usableFiles = newFiles.filter((file: File) => file.folder_id === currentFolder?.folder_id);
+        usableFiles = sortArray(usableFiles, { by: 'dateOfCreation', order: 'desc' });
+        setFiles(usableFiles);
+        setFilteredFiles(usableFiles);
       } else {
-        // Sort by new initially
-        const sortedFiles = sortArray(newFiles, { by: 'dateOfCreation', order: 'desc' });
-        setFiles(sortedFiles.filter((file: File) => file.folder_id === null))
-        setFilteredFiles(sortedFiles.filter((file: File) => file.folder_id === null))
+        usableFiles = newFiles.filter((file: File) => file.folder_id === null);
+        usableFiles = sortArray(usableFiles, { by: 'dateOfCreation', order: 'desc' });
+        setFiles(usableFiles);
+        setFilteredFiles(usableFiles);
       }
 
       setID(currentFolder ? (currentFolder.folder_id) : (projectID));
       setType(currentFolder ? (0) : (1));
 
+      let usableFolders: Folder[] = []
       if (currentFolder) {
-        // Sort by new initially
-        const sortedfolders = sortArray(newFolders, { by: 'dateOfCreation', order: 'desc' });
-        setFolders(sortedfolders.filter((folder: Folder) => folder.parent_folder_id === currentFolder?.folder_id));
-        setFilteredFolders(sortedfolders.filter((folder: Folder) => folder.parent_folder_id === currentFolder?.folder_id));
+        usableFolders = newFolders.filter((folder: Folder) => folder.parent_folder_id === currentFolder?.folder_id);
+        usableFolders = sortArray(usableFolders, { by: 'dateOfCreation', order: 'desc' });
+        setFolders(usableFolders);
+        setFilteredFolders(usableFolders);
       } else {
-        // Sort by new initially
-        const sortedfolders = sortArray(newFolders, { by: 'dateOfCreation', order: 'desc' });
-
-        setFolders(sortedfolders.filter((folder: Folder) => folder.parent_folder_id === null));
-        setFilteredFolders(sortedfolders.filter((folder: Folder) => folder.parent_folder_id === null));
+        usableFolders = newFolders.filter((folder: Folder) => folder.parent_folder_id === null);
+        usableFolders = sortArray(usableFolders, { by: 'dateOfCreation', order: 'desc' });
+        setFolders(usableFolders);
+        setFilteredFolders(usableFolders);
       }
+
+      console.log(usableFiles);
+      console.log(usableFolders);
       // Get Tags
 
       // All Tags
@@ -263,13 +268,14 @@ function Home({ params }: ParamProps) {
 
       const folderTags = await folderTagsQuery.json();
 
-      folders.forEach((folder: Folder) => {
+      usableFolders.forEach((folder: Folder) => {
         folder.tags = folderTags.filter((tag: FolderTags) => tag.folder_id === folder.folder_id);
       });
 
       // Adds tags to files
-      files.forEach((file: File) => {
+      usableFiles.forEach((file: File) => {
         file.tags = objectTags.filter((tag: ItemTags) => tag.object_id === file.object_id);
+        console.log(file.tags);
       });
 
       const checkbox = document.getElementById('file-checkbox');
@@ -368,7 +374,7 @@ function Home({ params }: ParamProps) {
               <button
                 className="w-full text-left px-3 py-2 bg-indigo-400/50 dark:bg-indigo-600/50 hover:bg-indigo-400/50 hover:dark:bg-indigo-400/50 
                                   transition-all duration-200 rounded-md text-slate-900 dark:text-slate-200 font-medium flex items-center gap-2 shadow-sm hover:shadow"
-                onClick={() => { router.push(`/project/${projectID}+${project.replace(/%2B/g, '+')}`); }}
+                onClick={() => { router.push(`/project/${projectID}+${project.replace(/%2B/g, '+')}`); sessionStorage.setItem("reload", "yes"); }}
               >
                 <svg className="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round"

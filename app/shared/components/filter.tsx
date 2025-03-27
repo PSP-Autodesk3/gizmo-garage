@@ -59,14 +59,6 @@ export default function Filters({ query, onQueryChange, values, onValuesChange }
               <div className='flex text-3xl font-semibold items-center pr-6'>Gizmo Garage</div>
             </div>
           </Link>
-          {values && onValuesChange && (
-            <div id='Filters'>
-              <div className='flex flex-row justify-between pl-5 pr-5 text-xl'>
-                <p id="lower">{values[0]}</p>
-                <p id="higher">{values[1]}</p>
-              </div>
-            </div>
-          )}
           {onQueryChange && (
             <div id="search" className='pt-4 '>
               <label htmlFor="search=bar">Search Projects</label>

@@ -28,7 +28,7 @@ export default function Breadcrumbs({projectID, project, routes}: BreadcrumbsPro
             <h1>&nbsp;&nbsp;&gt;&nbsp;&nbsp;</h1>
             <button
                 className="transition-colors duration-300 hover:text-indigo-800 dark:hover:text-indigo-400"
-                onClick={() => { router.push(`/project/${projectID}+${project.replace(/%2B/g, '+')}`); }}
+                onClick={() => { router.push(`/project/${projectID}+${project.replace(/%2B/g, '+')}`); sessionStorage.setItem("reload", "yes"); }}
             >
                 {project.replace(/%2B/g, ' ')}
             </button>
