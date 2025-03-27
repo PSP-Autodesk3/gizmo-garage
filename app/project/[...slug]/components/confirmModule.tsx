@@ -299,7 +299,7 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                         <div className='dark:bg-slate-800 border border-slate-700/50 rounded-lg overflow-hidden flex flex-wrap w-[90%]'>
                             {filteredTags.length > 0 ? (
                                 filteredTags.map((tag: Tag) => (
-                                    <button type="button" className='m-2 rounded-full bg-blue-600 dark:text-white text-gray-800 text-sm px-4 py-2 flex items-center text-center' onClick={() => applyTag(tag.tag_id)} key={tag.tag_id}>{tag.tag}</button>
+                                    <button type="button" className='m-2 rounded-full bg-indigo-700 text-slate-200 dark:text-slate-200 text-sm px-4 py-2 items-center text-center py-2 flex items-center text-center' onClick={() => applyTag(tag.tag_id)} key={tag.tag_id}>{tag.tag}</button>
                                 ))
                             ) : (
                                 <span className='text-gray-800 dark:text-white m-auto p-2'>No tags found</span>
@@ -311,24 +311,25 @@ export default function ConfirmModule({ itemType, projectID, type, id, setConfir
                             {appliedTags.length > 0 ? (
                                 appliedTags.map((tag: Tag) => (
                                     <button type='button'
-                                        className='rounded-full overflow-hidden white-space-nowrap truncate m-1 bg-blue-600 text-white text-sm px-4 py-2 flex max-w-[100px] items-center text-center'
+                                        className='rounded-full bg-indigo-700 text-slate-200 dark:text-slate-200 text-sm px-4 py-2 items-center text-center flex items-center text-center mr-2 mb-2'
                                         onClick={() => removeTag(tag.tag_id)}
                                         key={tag.tag_id}
                                     >
                                         <svg
-                                            className="w-6 h-6 flex-shrink-0 text-blue-800 dark:text-white"
+                                            className="w-4 h-4 flex-shrink-0 text-slate-200 hover:font-bold mr-2"
                                             aria-hidden="true"
                                             xmlns="http://www.w3.org/2000/svg"
                                             width="15"
                                             height="15"
                                             fill="none"
-                                            viewBox="0 0 24 24">
-                                            <path
-                                                stroke="currentColor"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth="2"
-                                                d="M6 18 17.94 6M18 18 6.06 6" />
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path 
+                                            stroke="currentColor" 
+                                            strokeLinecap="round" 
+                                            strokeLinejoin="round" 
+                                            strokeWidth="2" 
+                                            d="M6 18 17.94 6M18 18 6.06 6" />
                                         </svg>{tag.tag}</button>
                                 ))
                             ) : (
